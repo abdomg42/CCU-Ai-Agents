@@ -1,0 +1,6 @@
+{
+  "title": "Service LAN non opérationnel",
+  "description": "Leroy Network (acc-44444) signale que son service LAN VPN svc-lan-44444 ne fonctionne pas. Le port switch est ge-0/0/42.",
+  "source": "noc",
+  "priority": "P2"
+}

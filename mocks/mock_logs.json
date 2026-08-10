@@ -1,0 +1,92 @@
+[
+  {
+    "log_id": "log-001",
+    "timestamp": "2026-08-08T14:23:11Z",
+    "severity": "ERROR",
+    "service_id": "svc-fiber-12345",
+    "order_id": "ord-2026-001",
+    "source": "olt-north-03",
+    "message": "Perte de signal optique détectée sur l'interface PON 7/3/2. RX power -32 dBm (seuil -28 dBm)."
+  },
+  {
+    "log_id": "log-002",
+    "timestamp": "2026-08-08T14:24:05Z",
+    "severity": "WARNING",
+    "service_id": "svc-fiber-12345",
+    "order_id": "ord-2026-001",
+    "source": "ccu-provisioner",
+    "message": "Tentative de provisioning CPE refusée : service_id svc-fiber-12345 en état DOWN côté OLT."
+  },
+  {
+    "log_id": "log-003",
+    "timestamp": "2026-08-09T09:10:00Z",
+    "severity": "ERROR",
+    "service_id": "svc-mobile-98765",
+    "order_id": "ord-2026-002",
+    "source": "crm-adapter",
+    "message": "CRM POST /customer/acc-56789/subscription timeout après 30s. HTTP 504 Gateway Timeout."
+  },
+  {
+    "log_id": "log-004",
+    "timestamp": "2026-08-09T09:10:02Z",
+    "severity": "ERROR",
+    "service_id": "svc-mobile-98765",
+    "order_id": "ord-2026-002",
+    "source": "tmf622-adapter",
+    "message": "Order ord-2026-002 bloquée en state 'acknowledged' : impossible de récupérer le profile client depuis CRM."
+  },
+  {
+    "log_id": "log-005",
+    "timestamp": "2026-08-09T11:45:33Z",
+    "severity": "INFO",
+    "service_id": "svc-mobile-98765",
+    "order_id": "ord-2026-002",
+    "source": "tmf622-adapter",
+    "message": "Retry CRM OK après 3 tentatives, passage en state 'inProgress'."
+  },
+  {
+    "log_id": "log-006",
+    "timestamp": "2026-08-10T08:12:19Z",
+    "severity": "ERROR",
+    "service_id": "svc-sim-11111",
+    "order_id": "ord-2026-003",
+    "source": "hss-activation",
+    "message": "IMSI 208150123456789 non trouvé. Activation SIM rejetée avec cause 'Unknown subscriber'."
+  },
+  {
+    "log_id": "log-007",
+    "timestamp": "2026-08-10T08:12:20Z",
+    "severity": "WARNING",
+    "service_id": "svc-sim-11111",
+    "order_id": "ord-2026-003",
+    "source": "tmf622-adapter",
+    "message": "Order ord-2026-003 : caractéristique ICCID '8988228066123456789' non provisionnée dans le HLR."
+  },
+  {
+    "log_id": "log-008",
+    "timestamp": "2026-08-10T10:05:00Z",
+    "severity": "ERROR",
+    "service_id": "svc-lan-44444",
+    "order_id": "ord-2026-004",
+    "source": "switch-core-01",
+    "message": "VLAN mismatch détecté : port ge-0/0/42 tagged VLAN 120, service svc-lan-44444 attend VLAN 210."
+  },
+  {
+    "log_id": "log-009",
+    "timestamp": "2026-08-10T10:05:01Z",
+    "severity": "ERROR",
+    "service_id": "svc-lan-44444",
+    "order_id": "ord-2026-004",
+    "source": "ccu-provisioner",
+    "message": "Echec provisioning L2 : VLAN du service ne correspond pas à la configuration du port."
+  },
+  {
+    "log_id": "log-010",
+    "timestamp": "2026-08-10T13:30:00Z",
+    "severity": "WARNING",
+    "service_id": "svc-bill-99999",
+    "order_id": null,
+    "source": "billing-engine",
+    "message": "Montant facture hors tolérance : +0.03 € par rapport à la somme des usages. Écart considéré comme négligeable."
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "title": "Activation SIM échouée",
+  "description": "Client Bernard Mobile (acc-11111) ne peut pas activer sa nouvelle SIM. Commande ord-2026-003, service svc-sim-11111, ICCID 8988228066123456789.",
+  "source": "support",
+  "priority": "P2"
+}

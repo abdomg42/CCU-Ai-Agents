@@ -1,0 +1,5 @@
+{
+  "expected_cause": "VLAN mismatch entre service et port switch",
+  "expected_risk": "Moyen",
+  "expected_validation": "approuvée_conditionnelle"
+}

@@ -1,0 +1,8 @@
+{
+  "ticket_id": "TICK-2025-027",
+  "summary": "Commande mobile bloquée en acknowledged",
+  "description": "Une commande TMF622 reste bloquée en state 'acknowledged'. Les logs CRM indiquent un timeout 504 lors de la récupération du profil client. Cause : indisponibilité temporaire du CRM. Action : relancer l'appel CRM et forcer le passage en 'inProgress' si le retry réussit.",
+  "root_cause": "Timeout CRM lors de la récupération du profil client",
+  "resolution": "Retry CRM et passage manuel en inProgress",
+  "tags": ["tmf622", "crm", "timeout", "acknowledged"]
+}

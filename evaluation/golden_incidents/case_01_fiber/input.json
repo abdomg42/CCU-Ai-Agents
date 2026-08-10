@@ -1,0 +1,6 @@
+{
+  "title": "Coupure fibre client Dupont SARL",
+  "description": "Le client Dupont SARL (acc-12345) signale une coupure Internet sur son service svc-fiber-12345. La commande ord-2026-001 est bloquée en provisioning CPE.",
+  "source": "noc",
+  "priority": "P2"
+}

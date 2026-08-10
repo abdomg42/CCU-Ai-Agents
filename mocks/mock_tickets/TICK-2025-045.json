@@ -1,0 +1,8 @@
+{
+  "ticket_id": "TICK-2025-045",
+  "summary": "VLAN mismatch sur port switch",
+  "description": "Le service LAN ne monte pas. Le switch remonte un VLAN mismatch : le port est taggé VLAN 120 alors que le service attend le VLAN 210. Cause : erreur de configuration du port. Action : corriger le VLAN sur le port du switch.",
+  "root_cause": "VLAN mismatch entre service et port switch",
+  "resolution": "Correction du VLAN sur le port switch",
+  "tags": ["lan", "vlan", "switch", "misconfiguration"]
+}

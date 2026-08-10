@@ -1,0 +1,8 @@
+{
+  "ticket_id": "TICK-2025-052",
+  "summary": "Écart de facturation mineur non expliqué",
+  "description": "Client signale un écart de 0.03 € sur sa facture. Aucun log technique anormal. Aucune commande récente. Cause non déterminée. Action : crédit manuel ou escalade vers billing support.",
+  "root_cause": "indéterminée",
+  "resolution": "Crédit manuel ou escalade billing",
+  "tags": ["billing", "écart", "indéterminé"]
+}

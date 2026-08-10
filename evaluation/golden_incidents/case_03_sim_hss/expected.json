@@ -1,0 +1,5 @@
+{
+  "expected_cause": "ICCID SIM non provisionnée dans le HLR",
+  "expected_risk": "Critique",
+  "expected_validation": "approuvée_conditionnelle"
+}

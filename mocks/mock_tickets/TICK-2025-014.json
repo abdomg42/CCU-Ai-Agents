@@ -1,0 +1,8 @@
+{
+  "ticket_id": "TICK-2025-014",
+  "summary": "Perte de signal fibre sur OLT Nord",
+  "description": "Client signale une coupure Internet. Logs OLT indiquent une perte de signal optique (RX power < -28 dBm). Cause : coupure fibre ou mauvais connecteur. Action : envoyer technicien sur site pour contrôle du point de terminaison optique.",
+  "root_cause": "Perte de signal fibre optique",
+  "resolution": "Raccordement fibre réparé sur le PTO",
+  "tags": ["fiber", "olt", "signal", "pon"]
+}

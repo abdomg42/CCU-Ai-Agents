@@ -1,0 +1,6 @@
+{
+  "title": "Écart facture Petit Consulting",
+  "description": "Petit Consulting (acc-99999) conteste un écart de 0.03 € sur sa facture du service svc-bill-99999. Aucune commande récente.",
+  "source": "billing",
+  "priority": "P4"
+}

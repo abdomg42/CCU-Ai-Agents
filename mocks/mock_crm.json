@@ -1,0 +1,79 @@
+{
+  "customers": [
+    {
+      "customer_id": "acc-12345",
+      "name": "Dupont SARL",
+      "segment": "PME",
+      "contact": "support@dupont-sarl.fr",
+      "account_status": "active",
+      "subscriptions": [
+        {
+          "service_id": "svc-fiber-12345",
+          "offer": "Fibre Pro 500",
+          "status": "active",
+          "address": "12 rue des Lilas, 75011 Paris"
+        }
+      ]
+    },
+    {
+      "customer_id": "acc-56789",
+      "name": "Martin Telecom",
+      "segment": "Enterprise",
+      "contact": "noc@martin-telecom.com",
+      "account_status": "active",
+      "subscriptions": [
+        {
+          "service_id": "svc-mobile-98765",
+          "offer": "Mobile 5G Enterprise",
+          "status": "active",
+          "address": "45 avenue de la République, Lyon"
+        }
+      ]
+    },
+    {
+      "customer_id": "acc-11111",
+      "name": "Bernard Mobile",
+      "segment": "Particulier",
+      "contact": "bernard.mobile@email.fr",
+      "account_status": "active",
+      "subscriptions": [
+        {
+          "service_id": "svc-sim-11111",
+          "offer": "Forfait Nano SIM",
+          "status": "pending",
+          "address": "3 impasse du Port, Marseille"
+        }
+      ]
+    },
+    {
+      "customer_id": "acc-44444",
+      "name": "Leroy Network",
+      "segment": "PME",
+      "contact": "admin@leroy-network.fr",
+      "account_status": "active",
+      "subscriptions": [
+        {
+          "service_id": "svc-lan-44444",
+          "offer": "LAN Pro VPN",
+          "status": "active",
+          "address": "8 rue de l'Industrie, Lille"
+        }
+      ]
+    },
+    {
+      "customer_id": "acc-99999",
+      "name": "Petit Consulting",
+      "segment": "TPE",
+      "contact": "contact@petit-consulting.fr",
+      "account_status": "active",
+      "subscriptions": [
+        {
+          "service_id": "svc-bill-99999",
+          "offer": "Cloud Voice",
+          "status": "active",
+          "address": "21 boulevard Haussmann, Paris"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "order_id": "ord-2026-001",
+    "customer_id": "acc-12345",
+    "service_id": "svc-fiber-12345",
+    "product": "Fibre Pro 500",
+    "status": "inProgress",
+    "reason": "Provisioning CPE en cours",
+    "characteristics": {
+      "bandwidth": "500 Mbps",
+      "olt_port": "7/3/2"
+    }
+  },
+  {
+    "order_id": "ord-2026-002",
+    "customer_id": "acc-56789",
+    "service_id": "svc-mobile-98765",
+    "product": "Mobile 5G Enterprise",
+    "status": "acknowledged",
+    "reason": "Attente CRM customer profile",
+    "characteristics": {
+      "imei": "351234567890123",
+      "sim_profile": "Enterprise_V3"
+    }
+  },
+  {
+    "order_id": "ord-2026-003",
+    "customer_id": "acc-11111",
+    "service_id": "svc-sim-11111",
+    "product": "Forfait Nano SIM",
+    "status": "failed",
+    "reason": "SIM non reconnue par le HSS",
+    "characteristics": {
+      "iccid": "8988228066123456789",
+      "imsi": "208150123456789"
+    }
+  },
+  {
+    "order_id": "ord-2026-004",
+    "customer_id": "acc-44444",
+    "service_id": "svc-lan-44444",
+    "product": "LAN Pro VPN",
+    "status": "failed",
+    "reason": "VLAN mismatch port/switch",
+    "characteristics": {
+      "vlan": "210",
+      "switch_port": "ge-0/0/42"
+    }
+  }
+]

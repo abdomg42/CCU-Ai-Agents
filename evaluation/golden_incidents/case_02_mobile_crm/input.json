@@ -1,0 +1,6 @@
+{
+  "title": "Commande mobile bloquée acknowledged",
+  "description": "Martin Telecom (acc-56789) reporte que la commande ord-2026-002 pour le service svc-mobile-98765 reste en acknowledged. Erreur CRM timeout.",
+  "source": "crm",
+  "priority": "P2"
+}

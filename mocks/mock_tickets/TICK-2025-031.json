@@ -1,0 +1,8 @@
+{
+  "ticket_id": "TICK-2025-031",
+  "summary": "Activation SIM rejetée par le HSS",
+  "description": "Une commande avec activation SIM échoue. Le HSS retourne 'Unknown subscriber' pour l'IMSI fourni. La cause est une ICCID non provisionnée dans le HLR. Action : reprovisionner la carte SIM dans le HLR/HSS puis relancer l'activation.",
+  "root_cause": "ICCID SIM non provisionnée dans le HLR",
+  "resolution": "Reprovisionnement ICCID dans le HLR et relance HSS",
+  "tags": ["sim", "hss", "hlr", "iccid", "imsi"]
+}

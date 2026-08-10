@@ -1,0 +1,5 @@
+{
+  "expected_cause": "Timeout CRM lors de la récupération du profil client",
+  "expected_risk": "Faible",
+  "expected_validation": "approuvée_conditionnelle"
+}
