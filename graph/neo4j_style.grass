@@ -1,0 +1,48 @@
+{
+  "node": {
+    "diameter": "45px",
+    "color": "#A5ABB6",
+    "border-color": "#FFFFFF",
+    "border-width": "2px",
+    "font-color": "#FFFFFF",
+    "font-size": "12px",
+    "caption": "{id}"
+  },
+  "node.Client": {
+    "color": "#4C8BB5",
+    "diameter": "55px",
+    "caption": "{name}"
+  },
+  "node.Subscription": {
+    "color": "#7EB356",
+    "diameter": "50px",
+    "caption": "{offer}"
+  },
+  "node.Product": {
+    "color": "#F9A620",
+    "diameter": "50px",
+    "caption": "{name}"
+  },
+  "node.Order": {
+    "color": "#9B7ED9",
+    "diameter": "50px",
+    "caption": "{id}"
+  },
+  "node.LogEvent": {
+    "color": "#E65A5A",
+    "diameter": "40px",
+    "caption": "{id}"
+  },
+  "node.Ticket": {
+    "color": "#F2C94C",
+    "diameter": "55px",
+    "font-color": "#333333",
+    "caption": "{id}"
+  },
+  "relationship": {
+    "color": "#A5ABB6",
+    "shaft-width": "2px",
+    "font-color": "#A5ABB6",
+    "font-size": "10px"
+  }
+}

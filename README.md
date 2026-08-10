@@ -5,7 +5,7 @@ Agent IA de diagnostic technique pour le système d'information télécom **CCU*
 L'agent analyse des incidents techniques en corrélant :
 - des logs réseau,
 - l'historique client (CRM),
-- les tickets d'incidents historiques (Jira/ServiceNow),
+- les tickets d'incidents historiques (Jira/ServiceNow via GraphRAG Neo4j),
 
 pour proposer un diagnostic et une action corrective. **Aucune action n'est exécutée automatiquement** : le pipeline s'arrête toujours à "action proposée" et passe par un guardrail de validation finale.
 
@@ -37,13 +37,16 @@ END
 
 Les trois agents collecteurs (`logs_investigator`, `context_agent`, `rag_ticket_search`) s'exécutent **en parallèle** dans le nœud `collectors` de LangGraph (via `asyncio.gather` / fallback `ThreadPoolExecutor`).
 
+`rag_ticket_search` s'appuie sur **Neo4j GraphRAG** : recherche vectorielle native sur les embeddings des tickets, filtrée par proximité de graphe (même produit / même type de commande).
+
 ## Stack technique
 
 - Python 3.11+
 - **LangGraph** pour l'orchestration agentique
-- **Ollama** en local (avec fallback/mock LLM pour les tests)
+- **Ollama** en local pour le LLM (`qwen2.5:latest`) et les embeddings (`mxbai-embed-large:latest`), avec fallback/mock LLM pour les tests
 - **FastAPI** pour l'API REST
-- **ChromaDB** (embarqué) pour le RAG des tickets historiques
+- **Neo4j** (graphe + index vectoriel) pour le GraphRAG des tickets historiques
+- **Interface d'embedding abstraite** : Ollama par défaut, extensible à sentence-transformers, OpenAI ou Voyage AI
 - **Pydantic** pour tous les schémas de sortie structurés
 - **pytest** pour les tests
 
@@ -53,23 +56,38 @@ Les trois agents collecteurs (`logs_investigator`, `context_agent`, `rag_ticket_
 diagnostic-technique/
 ├── orchestrator/pipeline.py
 ├── sub_agents/
-│   ├── intake_parser/          (prompt.py, agent.py, schemas.py)
+│   ├── intake_parser/
 │   ├── logs_investigator/
 │   ├── context_agent/
-│   ├── rag_ticket_search/
+│   ├── rag_ticket_search/      # Appelle désormais graph.queries.search_similar_incidents
 │   ├── root_cause_reasoner/
 │   ├── remediation_planner/
 │   └── guardrail_validator/
+├── graph/                       # GraphRAG Neo4j
+│   ├── schema.cypher            # Contraintes + index vectoriel
+│   ├── graph_client.py          # Wrapper driver Neo4j avec retry
+│   ├── embedding_provider.py    # Interface abstraite d'embedding
+│   ├── queries.py               # Requête GraphRAG principale
+│   ├── neo4j_style.grass      # Style multi-couleurs pour Neo4j Browser
+│   └── ingestion/               # Scripts de seeding des mocks
+│       ├── ingest_clients.py
+│       ├── ingest_orders.py
+│       ├── ingest_tickets.py
+│       ├── ingest_logs.py
+│       ├── generate_embeddings.py
+│       └── run_all.py
 ├── shared/
-│   ├── state.py                # État partagé du graphe
-│   ├── audit_logger.py         # Traces JSON
-│   └── llm_client.py           # Client Ollama + fallback mock
-├── mocks/                      # Données mockées (logs, CRM, commandes, tickets)
-├── evaluation/golden_incidents/# Cas d'évaluation + eval_runner.py
+├── mocks/
+├── evaluation/
 ├── config/settings.py
-├── api/main.py                 # FastAPI (POST /diagnose)
+├── api/main.py
 ├── tests/
-├── docker/docker-compose.yml
+├── docker/
+│   ├── docker-compose.yml
+│   └── Dockerfile
+├── scripts/
+│   └── seed_graph.sh            # Seed Neo4j en une commande
+├── Makefile
 ├── pyproject.toml
 └── README.md
 ```
@@ -77,48 +95,56 @@ diagnostic-technique/
 ## Installation
 
 ```bash
-cd diagnostic-technique
 python -m venv .venv
 source .venv/bin/activate  # Windows : .venv\Scripts\activate
-pip install -e ".[dev]"
+pip install -r requirements.txt
 ```
 
-Un fichier `.env` avec `MOCK_LLM=true` est déjà présent : le projet fonctionne immédiatement sans Ollama. Pour utiliser un vrai modèle local, installez [Ollama](https://ollama.com/) et téléchargez un modèle compatible JSON mode, par exemple `qwen2.5`.
-
-### Lancer Ollama (optionnel)
+Un fichier `.env` avec `MOCK_LLM=true` est déjà présent : le projet fonctionne immédiatement sans Ollama. Pour utiliser les modèles locaux, installez [Ollama](https://ollama.com/) et téléchargez les modèles configurés :
 
 ```bash
-ollama pull qwen2.5
+ollama pull qwen2.5:latest
+ollama pull mxbai-embed-large:latest
 ollama serve
 ```
 
-### Lancer ChromaDB via Docker (optionnel)
+### Lancer Neo4j (local uniquement)
+
+Neo4j doit être installé et exécuté **localement** (pas dans Docker). Par défaut, le projet se connecte à `bolt://localhost:7687` avec les credentials `neo4j/password` (modifiable dans `.env`).
+
+Avec Neo4j Desktop / Neo4j local démarré :
+
+```bash
+make seed
+```
+
+Si vous préférez lancer l'API dans Docker tout en gardant Neo4j local et Ollama local :
 
 ```bash
 cd docker
-docker compose up -d
+docker compose up --build
 ```
 
-Par défaut le projet utilise ChromaDB embarqué en local (`data/chroma/`).
+Dans ce cas, l'API se connecte à Neo4j via `host.docker.internal:7687` et à Ollama via `host.docker.internal:11434`. Elle est disponible sur `http://127.0.0.1:8000`.
 
 ## Lancer l'API
 
+Après avoir seedé Neo4j :
+
 ```bash
-uvicorn api.main:app --reload
+make api
 ```
 
 L'API est disponible sur `http://127.0.0.1:8000`.
 
 ## Tester l'API
 
+Utilisez le fichier `body.json` créé à la racine ou composez votre propre requête :
+
 ```bash
 curl -X POST "http://127.0.0.1:8000/diagnose" \
   -H "Content-Type: application/json" \
-  -d '{
-    "title": "Coupure fibre client Dupont SARL",
-    "description": "Le client Dupont SARL (acc-12345) signale une coupure Internet sur son service svc-fiber-12345. La commande ord-2026-001 est bloquée en provisioning CPE.",
-    "priority": "P2"
-  }'
+  -d @body.json
 ```
 
 Réponse : diagnostic structuré complet avec `parsed_incident`, `logs`, `customer_context`, `similar_tickets`, `root_cause`, `remediation`, `risk_level`, `validation_status`, et `traces`.
@@ -126,10 +152,32 @@ Réponse : diagnostic structuré complet avec `parsed_incident`, `logs`, `custom
 ## Lancer les tests
 
 ```bash
-pytest tests/
+make test
 ```
 
-En mode `MOCK_LLM=true`, les tests s'exécutent sans dépendance externe.
+Les tests `test_graph_ingestion.py` et `test_rag.py` nécessitent Neo4j accessible. Ils seedent le graphe automatiquement et vérifient les compteurs de nœuds/relations et la recherche de tickets similaires.
+
+## Visualisation dans Neo4j Browser / Neo4j Desktop
+
+Pour afficher les nœuds avec des couleurs différentes selon leur label, appliquez le style GRASS fourni. Cela fonctionne à l'identique dans Neo4j Browser (navigateur) et dans l'interface graphique de Neo4j Desktop.
+
+1. Ouvrez votre instance dans Neo4j Browser (`http://localhost:7474`) ou dans Neo4j Desktop.
+2. Exécutez une requête affichant des nœuds, par exemple :
+   ```cypher
+   MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 100
+   ```
+3. Ouvrez le panneau **Style** (icône de pinceau en haut à gauche du résultat, ou bouton "Style").
+4. Cliquez sur **Import / Load Style** et sélectionnez `graph/neo4j_style.grass`.
+
+Ou copiez-collez le contenu du fichier dans la barre de commande Neo4j Browser précédé de `:style`.
+
+Couleurs utilisées :
+- `Client` — bleu
+- `Subscription` — vert
+- `Product` — orange
+- `Order` — violet
+- `LogEvent` — rouge
+- `Ticket` — jaune
 
 ## Lancer l'évaluation golden
 
@@ -141,29 +189,45 @@ Le runner rejoue les 5 cas mockés et affiche un rapport pass/fail + accuracy gl
 
 ## Configuration
 
-Un fichier `.env` est fourni avec `MOCK_LLM=true` pour permettre une exécution locale sans Ollama. Pour utiliser un vrai modèle local, modifiez `.env` :
+Variables d'environnement disponibles (voir `.env.example`) :
 
 ```env
-MOCK_LLM=false
+MOCK_LLM=true
+
+# Ollama
 OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen2.5
+OLLAMA_MODEL=qwen2.5:latest
+
+# Neo4j
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=password
+NEO4J_DATABASE=neo4j
+
+# Embeddings (Ollama par défaut)
+EMBEDDING_PROVIDER=ollama
+EMBEDDING_MODEL=mxbai-embed-large:latest
+VECTOR_INDEX_DIM=1024
+VECTOR_SIMILARITY_THRESHOLD=0.75
 ```
 
-Selon votre shell, vous pouvez aussi surcharger la variable :
+Pour basculer vers un autre provider d'embedding (sentence-transformers, OpenAI, Voyage AI), implémentez `EmbeddingProvider` dans `graph/embedding_provider.py` et changez `EMBEDDING_PROVIDER` / `EMBEDDING_MODEL` / `VECTOR_INDEX_DIM` en conséquence.
 
-- Bash / Git Bash : `export MOCK_LLM=true`
-- Windows CMD : `set MOCK_LLM=true`
-- PowerShell : `$env:MOCK_LLM="true"`
-
-Puis lancer les tests ou l'évaluation :
+## Commandes utiles (Makefile)
 
 ```bash
-pytest tests/
-python -m evaluation.golden_incidents.eval_runner
+make install      # pip install -r requirements.txt
+make seed         # Seed Neo4j local (schema + mocks + embeddings)
+make test         # pytest tests/  (Nécessite Neo4j local lancé)
+make api          # uvicorn api.main:app --reload
+make docker-up    # docker compose up --build api (Neo4j local requis)
+make docker-down  # docker compose down
 ```
 
 ## Notes de conception
 
+- **GraphRAG** : `rag_ticket_search` utilise `graph/queries.search_similar_incidents` qui combine l'index vectoriel Neo4j et un filtre de proximité de graphe (même produit / même commande).
+- **Seuil de similarité** : configurable via `VECTOR_SIMILARITY_THRESHOLD` (défaut 0.75). Aucun résultat sous ce seuil n'est retourné.
 - **Refus d'hallucination** : `root_cause_reasoner` retourne `cause="indéterminée"` et `confidence="faible"` s'il ne peut citer aucune source.
 - **Guardrail** : `guardrail_validator` classe les actions en `Faible/Moyen/Critique` selon `action_whitelist.yaml` et refuse toute action hors whitelist.
-- **Pas d'exécution automatique** : le champ `remediation.remediation.note_execution` rappelle explicitement qu'aucune action n'est exécutée automatiquement.
+- **Pas d'exécution automatique** : le pipeline s'arrête à "action proposée" et ne déclenche jamais d'action corrective automatiquement.

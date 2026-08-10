@@ -16,7 +16,7 @@ class Settings:
     # Anthropic ci-dessous pour switcher vers Claude (nécessite ANTHROPIC_API_KEY).
     LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "ollama")
     OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "qwen2.5")
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "qwen2.5:latest")
 
     # Pour tests et démo sans Ollama disponible
     MOCK_LLM: bool = os.getenv("MOCK_LLM", "false").lower() in {"1", "true", "yes"}
@@ -24,12 +24,26 @@ class Settings:
     # ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
     # ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620")
 
-    # Vector store (ChromaDB embarqué)
+    # Neo4j GraphRAG
+    NEO4J_URI: str = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+    NEO4J_USER: str = os.getenv("NEO4J_USER", "neo4j")
+    NEO4J_PASSWORD: str = os.getenv("NEO4J_PASSWORD", "password")
+    NEO4J_DATABASE: str = os.getenv("NEO4J_DATABASE", "neo4j")
+
+    # Embeddings (abstraction : ollama par défaut, sentence-transformers/openai/voyage possible)
+    EMBEDDING_PROVIDER: str = os.getenv("EMBEDDING_PROVIDER", "ollama")
+    EMBEDDING_MODEL: str = os.getenv(
+        "EMBEDDING_MODEL", "mxbai-embed-large:latest"
+    )
+    VECTOR_INDEX_DIM: int = int(os.getenv("VECTOR_INDEX_DIM", "1024"))
+    VECTOR_SIMILARITY_THRESHOLD: float = float(
+        os.getenv("VECTOR_SIMILARITY_THRESHOLD", "0.75")
+    )
+    TICKETS_VECTOR_INDEX: str = os.getenv("TICKETS_VECTOR_INDEX", "ticket_embeddings")
+
+    # Vector store (ChromaDB embarqué) -- deprecated, remplacé par Neo4j
     CHROMA_PERSIST_DIR: Path = PROJECT_ROOT / "data" / "chroma"
     TICKETS_COLLECTION: str = os.getenv("TICKETS_COLLECTION", "ccu_tickets")
-    EMBEDDING_MODEL: str = os.getenv(
-        "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
-    )
 
     # Mocks
     MOCKS_DIR: Path = PROJECT_ROOT / "mocks"

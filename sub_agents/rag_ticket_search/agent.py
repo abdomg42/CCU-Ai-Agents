@@ -1,15 +1,11 @@
-"""Agent RAG de recherche de tickets similaires via ChromaDB."""
-import glob
-import json
+"""Agent RAG de recherche de tickets similaires via Neo4j GraphRAG."""
 from typing import Any
-
-import chromadb
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
 from shared.llm_client import LLMClient
 from shared.state import GraphState
 from shared.audit_logger import audit_logger
 from config.settings import get_settings
+from graph.queries import search_similar_incidents
 from .prompt import RAG_SYSTEM_PROMPT
 from .schemas import RAGSchema
 from sub_agents.intake_parser.schemas import IncidentSchema
@@ -23,44 +19,52 @@ class RAGTicketSearchAgent:
     def __init__(self) -> None:
         self.settings = get_settings()
         self.llm = LLMClient()
-        self.client = chromadb.PersistentClient(path=str(self.settings.CHROMA_PERSIST_DIR))
-        self.embedding_fn = SentenceTransformerEmbeddingFunction(model_name=self.settings.EMBEDDING_MODEL)
-        self.collection = self.client.get_or_create_collection(
-            name=self.settings.TICKETS_COLLECTION,
-            embedding_function=self.embedding_fn,
-        )
-        self._index_tickets_if_empty()
 
-    def _index_tickets_if_empty(self) -> None:
-        if self.collection.count() > 0:
-            return
-        tickets = []
-        for path in glob.glob(str(self.settings.MOCK_TICKETS_DIR / "*.json")):
-            with open(path, encoding="utf-8") as f:
-                tickets.append(json.load(f))
-        documents = [t["description"] for t in tickets]
-        metadatas = [{"ticket_id": t["ticket_id"], "root_cause": t["root_cause"], "resolution": t["resolution"]} for t in tickets]
-        ids = [t["ticket_id"] for t in tickets]
-        if documents:
-            self.collection.add(documents=documents, metadatas=metadatas, ids=ids)
+    @staticmethod
+    def _pick_anchor_id(parsed: IncidentSchema) -> str:
+        """Choisit le meilleur identifiant d'ancrage dans le graphe."""
+        return (
+            parsed.service_id
+            or parsed.order_id
+            or parsed.customer_id
+            or parsed.incident_type
+            or ""
+        )
 
     def run(self, state: GraphState) -> dict[str, Any]:
         parsed = _as_parsed(state.parsed_incident)
         audit_logger.log("rag_start", {"parsed": parsed.model_dump()})
-        query = f"{parsed.incident_type or ''} {parsed.description or ''}"
-        results = self.collection.query(query_texts=[query], n_results=3)
 
-        similar = []
-        source_ids = []
-        for meta, distance in zip(results.get("metadatas", [[]])[0], results.get("distances", [[]])[0]):
-            if meta:
-                similar.append({
-                    "ticket_id": meta.get("ticket_id"),
-                    "root_cause": meta.get("root_cause"),
-                    "resolution": meta.get("resolution"),
-                    "distance": distance,
-                })
-                source_ids.append(meta.get("ticket_id"))
+        query = f"{parsed.incident_type or ''} {parsed.description or ''}".strip()
+        anchor_id = self._pick_anchor_id(parsed)
+
+        similar: list[dict[str, Any]] = []
+        source_ids: list[str] = []
+
+        if anchor_id and query:
+            try:
+                results = search_similar_incidents(
+                    incident_id=anchor_id,
+                    query_text=query,
+                    top_k=3,
+                )
+                for r in results:
+                    similar.append(
+                        {
+                            "ticket_id": r.ticket_id,
+                            "summary": r.summary,
+                            "description": r.description,
+                            "root_cause": r.root_cause,
+                            "resolution": r.resolution,
+                            "score": r.score,
+                            "distance": 1.0 - r.score,
+                        }
+                    )
+                    source_ids.append(r.ticket_id)
+            except Exception as exc:
+                audit_logger.log("rag_graph_error", {"error": str(exc)})
+        else:
+            audit_logger.log("rag_skip", {"reason": "missing anchor_id or query"})
 
         result = RAGSchema(
             similar_tickets=similar,
@@ -68,7 +72,7 @@ class RAGTicketSearchAgent:
             source_ids=source_ids,
         )
 
-        if not self.llm.settings.MOCK_LLM:
+        if not self.llm.settings.MOCK_LLM and similar:
             try:
                 user_msg = f"Tickets similaires : {similar}"
                 result = self.llm.invoke_structured(RAG_SYSTEM_PROMPT, user_msg, RAGSchema)
