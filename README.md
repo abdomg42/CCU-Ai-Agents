@@ -149,6 +149,14 @@ curl -X POST "http://127.0.0.1:8000/diagnose" \
 
 Réponse : diagnostic structuré complet avec `parsed_incident`, `logs`, `customer_context`, `similar_tickets`, `root_cause`, `remediation`, `risk_level`, `validation_status`, et `traces`.
 
+Pour une sortie plus lisible dans le terminal avec `curl` :
+
+```bash
+curl -X POST "http://127.0.0.1:8000/diagnose/text" \
+  -H "Content-Type: application/json" \
+  -d @body.json
+```
+
 ## Lancer les tests
 
 ```bash
