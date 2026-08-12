@@ -1,0 +1,41 @@
+{
+  "ticket_id": "TICK-CCU-0002",
+  "summary": "Order stuck in CRM acknowledged state",
+  "description": "Investigation ongoing; root cause not yet identified.",
+  "root_cause": "undetermined",
+  "resolution": "",
+  "tags": [
+    "crm_sync",
+    "mobile_5g_enterprise"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "crm_sync",
+  "product_type": "Mobile 5G Enterprise",
+  "client_id": "CLI-00002",
+  "order_id": "ORD-CCU-0002",
+  "created_at": "2026-08-12T23:53:11.141501+00:00",
+  "related_log_pattern": "CRM_API_TIMEOUT order_id={order_id} duration=45000ms",
+  "tmf621": {
+    "id": "TICK-CCU-0002",
+    "href": "/tmf621/troubleTicket/TICK-CCU-0002",
+    "creationDate": "2026-08-12T23:53:11.141501+00:00",
+    "description": "Order stuck in CRM acknowledged state",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "crm_sync",
+    "relatedParty": [
+      {
+        "id": "CLI-00002",
+        "role": "customer"
+      }
+    ],
+    "relatedObject": [
+      {
+        "id": "ORD-CCU-0002",
+        "role": "order"
+      }
+    ]
+  }
+}

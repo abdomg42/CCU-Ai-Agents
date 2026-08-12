@@ -29,12 +29,22 @@ class GraphState(BaseModel):
 
     # Résultats des agents raisonneurs
     root_cause: Optional[dict[str, Any]] = None
-    remediation: Optional[dict[str, Any]] = None
+    remediation_explanation: Optional[str] = None
 
-    # Guardrail
-    risk_level: Optional[str] = None  # Faible / Moyen / Critique
-    validation_status: Optional[str] = None  # approuvée_conditionnelle / refusée
-    validation_reason: Optional[str] = None
+    # Ticket mapping / création
+    ticket_mapping: Optional[dict[str, Any]] = None
+
+    # Guardrail de contenu (PII)
+    sanitized_what_happened: Optional[str] = None
+    sanitized_root_cause: Optional[str] = None
+    sanitized_root_cause_explanation: Optional[str] = None
+    sanitized_recommendation: Optional[str] = None
+
+    # Génération de rapport et notification
+    report_path: Optional[str] = None
+    email_sent: bool = False
+    email_recipients: list[str] = Field(default_factory=list)
+    zammad_note_added: bool = False
 
     # Debug / observabilité
     traces: list[dict[str, Any]] = Field(default_factory=list)

@@ -21,8 +21,9 @@ class Settings:
     # Pour tests et démo sans Ollama disponible
     MOCK_LLM: bool = os.getenv("MOCK_LLM", "false").lower() in {"1", "true", "yes"}
 
-    # ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
-    # ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620")
+    # Anthropic (utilisé pour la génération de tickets synthétiques CCU)
+    ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
+    ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620")
 
     # Neo4j GraphRAG
     NEO4J_URI: str = os.getenv("NEO4J_URI", "bolt://localhost:7687")
@@ -52,6 +53,27 @@ class Settings:
     MOCK_ORDERS: Path = MOCKS_DIR / "mock_orders_tmf622.json"
     MOCK_TICKETS_DIR: Path = MOCKS_DIR / "mock_tickets"
 
+    # Zammad
+    ZAMMAD_URL: str = os.getenv("ZAMMAD_URL", "http://localhost:3000")
+    ZAMMAD_TOKEN: str = os.getenv("ZAMMAD_TOKEN", "")
+    ZAMMAD_DEFAULT_GROUP: str = os.getenv("ZAMMAD_DEFAULT_GROUP", "Users")
+
+    # Mailhog (SMTP local pour les tests de notification)
+    SMTP_HOST: str = os.getenv("SMTP_HOST", "localhost")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "1025"))
+    SMTP_FROM: str = os.getenv("SMTP_FROM", "diagnostic-agent@ccu.local")
+    REPORT_RECIPIENTS: list[str] = [
+        addr.strip()
+        for addr in os.getenv("REPORT_RECIPIENTS", "noc@ccu.local, support@ccu.local").split(",")
+        if addr.strip()
+    ]
+
+    # Reports
+    REPORTS_DIR: Path = PROJECT_ROOT / "reports"
+    TEMPLATE_DIR: Path = (
+        PROJECT_ROOT / "sub_agents" / "report_generator" / "templates"
+    )
+
     # Guardrail
     WHITELIST_PATH: Path = (
         PROJECT_ROOT
@@ -62,6 +84,11 @@ class Settings:
 
     # Audit
     AUDIT_LOG_PATH: Path = PROJECT_ROOT / "data" / "audit.log"
+
+    # Ticket mapping
+    TICKET_MAPPING_SIMILARITY_THRESHOLD: float = float(
+        os.getenv("TICKET_MAPPING_SIMILARITY_THRESHOLD", "0.85")
+    )
 
 
 def get_settings() -> Settings:

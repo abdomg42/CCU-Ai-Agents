@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00480",
+  "summary": "Unable to link new location to existing merchant ID",
+  "description": "Merchants report that the content of the Merchant Agreement PDF appears distorted and unreadable when accessed for review and e-signature.",
+  "root_cause": "undetermined",
+  "resolution": "Performed a system cache refresh to reload the merchant data and ensured proper data mapping to display information accurately in the Sales UI.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-12T23:53:03.217897+00:00",
+  "tmf621": {
+    "id": "INC00480",
+    "href": "/tmf621/troubleTicket/INC00480",
+    "creationDate": "2026-08-12T23:53:03.217897+00:00",
+    "description": "Unable to link new location to existing merchant ID",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

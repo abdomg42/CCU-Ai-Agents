@@ -7,7 +7,7 @@ L'agent analyse des incidents techniques en corrélant :
 - l'historique client (CRM),
 - les tickets d'incidents historiques (Jira/ServiceNow via GraphRAG Neo4j),
 
-pour proposer un diagnostic et une action corrective. **Aucune action n'est exécutée automatiquement** : le pipeline s'arrête toujours à "action proposée" et passe par un guardrail de validation finale.
+pour **diagnostiquer, rapporter et notifier** — **aucune action technique n'est jamais exécutée automatiquement** sur un système réel. Le seul guardrail est un guardrail de **contenu/PII** avant tout envoi externe.
 
 ## Architecture
 
@@ -26,10 +26,19 @@ intake_parser
 root_cause_reasoner
   │
   ▼
-remediation_planner
+ticket_manager
   │
   ▼
-guardrail_validator
+remediation_explainer
+  │
+  ▼
+content_guardrail (PII)
+  │
+  ▼
+report_generator (PDF)
+  │
+  ▼
+notifier (email + note Zammad)
   │
   ▼
 END
@@ -37,7 +46,7 @@ END
 
 Les trois agents collecteurs (`logs_investigator`, `context_agent`, `rag_ticket_search`) s'exécutent **en parallèle** dans le nœud `collectors` de LangGraph (via `asyncio.gather` / fallback `ThreadPoolExecutor`).
 
-`rag_ticket_search` s'appuie sur **Neo4j GraphRAG** : recherche vectorielle native sur les embeddings des tickets, filtrée par proximité de graphe (même produit / même type de commande).
+`rag_ticket_search` et `ticket_manager` s'appuient sur **Neo4j GraphRAG** : recherche vectorielle native sur les embeddings des tickets, filtrée par proximité de graphe (même produit / même type de commande).
 
 ## Stack technique
 
@@ -59,16 +68,19 @@ diagnostic-technique/
 │   ├── intake_parser/
 │   ├── logs_investigator/
 │   ├── context_agent/
-│   ├── rag_ticket_search/      # Appelle désormais graph.queries.search_similar_incidents
+│   ├── rag_ticket_search/       # Appelle graph.queries.search_similar_incidents
 │   ├── root_cause_reasoner/
-│   ├── remediation_planner/
-│   └── guardrail_validator/
+│   ├── ticket_manager/          # Mapping/création de tickets Zammad
+│   ├── remediation_explainer/   # Texte informatif (pas d'action exécutable)
+│   ├── content_guardrail/       # PII sanitizer
+│   ├── report_generator/        # Template Jinja2 + PDF WeasyPrint
+│   └── notifier/                # Email + note Zammad
 ├── graph/                       # GraphRAG Neo4j
 │   ├── schema.cypher            # Contraintes + index vectoriel
 │   ├── graph_client.py          # Wrapper driver Neo4j avec retry
 │   ├── embedding_provider.py    # Interface abstraite d'embedding
 │   ├── queries.py               # Requête GraphRAG principale
-│   ├── neo4j_style.grass      # Style multi-couleurs pour Neo4j Browser
+│   ├── neo4j_style.grass        # Style multi-couleurs pour Neo4j Browser
 │   └── ingestion/               # Scripts de seeding des mocks
 │       ├── ingest_clients.py
 │       ├── ingest_orders.py
@@ -76,17 +88,31 @@ diagnostic-technique/
 │       ├── ingest_logs.py
 │       ├── generate_embeddings.py
 │       └── run_all.py
+├── tools/                       # Clients bas niveau (Zammad, ...)
+│   └── ticketing_client.py
 ├── shared/
 ├── mocks/
 ├── evaluation/
 ├── config/settings.py
-├── api/main.py
+├── api/                         # FastAPI + routes SSE
+│   ├── main.py
+│   └── routes/diagnose.py
 ├── tests/
+├── ui/                          # Chatbot Next.js
+│   ├── app/
+│   ├── components/
+│   └── package.json
 ├── docker/
 │   ├── docker-compose.yml
 │   └── Dockerfile
 ├── scripts/
-│   └── seed_graph.sh            # Seed Neo4j en une commande
+│   ├── seed_graph.sh            # Seed Neo4j en une commande
+│   └── seed/                    # Génération de tickets
+│       ├── generate_tickets.py
+│       └── generate_ccu_tickets.py
+├── infra/
+│   └── scripts/seed_zammad.py   # Injection des tickets dans Zammad
+├── reports/                     # Rapports PDF/HTML générés
 ├── Makefile
 ├── pyproject.toml
 └── README.md
@@ -239,3 +265,72 @@ make docker-down  # docker compose down
 - **Refus d'hallucination** : `root_cause_reasoner` retourne `cause="indéterminée"` et `confidence="faible"` s'il ne peut citer aucune source.
 - **Guardrail** : `guardrail_validator` classe les actions en `Faible/Moyen/Critique` selon `action_whitelist.yaml` et refuse toute action hors whitelist.
 - **Pas d'exécution automatique** : le pipeline s'arrête à "action proposée" et ne déclenche jamais d'action corrective automatiquement.
+
+## Lancement complet depuis zéro
+
+### 1. Variables d'environnement
+
+Copier `.env.example` en `.env` et ajuster si besoin :
+
+```bash
+cp .env.example .env
+```
+
+Points importants :
+- `MOCK_LLM=true` pour démarrer sans Ollama (mode déterministe/fallback).
+- `ZAMMAD_TOKEN` : token API Zammad (à créer dans l'UI Zammad une fois démarré).
+- `ANTHROPIC_API_KEY` : facultatif, pour générer les tickets CCU via Claude (fallback déterministe sinon).
+
+### 2. Démarrer l'infrastructure (recommandé)
+
+Le plus simple est Docker Compose :
+
+```bash
+make docker-up
+```
+
+Cela démarre : API FastAPI (8000), Neo4j (7474/7687), Zammad (3000), Mailhog (8025/1025), Splunk (18000/8088), Prism (4010).
+
+> Sous Windows, WeasyPrint a besoin des librairies GTK/Pango. Le Dockerfile installe les dépendances Debian nécessaires, la génération PDF fonctionne donc dans le conteneur. En local sans Docker, l'agent génère un fallback HTML si les librairies système sont manquantes.
+
+### 3. Seed des données
+
+Dans un autre terminal (avec l'API et Neo4j démarrés) :
+
+```bash
+# Seed Neo4j (clients, commandes, logs, tickets + embeddings)
+make seed
+
+# Générer des tickets mockés
+make seed-tickets
+
+# Injecter les tickets dans Zammad (une fois Zammad healthy)
+make seed-zammad
+```
+
+### 4. Démarrer le chatbot (sans Docker)
+
+```bash
+# Terminal 1 : backend
+make api
+
+# Terminal 2 : frontend
+cd ui && npm install
+make ui
+```
+
+Ouvrir http://localhost:3001.
+
+## Scénario de test de bout en bout
+
+1. Ouvrir Mailhog : http://localhost:8025.
+2. Ouvrir le chatbot : http://localhost:3001.
+3. Saisir un message en langage naturel, par exemple :
+   > "Client acc-12345, service svc-fiber-12345, commande ord-2026-001. Coupure Internet fibre."
+4. Observer dans le chat :
+   - le message utilisateur,
+   - la trace agent (intake → collectors → root_cause → ticket_manager → remediation_explainer → content_guardrail → report_generator → notifier),
+   - le `MappingBadge` : "New ticket created (#TICK-CCU-XXXX)",
+   - la `ReportCard` avec le bouton "Download PDF report" et le badge "Email sent to ...".
+5. Dans Mailhog, vérifier la réception d'un email avec le sujet `[CCU] Incident Report INC-CCU-XXXX - medium confidence` et la pièce jointe PDF.
+6. Vérifier dans Zammad (http://localhost:3000) que le nouveau ticket contient une note interne "Full report sent by email".

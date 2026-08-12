@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00213",
+  "summary": "Fees/services configuration not reflecting in final agreement",
+  "description": "Sales Agent using a legacy browser experienced a freeze while configuring equipment, leading to incomplete data entry; Sales Agent affected.",
+  "root_cause": "undetermined",
+  "resolution": "Identified compatible equipment options meeting merchant specifications. Replaced incompatible equipment to restore seamless connectivity for the merchant.",
+  "tags": [
+    "hardware"
+  ],
+  "priority": "P1",
+  "status": "new",
+  "category": "Hardware",
+  "created_at": "2026-08-12T23:53:03.217060+00:00",
+  "tmf621": {
+    "id": "INC00213",
+    "href": "/tmf621/troubleTicket/INC00213",
+    "creationDate": "2026-08-12T23:53:03.217060+00:00",
+    "description": "Fees/services configuration not reflecting in final agreement",
+    "severity": "P1",
+    "priority": "P1",
+    "status": "new",
+    "type": "Hardware"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "ticket_id": "TICK-CCU-0005",
+  "summary": "Double billing for Cloud Voice subscription",
+  "description": "Customer invoiced twice for the same Cloud Voice subscription in this billing cycle.",
+  "root_cause": "Duplicate billing cycle due to order amendment",
+  "resolution": "Credited duplicate charge and consolidated billing.",
+  "tags": [
+    "billing",
+    "cloud_voice"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "billing",
+  "product_type": "Cloud Voice",
+  "client_id": "CLI-00005",
+  "order_id": "ORD-CCU-0005",
+  "created_at": "2026-08-12T23:53:11.141516+00:00",
+  "related_log_pattern": "BILLING_DUPLICATE_CHARGE order_id={order_id} amount=",
+  "tmf621": {
+    "id": "TICK-CCU-0005",
+    "href": "/tmf621/troubleTicket/TICK-CCU-0005",
+    "creationDate": "2026-08-12T23:53:11.141516+00:00",
+    "description": "Double billing for Cloud Voice subscription",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "billing",
+    "relatedParty": [
+      {
+        "id": "CLI-00005",
+        "role": "customer"
+      }
+    ],
+    "relatedObject": [
+      {
+        "id": "ORD-CCU-0005",
+        "role": "order"
+      }
+    ]
+  }
+}

@@ -9,8 +9,9 @@ def test_pipeline_fiber_case():
     }
     result = run_diagnosis(incident)
     assert result["root_cause"]["cause"] == "Perte de signal fibre optique"
-    assert result["validation_status"] == "approuvée_conditionnelle"
-    assert result["risk_level"] == "Moyen"
+    assert result["ticket_mapping"]["status"] == "created_new"
+    assert result["report_path"] is not None
+    assert result["remediation_explanation"] is not None
 
 
 def test_pipeline_billing_undetermined():
@@ -20,4 +21,4 @@ def test_pipeline_billing_undetermined():
     }
     result = run_diagnosis(incident)
     assert result["root_cause"]["cause"] == "indéterminée"
-    assert result["validation_status"] == "approuvée_conditionnelle"
+    assert result["ticket_mapping"]["status"] == "created_new"

@@ -1,0 +1,41 @@
+{
+  "ticket_id": "TICK-CCU-0004",
+  "summary": "VLAN mismatch on switch port",
+  "description": "CE switch reports VLAN mismatch for the ordered LAN service.",
+  "root_cause": "VLAN mismatch entre service et port switch",
+  "resolution": "Corrected VLAN configuration on the switch port.",
+  "tags": [
+    "network",
+    "lan_pro_vpn"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "network",
+  "product_type": "LAN Pro VPN",
+  "client_id": "CLI-00004",
+  "order_id": "ORD-CCU-0004",
+  "created_at": "2026-08-12T23:53:11.141512+00:00",
+  "related_log_pattern": "SWITCH_VLAN_MISMATCH port=Gi0/24 expected=200 actual=300",
+  "tmf621": {
+    "id": "TICK-CCU-0004",
+    "href": "/tmf621/troubleTicket/TICK-CCU-0004",
+    "creationDate": "2026-08-12T23:53:11.141512+00:00",
+    "description": "VLAN mismatch on switch port",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "network",
+    "relatedParty": [
+      {
+        "id": "CLI-00004",
+        "role": "customer"
+      }
+    ],
+    "relatedObject": [
+      {
+        "id": "ORD-CCU-0004",
+        "role": "order"
+      }
+    ]
+  }
+}

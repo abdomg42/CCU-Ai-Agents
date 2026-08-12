@@ -17,6 +17,12 @@ build/
 # Données générées
 data/
 *.log
+reports/
 
 # ChromaDB
 chroma/
+
+# Next.js
+ui/node_modules/
+ui/.next/
+ui/out/

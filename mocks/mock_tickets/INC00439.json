@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00439",
+  "summary": "Merchant data displaying incorrectly",
+  "description": "An error occurs when a Sales Agent tries to save merchant data in the Sales UI, leading to incomplete information and hindered onboarding process.",
+  "root_cause": "undetermined",
+  "resolution": "The faulty hardware component causing the malfunction was identified and replaced, restoring the ability for sales agents to select equipment for merchants without any issues.",
+  "tags": [
+    "network",
+    "pon"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Network",
+  "created_at": "2026-08-12T23:53:03.219350+00:00",
+  "tmf621": {
+    "id": "INC00439",
+    "href": "/tmf621/troubleTicket/INC00439",
+    "creationDate": "2026-08-12T23:53:03.219350+00:00",
+    "description": "Merchant data displaying incorrectly",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Network"
+  }
+}

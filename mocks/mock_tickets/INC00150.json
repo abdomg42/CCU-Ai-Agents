@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00150",
+  "summary": "Inability to configure services for additional location",
+  "description": "After selecting equipment for a new location under an existing merchant ID, the Sales Agent noticed that the equipment choices were not saved. This caused delays in the onboarding process for the additional location.",
+  "root_cause": "undetermined",
+  "resolution": "The issue was rectified by rolling back the incorrect fees, conducting a thorough audit of all recent fee changes, and ensuring the accurate fees were applied.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-12T23:53:03.220124+00:00",
+  "tmf621": {
+    "id": "INC00150",
+    "href": "/tmf621/troubleTicket/INC00150",
+    "creationDate": "2026-08-12T23:53:03.220124+00:00",
+    "description": "Inability to configure services for additional location",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}
