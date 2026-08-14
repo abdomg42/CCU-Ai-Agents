@@ -1,0 +1,56 @@
+\babel@toc {english}{}\relax 
+\contentsline {xchapter}{}{ii}{section*.2}%
+\contentsline {xchapter}{}{iii}{section*.4}%
+\contentsline {xchapter}{}{iv}{section*.6}%
+\contentsline {xchapter}{}{v}{section*.8}%
+\babel@toc {french}{}\relax 
+\contentsline {xchapter}{}{vii}{section*.8}%
+\contentsline {xchapter}{}{ix}{section*.9}%
+\contentsline {xchapter}{}{x}{section*.10}%
+\contentsline {xchapter}{}{1}{section*.12}%
+\contentsline {xchapter}{}{2}{section*.14}%
+\babel@toc {french}{}\relax 
+\addvspace {10\p@ }
+\contentsline {xchapter}{Présentation du Projet}{2}{chapter.1}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Secteurs d'activité}}{5}{figure.caption.18}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Organigramme d'Inetum Offshore Maroc}}{5}{figure.caption.19}%
+\contentsline {figure}{\numberline {1.3}{\ignorespaces Architecture cible du SI - Convergence des référentiels vers la solution Ni2.}}{7}{figure.caption.20}%
+\contentsline {figure}{\numberline {1.4}{\ignorespaces Cartographie des modules Ni2.}}{9}{figure.caption.21}%
+\contentsline {figure}{\numberline {1.5}{\ignorespaces Cadre de gouvernance globale en Cycle en V.}}{11}{figure.caption.24}%
+\contentsline {figure}{\numberline {1.6}{\ignorespaces Processus de la méthode SCRUM}}{12}{figure.caption.25}%
+\contentsline {figure}{\numberline {1.7}{\ignorespaces Planification du projet - Diagramme de Gantt}}{13}{figure.caption.26}%
+\addvspace {10\p@ }
+\contentsline {xchapter}{Stratégie de Migration}{14}{chapter.2}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Démarche de rétro-ingénierie du CRM}}{16}{figure.caption.28}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Format des colonnes fichiers CSV }}{17}{figure.caption.29}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Processus de réconciliation inter-systèmes}}{19}{figure.caption.30}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Architecture générale du framework de migration Ni2}}{20}{figure.caption.31}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Processus de migration SQL Sync}}{21}{figure.caption.32}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Stratégie de validation par Dry Runs itératifs}}{23}{figure.caption.33}%
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Politique de gestion des rejets selon les phases du processus ETL}}{25}{figure.caption.35}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Stratégie de retour arrière en cas de No Go}}{26}{figure.caption.36}%
+\addvspace {10\p@ }
+\contentsline {xchapter}{Migration des Données}{28}{chapter.3}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Modèle de données Ni2 pour le thème Locations}}{32}{figure.caption.41}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Extrait représentatif de la logique d'extraction SQL (Focus : Sous-Réseaux)}}{33}{figure.caption.42}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Modèle de données Ni2 pour le thème clients services}}{36}{figure.caption.45}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Modèle de données Ni2 pour le thème clients services 2}}{36}{figure.caption.46}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Modélisation de la dualité Physique/Logique et des relations de contenance dans Ni2.}}{40}{figure.caption.49}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Modélisation de la décomposition interne d'un équipement actif}}{42}{figure.caption.51}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces \relax }}{43}{figure.caption.52}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Pipeline de déploiement des données CRM vers Ni2}}{47}{figure.caption.55}%
+\addvspace {10\p@ }
+\contentsline {xchapter}{Réalisation}{51}{chapter.4}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Authentification VPN Cisco}}{52}{figure.caption.60}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces DBeaver : double connexion GAIA et CRM }}{53}{figure.caption.61}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces MobaXterm : session SSH active sur le serveur DEV Ni2}}{54}{figure.caption.62}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces VS Code : développement des scripts SQL et Shell}}{54}{figure.caption.63}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Bitbucket : dépôt dt-gaia-data-migration et ***telecom}}{55}{figure.caption.64}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Pipeline de déploiement en 6 étapes}}{57}{figure.caption.66}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Workflow Git du projet : de la branche créée au merge sur main}}{57}{figure.caption.67}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Tableau de bord Ni2 DEV (HHaoud) — menu Gestion des commandes actif}}{58}{figure.caption.68}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Module Recherche clients Ni2 : 27 127 clients importés détectés (KPI de volume)}}{58}{figure.caption.69}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Fiche client}}{59}{figure.caption.70}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces fiche de propriétés}}{59}{figure.caption.71}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Onglet Dépendances }}{60}{figure.caption.72}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Vue Schématique}}{60}{figure.caption.73}%

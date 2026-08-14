@@ -1,0 +1,426 @@
+﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% GI Template Class - Minimal Fixed Version (pdfLaTeX compatible)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{gi}[2026/06/19 GI Template Class]
+\LoadClass[a4paper,11pt,oneside]{report}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  chargement des paquetages     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french,english]{babel} % If you write in French]{babel}
+\usepackage{arabtex}
+\usepackage{utf8}
+\usepackage{pifont}  % for some special characters 
+
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor} % les couleurs avec les divers modes d'appels
+\usepackage{setspace}
+\usepackage[]{graphicx} % pour insérer des images
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[amssymb,cdot]{SIunits}% pour quelques symboles mathmatiques comme <ou=
+\usepackage{mathcomp} % pour avoir le mu droit  $\tcmu$
+\usepackage{multirow}
+\usepackage{geometry} % pour la mise en page: marge haut, bas, droit et gauche.
+\usepackage[Lenny]{fncychap} %personnaliser le titre des chapitres
+\usepackage{palatino} % choix de la police
+\usepackage{float} % obliger l'image a rester la ou je veux
+\usepackage{pdfpages} % inclure les pages pdf d'un autre document
+\usepackage[hyphens]{url}
+    \def\UrlBreaks{\do\.\do\@\do\\\do\/\do\!\do\_\do\|\do\;\do\>%
+\do\]\do\)\do\,\do\?\do\'\do+\do\=\do\#\do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z%
+\do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z%
+\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9\do\%\do\=}%
+%\usepackage{color} % les couleurs avec les divers modes d'appels
+% activer tous les liens
+\usepackage[ 
+            colorlinks=true,%activer la coloration des liens 
+            linkcolor=RoyalBlue,% personaliser la couleur des liens simple
+            ]{hyperref}
+
+%\usepackage[nonumberlist, acronym, toc]{glossaries} %Mise en forme du glossaire
+\usepackage[acronym, toc]{glossaries} %Mise en forme du glossaire
+%\usepackage[nonumberlist,style=altlist]{glossaries}
+% \renewcommand*{\glsgroupskip}{}
+% \renewcommand*{\glsseeformat}[3][\seename]{%
+% (\xmakefirstuc{#1} \glsseelist{#2}.)}
+ 
+\usepackage{fancyhdr}
+\usepackage{lastpage} % la dernière page
+\usepackage{titlesec} % modifification des titres
+\usepackage[strict]{changepage} % ajustement automatique de la largeur des frame
+\usepackage{framed} % pour definir nos propres frames
+\usepackage{listings} % listing de code
+\usepackage{listingsutf8} % listing utf8
+\usepackage{caption}
+\usepackage[francais]{minitoc} % mini table des matières % table des matières par chapitre
+\usepackage{pifont}
+\usepackage{pdflscape} % mettre certaines page en paysage
+\usepackage{courier} % pour les listings
+
+% les couleurs du code
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}  
+\lstset{
+%language=Java,
+basicstyle=\ttfamily,
+basicstyle=\scriptsize,
+upquote=true,
+numbers=left,
+numberstyle=\tiny\color{black},
+stepnumber=1,
+numbersep=5pt,
+tabsize=2,
+showspaces=false,
+showstringspaces=false,
+extendedchars=true,
+backgroundcolor=\color{lbcolor}, 
+literate={á}{{\'a}}1 {ã}{{\~a}}1 {é}{{\'e}}1,
+frame=leftline
+}
+
+\lstdefinestyle{Shell}{delim=[il][\bfseries]{BB}}
+
+\definecolor{gris}{rgb}{68,68,68}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{lgray}{gray}{0.97} % page de garde
+\definecolor{bookColor}{cmyk}{0 , 0  , 0   , 0.98}  % 0.90\% of black
+\usepackage{multirow} % pour les rowspan des tableaux
+\usepackage{longtable} % tableaux sur plusieurs pages
+%\usepackage[chapter]{algorithm}
+%\usepackage[french]{algorithm2e}
+\usepackage[nottoc,notlof,notlot,notbib]{tocbibind}
+
+\usepackage[french,linesnumbered,lined,boxed,commentsnumbered,ruled]{algorithm2e}
+\usepackage{algpseudocode} % algorithmic
+%\usepackage{algorithmic}
+
+%\usepackage{auto-pst-pdf} 
+\usepackage{pstricks,pst-node,pst-tree}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Colors and Custom Styles
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xcolor}
+\definecolor{quotemark}{gray}{0.7}
+\definecolor{gris}{rgb}{68,68,68}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{lgray}{gray}{0.97}
+\definecolor{bookColor}{cmyk}{0,0,0,0.98}
+\definecolor{fondBleu}{rgb}{0.95,0.95,1}
+\definecolor{iNavy}{rgb}{0.0,0.2,0.4}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Definition des variables %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\titreDuMemoire}[1]{\newcommand{\@titreDuMemoire}{#1}}
+\newcommand{\typeMemoire}[1]{\newcommand{\@typeMemoire}{#1}}
+\newcommand{\etudiant}[1]{\newcommand{\@etudiant}{#1}}
+\newcommand{\encadrants}[1]{\newcommand{\@encadrants}{#1}}
+\newcommand{\jurys}[1]{\newcommand{\@jurys}{#1}}
+\newcommand{\dateSoutenance}[1]{\newcommand{\@dateSoutenance}{#1}}
+\newcommand{\optionFormation}[1]{\newcommand{\@optionFormation}{#1}}
+\newcommand{\anneeScolaire}[1]{\newcommand{\@anneeScolaire}{#1}}
+\newcommand{\titre}[1]{\newcommand{\@titre}{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Mise en page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\geometry{tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\setlength\headheight{15pt}
+\renewcommand{\baselinestretch}{1.2}
+\setlength{\parindent}{0pt}  % Supprime l'indentation des paragraphes
+\pagestyle{headings}
+
+\renewcommand{\listfigurename}{Liste des figures}
+\renewcommand{\listtablename}{Liste des tableaux}
+
+\newenvironment{formal}{%
+  \def\FrameCommand{%
+    \hspace{1pt}%
+    {\color{black}\vrule width 2pt}%
+    {\color{lgray}\vrule width 4pt}%
+    \colorbox{lgray}%
+  }%
+  \MakeFramed{\advance\hsize-\width\FrameRestore}%
+  %\noindent\hspace{-4.55pt}% desactiver l'identation
+  %\noindent
+  \begin{adjustwidth}{}{7pt}%
+  \vspace{0pt}\vspace{0pt}%
+}
+{%
+  \vspace{2pt}\end{adjustwidth}\endMakeFramed%
+}
+
+
+\newcommand{\monBloc}[1]{
+\begin{formal}
+\emph{{#1}}
+\end{formal}
+}	
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% commande epigraphe
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\epigraphe}[3]{
+    \begin{formal}
+	\ding{125}    
+    {\itshape #1}
+    \ding{126}
+    \end{formal}
+    {\raggedleft \textsc{#2} #3\par}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% modification de la numerotation %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% niveau de hirarchie  3
+\setcounter{secnumdepth}{3}	% permet de numroter 4 niveaux
+\setcounter{tocdepth}{2}	% et en affiche 2 dans la toc
+
+% saut de page aprs le titre du chapitre
+\def\chapitre#1{\chapter{#1}\newpage}
+% compteur de partie sous la forme A, B, ...
+%\renewcommand\thepart{\Alph{part}}
+% compteur de chapitre sous la forme 1), 2) ...
+%\renewcommand{\thechapter}{\arabic{chapter}}
+% compteur de section sous la forme I, II, ...
+%\renewcommand{\thesection}{\Roman{section}}
+% compteur de section sous la forme I, II...
+%\renewcommand{\thesection}{\Roman{section}}
+% compteur de sous-section sous la forme 1), 2)...
+%\renewcommand{\thesubsection}{\arabic{subsection})}
+% compteur de sous-sous-section sous la forme 1), 2)...
+%\renewcommand{\thesubsubsection}{\arabic{subsubsection})}
+%differente pagination pour les tableaux
+%\renewcommand{\thetable}{\arabic{chapter}.\arabic{table}}
+%différente pagination pour les figures
+%\renewcommand{\thefigure}{\arabic{chapter}.\arabic{figure}}
+%différente pagination la table des matières
+%\renewcommand{\glsaddall}{\arabic{chapter}.\arabic{glossary}}
+
+\newcommand\listofsigle{\chapter*{\textbf{Liste des sigles et acronymes}}\phantomsection\addcontentsline{toc}{chapter}{Liste des sigles et acronymes}}
+\newcommand\dedicace{\chapter*{Dédicace}\phantomsection\addcontentsline{toc}{chapter}{Dédicace}}
+\newcommand\remerciements{\chapter*{Remerciements}\phantomsection\addcontentsline{toc}{chapter}{Remerciements}}
+\newcommand\introduction{\chapter*{Introduction Générale}\phantomsection\addcontentsline{toc}{chapter}{Introduction}}
+\newcommand\conclusion{\chapter*{Conclusion Générale}\phantomsection\addcontentsline{toc}{chapter}{Conclusion}}
+\newcommand\resume{\chapter*{Résumé}\phantomsection\addcontentsline{toc}{chapter}{Résumé}}
+\newcommand\resumeAn{\chapter*{Abstract}\phantomsection\addcontentsline{toc}{chapter}{Abstract}}
+\newcommand\resumeAr{\chapter*{\RL{mol_h.s}}\phantomsection\addcontentsline{toc}{chapter}{\RL{mol_h.s}}}
+\newcommand\annexe{\chapter*{}\phantomsection\addcontentsline{toc}{chapter}{Annexes}}
+
+%\renewcommand\glsaddall{\chapter*{Glossaire}\phantomsection\addcontentsline{toc}{chapter}{Glossaire}}
+
+%\newcommand\resume{\subsubsection*{}\phantomsection\addcontentsline{toc}{chapter}{Résumé / Abstract}}
+
+\renewcommand\printglossaries{\chapter*{Glossaire}\phantomsection\addcontentsline{toc}{chapter}{Glossaire}}
+
+%\renewcommand\printsigles{\chapter*{Sigles et Abréviations}\phantomsection\addcontentsline{toc}{chapter}{Sigles et Abréviations}}
+\newenvironment{fquote}{%
+  \begin{quote}\small\itshape%
+}{%
+  \end{quote}%
+}
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+%\fancyfoot[R]{\thepage / \pageref{LastPage}}
+\fancyfoot[C]{\thepage}
+\fancyhead[L]{\tiny \leftmark}
+\fancyhead[R]{\scriptsize \rightmark}
+
+% french and english abstract on same page
+% http://www.latex-community.org/forum/viewtopic.php?f=44&t=13708
+
+
+\if@titlepage
+  \renewenvironment{abstract}{%
+      %\null\vfil
+      \@beginparpenalty\@lowpenalty
+      \begin{center}%
+        \Huge \abstractname
+        \@endparpenalty\@M
+      \end{center}\fancyhf{}}%
+     {
+     %\par\vfil\null
+     }
+\fi
+
+
+% \newglossarystyle{clong}{%
+%  \renewenvironment{theglossary}%
+%      {\begin{longtable}{p{.3\linewidth}p{\glsdescwidth}}}%
+%      {\end{longtable}}%
+%   \renewcommand*{\glossaryheader}{}%
+%   \renewcommand*{\glsgroupheading}[1]{}%
+%   \renewcommand*{\glossaryentryfield}[5]{%
+%     \glstarget{##1}{##2} & ##3\glspostdescription\space ##5\\}%
+%   \renewcommand*{\glossarysubentryfield}[6]{%
+%      & \glstarget{##2}{\strut}##4\glspostdescription\space ##6\\}%
+%   %\renewcommand*{\glsgroupskip}{ & \\}%
+% }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% modification de la toc          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage{tocloft}
+%\renewcommand{\cftchapnumwidth}{\setlength{0.7cm}}
+%\renewcommand{\cftsecnumwidth}{\setlength{0.7cm}}
+%\renewcommand{\cftsubsecnumwidth}{\setlength{0.7cm}}
+%\renewcommand{\cftsubsubsecnumwidth}{\setlength{0.7cm}}
+
+%%%%%%%%% commenter les lignes suivantes pour avoir %%%%%%%%%%%%%%%
+%%%%%%%%%       les hauts de page en majuscule      %%%%%%%%%%%%%%%
+
+  \renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+  \renewcommand{\chaptermark}[1]{%
+    \markboth{\if@mainmatter\@chapapp\ \thechapter. \fi\ #1}%
+    {\if@mainmatter\@chapapp\ \thechapter. \fi\ #1}}
+
+%surcharge des sections
+\titleformat{\section}
+{\normalfont\Large\bfseries}{\thesection}{0.5em}{}[\hspace{1ex}] %\titlerule par Ezin
+
+% surcharge des titres des parties
+
+\titleclass{\part}{page}
+\titleformat{\part}[display]
+  {\centering\normalfont\huge\bfseries}
+  {\centering\normalfont\normalsize\scshape\partname\ \centering{\thepart}}
+  {2ex}
+  {\titlerule\vspace{1ex}}
+  [\vspace{2ex}\titlerule]
+
+{\newpage\renewcommand{\thepage}{\arabic{page}}\setcounter{page}{1}}
+
+
+% enlever le point à la fin
+\renewcommand*{\glspostdescription}{}
+% mettre deux points apres les titres
+\renewcommand{\glsnamefont}[1]{\textbf{#1 :  }}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\footnoteremember}[2]{
+\footnote{#2}
+\newcounter{#1}
+\setcounter{#1}{\value{footnote}}
+}
+
+\newcommand{\footnoterecall}[1]{
+\footnotemark[\value{#1}]
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{nomencl}
+\renewcommand{\nomname}{Sigles et abréviations}
+\makenomenclature
+
+% Simple Title Page Command
+\newcommand{\pageDeGarde}{%
+  \begin{titlepage}
+  \begin{center}
+    \begin{tabular}{c}
+      \textsf{{\scriptsize  }}
+    \end{tabular}
+  \end{center}
+
+  \vspace{-1.75cm}
+  \begin{flushleft}
+    \hspace{-0.5cm}
+    \begin{tabular}{p{3.5cm}}
+      \begin{flushright}
+        \includegraphics[scale=0.6]{images/logo-univ-D-uh1.png}\\
+      \end{flushright}
+    \end{tabular}
+    \hfill
+    \begin{tabular}{p{8.5cm}}
+      \begin{center}
+        {\footnotesize \textbf{\textsf{UNIVERSITÉ HASSAN 1er}}\\}
+        \vspace{0.25cm}
+        {\footnotesize \textbf {\textsf{FACULTÉ DE SCIENCES ET TECHNIQUES }\\}}
+        \vspace{0.25cm}
+        {\footnotesize \textbf {\textsf{ --- SETTAT --- }\\}}
+        \vspace{0.25cm}
+        {}
+        \vspace{-0.25cm}
+        {}
+      \end{center}
+    \end{tabular}
+    \hfill
+    \begin{tabular}{p{3.5cm}}
+      \begin{flushleft}
+        \includegraphics[scale=0.6]{images/logo-univ-G-fst.png}
+      \end{flushleft}
+    \end{tabular}
+\end{flushleft}
+%\vfill
+
+%\vfill
+
+\begin{center}
+  {\large Projet de Fin d'Etude \\}
+  \vspace{0.5cm}
+  {\large En vue de l'obtention du diplôme\\}
+  \vspace{0.5cm}
+
+  {\large \bf \centering \@typeMemoire \\ }
+  \vspace{0.5cm}
+
+  {\large \centering Spécialité : \@optionFormation \\ }
+  \vspace{0.5cm}
+
+  { \textbf{Présenté par} : \\}
+  {\@etudiant{}}\\
+  \vspace{1cm}
+
+  %{\rule{\textwidth}{0.2mm}}\vspace{3mm} \\
+  {{\Huge {\bf \centering \@titreDuMemoire}}}\\
+  %{\rule{\textwidth}{0.2mm}}\\
+  \vspace{1cm} % Réduit un peu l'espace pour faire de la place au logo
+
+  % --- AJOUT DU LOGO INETUM ---
+  \begin{center}
+      \includegraphics[height=1.5cm]{images/logoIID.png} % Ajustez la hauteur ici si nécessaire
+  \end{center}
+
+  \vspace{1.5cm}
+  {\large \textbf{Sous la direction de :}}
+
+\end{center}
+  
+
+  
+  \vspace{0.3cm}
+  {\@encadrants}
+  
+\begin{center}
+  \vspace{1cm}
+  {\large \textbf{Soutenu le 25 juin 2026, devant le jury : }}
+  
+  \vspace{0.3cm}
+  {\@jurys}
+  
+  \vfill
+  {\large \textbf{Année Universitaire :} \bf \@anneeScolaire}
+\end{center}
+\end{titlepage}
+}
+
+% Initialize
+\makeindex
+\makeglossaries
+
+\author{}
+\date{}

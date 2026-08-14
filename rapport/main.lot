@@ -1,0 +1,37 @@
+\babel@toc {english}{}\relax 
+\contentsline {xchapter}{}{ii}{section*.2}%
+\contentsline {xchapter}{}{iii}{section*.4}%
+\contentsline {xchapter}{}{iv}{section*.6}%
+\contentsline {xchapter}{}{v}{section*.8}%
+\babel@toc {french}{}\relax 
+\contentsline {xchapter}{}{vii}{section*.8}%
+\contentsline {xchapter}{}{ix}{section*.9}%
+\contentsline {xchapter}{}{x}{section*.10}%
+\contentsline {xchapter}{}{1}{section*.12}%
+\contentsline {xchapter}{}{2}{section*.14}%
+\babel@toc {french}{}\relax 
+\addvspace {10\p@ }
+\contentsline {xchapter}{Présentation du Projet}{2}{chapter.1}%
+\contentsline {table}{\numberline {1.1}{\ignorespaces Identité et chiffres clés d'Inetum}}{3}{table.caption.16}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces Fiche technique d’Inetum Offshore Maroc}}{4}{table.caption.17}%
+\addvspace {10\p@ }
+\contentsline {xchapter}{Stratégie de Migration}{14}{chapter.2}%
+\contentsline {table}{\numberline {2.1}{\ignorespaces Planification des jalons}}{24}{table.caption.34}%
+\addvspace {10\p@ }
+\contentsline {xchapter}{Migration des Données}{28}{chapter.3}%
+\contentsline {table}{\numberline {3.1}{\ignorespaces Détail des tâches par jalon}}{29}{table.caption.38}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Processus de migration des données (ETL)}}{30}{table.caption.39}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Table de correspondance (Mapping) des objets Location GAIA vers Ni2}}{31}{table.caption.40}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Bilan quantitatif de la migration des objets Location}}{34}{table.caption.43}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Mapping des objets Actor et Service vers le modèle Ni2}}{35}{table.caption.44}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Bilan quantitatif de la migration des objets Service et Customer}}{38}{table.caption.47}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces Mapping de la hiérarchie des équipements (Devices) vers Ni2}}{39}{table.caption.48}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces Mapping des objets de l'infrastructure Cuivre vers Ni2}}{41}{table.caption.50}%
+\contentsline {table}{\numberline {3.9}{\ignorespaces Bilan quantitatif de la migration des objets Équipement et Infrastructure}}{44}{table.caption.53}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Description des tables pivots utilisées pour la migration CRM}}{45}{table.caption.54}%
+\contentsline {table}{\numberline {3.11}{\ignorespaces Pipeline technique de déploiement et d'importation CRM}}{47}{table.caption.56}%
+\contentsline {table}{\numberline {3.12}{\ignorespaces Résultats de réconciliation et de validation du Jalon L4 (Migration CRM)}}{49}{table.caption.57}%
+\contentsline {table}{\numberline {3.13}{\ignorespaces Bilan global des métriques de migration par jalon}}{50}{table.caption.58}%
+\addvspace {10\p@ }
+\contentsline {xchapter}{Réalisation}{51}{chapter.4}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Stack technologique et outils de travail}}{56}{table.caption.65}%

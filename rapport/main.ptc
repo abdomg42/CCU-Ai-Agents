@@ -1,0 +1,277 @@
+
+ *File List*
+      gi.cls    2026/06/19 GI Template Class
+  report.cls    2025/01/22 v1.4n Standard LaTeX document class
+  size11.clo    2025/01/22 v1.4n Standard LaTeX file (size option)
+ fontenc.sty    2025/07/18 v2.1d Standard LaTeX package
+inputenc.sty    2024/02/08 v1.3d Input encoding file
+   babel.sty    2026/03/24 v26.5 The multilingual framework for LuaLaTeX, pdfLaTeX and XeLaTeX
+ bblopts.cfg    2005/09/08 v0.1 add Arabic and Farsi to "declared" options of babel
+babel-french.tex
+babel-english.tex
+  french.ldf    2025-08-15 v3.7e French support from the babel system
+ english.ldf    2017/06/06 v3.3r English support from the babel system
+scalefnt.sty    
+ arabtex.sty    2003/08/22  3.11 ArabTeX main module
+ arabaux.sty    2003/05/21  3.11 auxiliary macros for ArabTeX
+    acmd.sty    2003/08/20  3.11 Arabic command processing 
+  afonts.sty    1995/11/16  3.04 define Naskh font 
+ afonts2.sty    1998/10/19  3.10 define Naskh fonts for LaTeX2e
+   ascan.sty    2003/08/22  3.11 standard ZDMG input encoding 
+  aparse.sty    2003/05/26  3.11 get syllables 
+  awrite.sty    2003/06/05  3.11 build output word 
+xarbsymb.sty    1998/07/15  3.07 symbolic output encoding 
+arabskel.sty    2000/06/04  3.10 character skeleton definitions 
+xarbskel.sty    1999/07/17  3.09 character skeleton definitions 
+  aboxes.sty    2003/05/28  3.11 build output boxes
+arabtoks.sty    1999/07/17  3.09 ArabTeX CS token definitions 
+arabchrs.sty    1998/07/11  3.07 letter token definitions 
+   aligs.sty    2003/05/26  3.11 compute ligatures
+ aoutput.sty    2000/06/04  3.10 build output lines
+  abidir.sty    2003/08/22  3.11 bidirectional linebreaking
+  atrans.sty    2003/06/14  3.11 generate the transliteration 
+  alatex.sty    2003/05/04  3.11 ArabTeX extensions for LaTeX 
+   afoot.sty    2003/05/12  3.11 ArabTeX footnotes
+   abjad.sty    2003/04/26  3.11 abjad numerals 
+  apatch.sty    2006/07/02  3.11s last minute patches 
+  alists.sty    2003/04/26  3.11 inverted list macros
+   asect.sty    2003/04/26  3.11 section macros for Arabic
+   atabg.sty    1997/01/21  3.05 LaTeX tabbing macros for Arabic
+    utf8.sty    2000/06/13  3.10 UTF-8 input encoding 
+ utfcode.sty    2002/03/07  3.10a Arabic+Hebrew segment of UTF-8
+  pifont.sty    2020/03/25 PSNFSS-v9.3 Pi font support (SPQR) 
+    upzd.fd    2001/06/04 font definitions for U/pzd.
+    upsy.fd    2001/06/04 font definitions for U/psy.
+  xcolor.sty    2024/09/29 v3.02 LaTeX color extensions (UK)
+   color.cfg    2016/01/02 v1.6 sample color configuration
+  pdftex.def    2025/09/29 v1.2d Graphics/color driver for pdftex
+mathcolor.ltx
+dvipsnam.def    2016/06/17 v3.0m Driver-dependent file (DPC,SPQR)
+  svgnam.def    2024/09/29 v3.02 Predefined colors according to SVG 1.1 (UK)
+colortbl.sty    2024/10/29 v1.0k Color table columns (DPC)
+   array.sty    2025/09/25 v2.6n Tabular extension package (FMi)
+setspace.sty    2022/12/04 v6.7b set line spacing
+graphicx.sty    2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+  keyval.sty    2022/05/29 v1.15 key=value parser (DPC)
+graphics.sty    2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+    trig.sty    2023/12/02 v1.11 sin cos tan (DPC)
+graphics.cfg    2016/06/04 v1.11 sample graphics configuration
+ amsmath.sty    2025/07/09 v2.17z AMS math features
+ amstext.sty    2024/11/17 v2.01 AMS text
+  amsgen.sty    1999/11/30 v2.0 generic functions
+  amsbsy.sty    1999/11/29 v1.2d Bold Symbols
+  amsopn.sty    2022/04/08 v2.04 operator names
+amsfonts.sty    2013/01/14 v3.01 Basic AMSFonts support
+ SIunits.sty    2007/12/02 v1.36 Support for the International System of units (MH)
+ SIunits.cfg
+mathcomp.sty    2001/01/07 v0.1f (TBo)
+textcomp.sty    2024/04/24 v2.1b Standard LaTeX package
+multirow.sty    2024/11/12 v2.9 Span multiple rows of a table
+geometry.sty    2026/03/07 v6.0 Page Geometry
+  ifvtex.sty    2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+   iftex.sty    2024/12/12 v1.0g TeX engine tests
+geometry.cfg
+fncychap.sty    2007/07/30 v1.34 LaTeX package (Revised chapters)
+palatino.sty    2020/03/25 PSNFSS-v9.3 (SPQR) 
+   float.sty    2001/11/08 v1.3d Float enhancements (AL)
+pdfpages.sty    2026/03/30 v0.6h Insert pages of external PDF documents (AM)
+  ifthen.sty    2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
+    calc.sty    2025/03/01 v4.3b Infix arithmetic (KKT,FJ)
+ eso-pic.sty    2025/12/10 v3.0d eso-pic (RN)
+etoolbox.sty    2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
+pppdftex.def    2026/03/30 v0.6h Pdfpages driver for pdfTeX (AM)
+     url.sty    2013/09/16  ver 3.4  Verb mode for urls, etc.
+hyperref.sty    2026-01-29 v7.01p Hypertext links for LaTeX
+kvsetkeys.sty    2022-10-05 v1.19 Key value parser (HO)
+kvdefinekeys.sty    2019-12-19 v1.6 Define keys (HO)
+pdfescape.sty    2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+ ltxcmds.sty    2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
+pdftexcmds.sty    2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
+infwarerr.sty    2019/12/03 v1.5 Providing info/warning/error messages (HO)
+ hycolor.sty    2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+ nameref.sty    2026-01-29 v2.58 Cross-referencing by name of section
+refcount.sty    2019/12/15 v3.6 Data extraction from label references (HO)
+gettitlestring.sty    2019/12/15 v1.6 Cleanup title references (HO)
+kvoptions.sty    2022-06-15 v3.15 Key value format for package options (HO)
+stringenc.sty    2019/11/29 v1.12 Convert strings between diff. encodings (HO)
+  pd1enc.def    2026-01-29 v7.01p Hyperref: PDFDocEncoding definition (HO)
+ intcalc.sty    2019/12/15 v1.3 Expandable calculations with integers (HO)
+   puenc.def    2026-01-29 v7.01p Hyperref: PDF Unicode definition (HO)
+  bitset.sty    2019/12/09 v1.3 Handle bit-vector datatype (HO)
+bigintcalc.sty    2019/12/15 v1.5 Expandable calculations on big integers (HO)
+ hpdftex.def    2026-01-29 v7.01p Hyperref driver for pdfTeX
+rerunfilecheck.sty    2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
+uniquecounter.sty    2019/12/15 v1.4 Provide unlimited unique counter (HO)
+glossaries.sty    2026/03/06 v5.0 (NLCT)
+ xkeyval.sty    2022/06/16 v2.9 package option processing (HA)
+ xkeyval.tex    2014/12/03 v2.7a key=value parser (HA)
+mfirstuc.sty    2025/04/03 v2.09 (NLCT)
+    xfor.sty    2009/02/05 v1.05 (NLCT)
+tracklang.sty    2025/03/11 v1.6.6 (NLCT) Track Languages
+tracklang.tex    2025/03/11 v1.6.6 (NLCT) Track Languages Generic Code
+translator.sty    2021-05-31 v1.12d Easy translation of strings in LaTeX
+glossaries-french.ldf    2016/12/12 v1.1
+glossaries-english.ldf    2014/11/23 v1.0
+datatool-base.sty    2025/12/04 v3.4.3 (NLCT)
+datatool-l3fp.def    2025/12/04 v3.4.3 (NLCT)
+datatool-utf8.ldf    2025/12/04 v3.4.3 (NLCT)
+glossary-hypernav.sty    2026/03/06 v5.0 (NLCT)
+glossary-list.sty    2026/03/06 v5.0 (NLCT)
+glossary-long.sty    2026/03/06 v5.0 (NLCT)
+longtable.sty    2025-10-13 v4.24 Multi-page Table package (DPC)
+glossary-super.sty    2026/03/06 v5.0 (NLCT)
+supertabular.sty    2025/06/26 v4.2d the supertabular environment
+glossary-tree.sty    2026/03/06 v5.0 (NLCT)
+fancyhdr.sty    2025/02/07 v5.2 Extensive control of page headers and footers
+lastpage.sty    2025/08/14 v2.1h lastpage: 2.09 or 2e? (HMM)
+lastpage2e.sty    2025/08/14 v2.1h Decide which 2e lastpage version to use (HMM)
+lastpagemodern.sty    2025-08-14 v2.1h Refers to last page's name (HMM; JPG)
+titlesec.sty    2025/01/04 v2.17 Sectioning titles
+changepage.sty    2009/10/20 v1.0c check page and change page layout
+  framed.sty    2011/10/22 v 0.96: framed or shaded text with page breaks
+listings.sty    2025/11/14 1.11b (Carsten Heinz)
+lstpatch.sty    2025/11/14 1.11b (Carsten Heinz)
+ lstmisc.sty    2025/11/14 1.11b (Carsten Heinz)
+listings.cfg    2025/11/14 1.11b listings configuration
+listingsutf8.sty    2019-12-10 v1.5 Allow UTF-8 in listings input (HO)
+ caption.sty    2023/08/05 v3.6o Customizing captions (AR)
+caption3.sty    2023/07/31 v2.4d caption3 kernel (AR)
+ltcaption.sty    2021/01/08 v1.4c longtable captions (AR)
+ minitoc.sty    2018/07/12 v62 Package minitoc
+ mtcmess.sty    2006/03/14
+    main.mtc0
+ english.mld    2006/01/13
+ english.mld    2006/01/13
+francais.mld    2004/12/14
+  french.mld    2006/03/21
+pdflscape.sty    2022-10-27 v0.13 Display of landscape pages in PDF
+pdflscape-nometadata.sty    2022-10-28 v0.13 Display of landscape pages in PDF (HO)
+  lscape.sty    2020/05/28 v3.02 Landscape Pages (DPC)
+ courier.sty    2020/03/25 PSNFSS-v9.3 (WaS) 
+tocbibind.sty    2010/10/13 v1.5k extra ToC listings
+algorithm2e.sty    2017/07/18 v5.2 algorithms environments
+ifoddpage.sty    2022/10/18 v1.2 Conditionals for odd/even page detection
+  xspace.sty    2014/10/28 v1.13 Space after command names (DPC,MH)
+ relsize.sty    2013/03/29 ver 4.1
+algpseudocode.sty    
+algorithmicx.sty    2005/04/27 v1.2 Algorithmicx
+pstricks.sty    2024/02/02 v0.75 LaTeX wrapper for `PSTricks' (RN,HV)
+pst-xkey.tex    2005/11/25 v1.6 PSTricks specialization of xkeyval (HA)
+pst-xkey.tex    2005/11/25 v1.6 PSTricks specialization of xkeyval (HA)
+pstricks.tex    2025/12/13 v3.22A `PSTricks' (tvz,hv)
+  pgffor.sty    2025-08-29 v3.1.11a (3.1.11a)
+  pgfrcs.sty    2025-08-29 v3.1.11a (3.1.11a)
+pgfrcs.code.tex
+ pgfkeys.sty    
+pgfkeys.code.tex
+ pgfmath.sty    
+pgfmath.code.tex
+pgffor.code.tex
+pstricks-dots.tex
+pst-code-grid.tex
+pst-code-box.tex
+pst-code-arc.tex
+pst-code-circle_ellipse.tex
+pst-code-ref_rot.tex
+pst-code-put.tex
+pst-code-pspicture.tex
+  pst-fp.tex    2020/11/20 v0.06 `PST-fp' (hv)
+pst-node.sty    2010/04/22 package wrapper for pst-node.tex
+pst-node.tex    2024/07/04 1.44 `pst-node' (tvz,hv)
+pst-tree.sty    2009/01/25 package wrapper for pst-tree.tex
+pst-tree.tex    2021/09/04 1.14 `pst-tree' (tvz,hv)
+ tocloft.sty    2017/08/31 v2.3i parameterised ToC, etc., typesetting
+ nomencl.sty    2021/11/10 v5.6 Nomenclature package
+tocbasic.sty    2026/02/02 v3.49.2 KOMA-Script package (handling toc-files)
+ scrbase.sty    2026/02/02 v3.49.2 KOMA-Script package (KOMA-Script-independent basics and keyval usage)
+scrlfile.sty    2026/02/02 v3.49.2 KOMA-Script package (file load hooks)
+scrlfile-hook.sty    2026/02/02 v3.49.2 KOMA-Script package (using LaTeX hooks)
+ scrlogo.sty    2026/02/02 v3.49.2 KOMA-Script package (logo)
+titletoc.sty    2025/01/04 v2.17 TOC entries
+    tikz.sty    2025-08-29 v3.1.11a (3.1.11a)
+     pgf.sty    2025-08-29 v3.1.11a (3.1.11a)
+ pgfcore.sty    2025-08-29 v3.1.11a (3.1.11a)
+  pgfsys.sty    2025-08-29 v3.1.11a (3.1.11a)
+pgfsys.code.tex
+pgfsyssoftpath.code.tex    2025-08-29 v3.1.11a (3.1.11a)
+pgfsysprotocol.code.tex    2025-08-29 v3.1.11a (3.1.11a)
+pgfcore.code.tex
+pgfcomp-version-0-65.sty    2025-08-29 v3.1.11a (3.1.11a)
+pgfcomp-version-1-18.sty    2025-08-29 v3.1.11a (3.1.11a)
+tikz.code.tex
+glossaire_reduit.tex
+   t1ppl.fd    2001/06/04 font definitions for T1/ppl.
+l3backend-pdftex.def    2026-02-18 L3 backend support: PDF output (pdfTeX)
+supp-pdf.mkii
+epstopdf-base.sty    2020-01-24 v2.11 Base part for package epstopdf
+epstopdf-sys.cfg    2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+    main.out
+    main.out
+  apatch.sty    2006/07/02  3.11s last minute patches 
+    umsa.fd    2013/01/14 v3.01 AMS symbols A
+    umsb.fd    2013/01/14 v3.01 AMS symbols B
+0-dedicace.tex
+1-remerciements.tex
+2-resume.tex
+2-2-resumeAn.tex
+2-4-listedessigles.tex
+3-introduction.tex
+  ot1phv.fd    2020/03/25 scalable font definitions for OT1/phv.
+  ot1ptm.fd    2001/06/04 font definitions for OT1/ptm.
+1-partie/1-fichier.tex
+  ts1ppl.fd    2001/06/04 font definitions for TS1/ppl.
+images/secteur d'activite.png
+images/organigramme3.png
+images/flux.png
+images/cartographie.png
+images/planninglot1.png
+images/planninglot2.png
+images/cycleV.png
+images/scrum.png
+images/gantt.png
+2-partie/1-fichier.tex
+images/retroingeCRM.png
+images/headerCSV.png
+images/index.png
+images/archiGeneraleNI2.png
+images/procesImport.png
+images/dry runs.png
+images/index2.png
+images/index3.png
+3-partie/1-fichier.tex
+   t1pcr.fd    2001/06/04 font definitions for T1/pcr.
+images/modele/LocationModel.png
+images/modele/ScriptLocation.png
+images/modele/CustomerServiceModel.png
+images/modele/NDModel.png
+images/modele/Image1.png
+images/modele/Image3.png
+images/modele/Image4.png
+lstlang1.sty    2025/11/14 1.11b listings language file
+images/chapitre 3/crm_deployment_pipeline.png
+4-partie/1-fichier.tex
+images/chapitre 4/vpn.png
+images/chapitre 4/dbeaver.jpg
+images/chapitre 4/cnxDbeaver.png
+images/chapitre 4/mobaxterm.jpg
+images/chapitre 4/sessionmobaxterm.png
+images/chapitre 4/vslogo.jpg
+images/chapitre 4/vs.png
+images/chapitre 4/bitbucket.png
+images/chapitre 4/excel.jpg
+images/chapitre 4/draw.io.png
+images/chapitre 4/workflow git .drawio.png
+4-conclusion.tex
+ ***********
+
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+

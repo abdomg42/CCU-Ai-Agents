@@ -1,0 +1,41 @@
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode Introduction}{\reset@font\mtcSfont 28}{section*.37}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {3.1}Migration GAIA vers Ni2}{\reset@font\mtcSfont 29}{section.3.1}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.1.1}Architecture du pipeline ETL GAIA}{\reset@font\mtcSSfont 29}{subsection.3.1.1}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.1.2}Thème Locations}{\reset@font\mtcSSfont 30}{subsection.3.1.2}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.2.1}Modèle de données Ni2 cible}{\reset@font\mtcSSSfont 30}{subsubsection.3.1.2.1}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.2.2}Processus technique de migration (ETL)}{\reset@font\mtcSSSfont 30}{subsubsection.3.1.2.2}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.2.3}Mapping et correspondance des objets (GAIA vers Ni2)}{\reset@font\mtcSSSfont 30}{subsubsection.3.1.2.3}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.2.4}Modélisation des objets relatifs aux « Emplacements »}{\reset@font\mtcSSSfont 31}{subsubsection.3.1.2.4}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.2.5}Scripts développés}{\reset@font\mtcSSSfont 32}{subsubsection.3.1.2.5}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode Script 1 --- Extraction des entités géographiques (\texttt {GAI\_1LOC\_...\_SousReseau.sql}) :}{\reset@font\mtcPfont 33}{subsubsection.3.1.2.5}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode Script 2 --- Extraction des Sites (\texttt {GAI\_1LOC...\_Adresse**.sql}) :}{\reset@font\mtcPfont 33}{figure.caption.42}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode Script 3 --- Extraction des infrastructures (\texttt {GAI\_1LOC...\_LocEquipment.sql}) :}{\reset@font\mtcPfont 34}{figure.caption.42}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.2.6}Résultats et validation IHM}{\reset@font\mtcSSSfont 34}{subsubsection.3.1.2.6}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.1.3}Thème Services \& Customers}{\reset@font\mtcSSfont 34}{subsection.3.1.3}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.3.1}Modèle de données Ni2 cible}{\reset@font\mtcSSSfont 34}{subsubsection.3.1.3.1}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.3.2}Modélisation des objets relatifs aux « Clients » et « Services »}{\reset@font\mtcSSSfont 35}{subsubsection.3.1.3.2}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.3.3}Scripts développés}{\reset@font\mtcSSSfont 36}{subsubsection.3.1.3.3}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.3.4}Résultats et validation IHM}{\reset@font\mtcSSSfont 37}{subsubsection.3.1.3.4}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.1.4}Thème Equipement}{\reset@font\mtcSSfont 38}{subsection.3.1.4}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.4.1}Devices Globaux}{\reset@font\mtcSSSfont 38}{subsubsection.3.1.4.1}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.4.2}Device Cuivre}{\reset@font\mtcSSSfont 41}{subsubsection.3.1.4.2}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {3.1.4.3}Devices Cuivre — MSAN}{\reset@font\mtcSSSfont 42}{subsubsection.3.1.4.3}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {3.2}Rétro-ingénierie et Migration CRM}{\reset@font\mtcSfont 44}{section.3.2}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.2.1}Investigation et Rétro-ingénierie du CRM}{\reset@font\mtcSSfont 44}{subsection.3.2.1}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode Exploration et identification des entités critiques}{\reset@font\mtcPfont 44}{subsection.3.2.1}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode Stratégie de pivot en collaboration avec l'équipe Comarch}{\reset@font\mtcPfont 45}{subsection.3.2.1}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.2.2} Développement des Scripts T-SQL et Fichier de Mapping}{\reset@font\mtcSSfont 45}{subsection.3.2.2}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode \textbf {Script 1 — Adresses} }{\reset@font\mtcPfont 45}{subsection.3.2.2}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode \textbf {Script 2 — Clients} }{\reset@font\mtcPfont 46}{subsection.3.2.2}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode \textbf {Script 3 — Contacts} }{\reset@font\mtcPfont 46}{subsection.3.2.2}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.2.3} Pipeline de Déploiement et Environnement d'Exécution}{\reset@font\mtcSSfont 46}{subsection.3.2.3}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.2.4}Validation, Tests Unitaires et Dossier de Recette}{\reset@font\mtcSSfont 48}{subsection.3.2.4}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode Analyse des logs et traitement des rejets}{\reset@font\mtcPfont 48}{subsection.3.2.4}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode Tests unitaires sur l'IHM Ni2}{\reset@font\mtcPfont 48}{subsection.3.2.4}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode Dossier de Test de Recette (DTR)}{\reset@font\mtcPfont 48}{subsection.3.2.4}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {3.3}Tests d'intégration de bout en bout Ni2 / Façade / CRM}{\reset@font\mtcSfont 49}{section.3.3}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.3.1}Contexte et périmètre des tests}{\reset@font\mtcSSfont 49}{subsection.3.3.1}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {3.4}Bilan de Réalisation et Analyse Critique}{\reset@font\mtcSfont 49}{section.3.4}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.4.1}Synthèse des métriques globales}{\reset@font\mtcSSfont 50}{subsection.3.4.1}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {3.4.2}Enseignements et points d'amélioration}{\reset@font\mtcSSfont 50}{subsection.3.4.2}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode Conclusion}{\reset@font\mtcSfont 50}{subsection.3.4.2}}

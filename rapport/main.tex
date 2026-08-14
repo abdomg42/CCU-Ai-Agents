@@ -1,0 +1,114 @@
+\documentclass{gi}
+
+\usepackage{tikz}
+\setlength{\glsdescwidth}{0.65\textwidth}
+
+\typeMemoire{\textbf{MASTER SCIENCES ET TECHNIQUES}}
+\optionFormation{Réseaux et Systèmes Informatiques (RSI)}
+\etudiant{HAOUD \textbf{HAJAR}}
+\titreDuMemoire{Rétro-ingénierie du Référentiel CRM et Migration des Données Réseau et Client vers la CMDB Ni2 Unified Inventory}
+\dateSoutenance{25 juin 2026}
+\anneeScolaire{2025 - 2026}
+
+\encadrants{
+    Pr. Fouad Toufik, Professeur à la FST de Settat \\
+    Mr. Mohamed Amine Brakez, Chef de projet
+}
+
+\jurys{
+    \begin{tabular}{lll}
+        Mme. Sara AREZKI & Professeur à la FST de Settat & Examinatrice \\
+        Mr. Fouad TOUFIK & Professeur à la FST de Settat & Encadrant \\
+    \end{tabular}
+}
+
+\hypersetup{
+    pdftitle={Rapport de stage de fin d'études},
+    pdfauthor={HAOUD Hajar},
+    pdfsubject={pfe},
+    pdfkeywords={--}
+}
+
+\loadglsentries{glossaire_reduit}
+
+\begin{document}
+
+\color{black}  % ← déplacé ici, dans le corps du document
+\pageDeGarde
+
+\pagecolor{white}
+\thispagestyle{empty}\ \clearpage
+\pagenumbering{roman}
+
+% ✅ \dominitoc AVANT tout \chapter ou \chapter*
+\dominitoc
+
+% ── Frontmatter ────────────────────────────────────────────────
+\include{0-dedicace}
+\mtcaddchapter      % ← compense \chapter*{Dédicace}
+
+\include{1-remerciements}
+\mtcaddchapter      % ← compense \chapter*{Remerciements}
+
+\include{2-resume}
+\mtcaddchapter      % ← compense \chapter*{Résumé}
+
+\include{2-2-resumeAn}
+\mtcaddchapter      % ← compense \chapter*{Abstract}
+
+\selectlanguage{french}
+
+% ── Tables (chacune génère un \chapter* en interne) ────────────
+\tableofcontents
+\mtcaddchapter      % ← compense \chapter*{Table des matières}
+\newpage
+
+\phantomsection
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+\mtcaddchapter      % ← compense \chapter*{Liste des figures}
+\newpage
+
+\phantomsection
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables
+\mtcaddchapter      % ← compense \chapter*{Liste des tableaux}
+\newpage
+
+\include{2-4-listedessigles}
+\mtcaddchapter      % ← compense \chapter*{Liste des sigles}
+\newpage
+
+% ── Corps principal ────────────────────────────────────────────
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\include{3-introduction}
+\mtcaddchapter      % ← compense \chapter*{Introduction Générale}
+
+\selectlanguage{french}
+\fancyhead[L]{\tiny \leftmark}
+\fancyhead[R]{\scriptsize \rightmark}
+\fancyfoot[C]{\thepage}
+
+% ✅ Les \minitoc seront maintenant correctement synchronisés
+\chapter{Présentation du Projet}\label{chap:1}
+\minitoc
+\input{1-partie/1-fichier}
+
+\chapter{Stratégie de Migration}\label{chap:2}
+\minitoc
+\input{2-partie/1-fichier}
+
+\chapter{Migration des Données}\label{chap:3}
+\minitoc
+\input{3-partie/1-fichier}
+
+\chapter{Réalisation}\label{chap:4}
+\minitoc
+\input{4-partie/1-fichier.tex}
+
+\include{4-conclusion}
+\lhead[]{} \rhead[]{} \chead[]{}
+
+\end{document}
