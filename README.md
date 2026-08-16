@@ -74,7 +74,7 @@ diagnostic-technique/
 │   ├── ticket_manager/          # Mapping/création de tickets Zammad
 │   ├── remediation_explainer/   # Texte informatif (pas d'action exécutable)
 │   ├── content_guardrail/       # PII sanitizer
-│   ├── report_generator/        # Template Jinja2 + PDF WeasyPrint
+│   ├── report_generator/        # Générateur PDF pur Python
 │   └── notifier/                # Email + note Zammad
 ├── graph/                       # GraphRAG Neo4j
 │   ├── schema.cypher            # Contraintes + index vectoriel
@@ -111,7 +111,7 @@ diagnostic-technique/
 │       └── generate_ccu_tickets.py
 ├── infra/
 │   └── scripts/seed_zammad.py   # Injection des tickets dans Zammad
-├── reports/                     # Rapports PDF/HTML générés
+├── reports/                     # Rapports PDF générés
 ├── Makefile
 ├── pyproject.toml
 └── README.md
@@ -290,7 +290,7 @@ make docker-up
 
 Cela démarre : API FastAPI (8000), Zammad (3000), Splunk (18000/8088), Prism (4010). Neo4j doit être démarré séparément sur l'hôte.
 
-> Sous Windows, WeasyPrint a besoin des librairies GTK/Pango. Le Dockerfile installe les dépendances Debian nécessaires, la génération PDF fonctionne donc dans le conteneur. En local sans Docker, l'agent génère un fallback HTML si les librairies système sont manquantes.
+> Le rapport PDF est généré directement en Python sans dépendance à WeasyPrint ou aux librairies GTK/Pango.
 
 ### 3. Seed des données
 

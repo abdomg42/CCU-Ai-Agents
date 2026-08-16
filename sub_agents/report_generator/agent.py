@@ -1,7 +1,6 @@
-"""Générateur de rapport PDF à partir du template Jinja2 fourni.
+"""Générateur de rapport PDF à partir de l'état LangGraph.
 
-Le dictionnaire de données est construit EXACTEMENT selon la structure de
-`render_sample.py`, en puisant les valeurs dans l'état LangGraph.
+Le PDF est généré directement en Python sans template HTML ni WeasyPrint.
 """
 from __future__ import annotations
 
@@ -12,12 +11,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from jinja2 import Environment, FileSystemLoader
-
 from config.settings import get_settings
 from shared.audit_logger import audit_logger
 from shared.state import GraphState
 from sub_agents.intake_parser.schemas import IncidentSchema
+
+from .pdf_renderer import generate_diagnostic_report
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ def _generate_incident_id(state: GraphState) -> str:
 
 def _confidence_label(confidence: str | None) -> str:
     key = (confidence or "").lower()
-    if key == "forte":
+    if key in {"forte", "high"}:
         return "high"
     if key == "moyenne":
         return "medium"
@@ -57,7 +56,7 @@ def _build_sources(state: GraphState) -> list[str]:
 
 
 def _build_report_data(state: GraphState) -> dict[str, Any]:
-    """Construit le dictionnaire exact attendu par le template Jinja2."""
+    """Construit le dictionnaire de données attendu par le renderer PDF."""
     incident = state.incident or {}
     parsed = _as_parsed(state.parsed_incident)
     root_cause = state.root_cause or {}
@@ -69,6 +68,7 @@ def _build_report_data(state: GraphState) -> dict[str, Any]:
     detected_at = incident.get("detected_at") or generated_at
 
     return {
+        "title": incident.get("title", "CCU Diagnostic Report"),
         "report_id": report_id,
         "generated_at": generated_at,
         "incident_id": incident_id,
@@ -90,56 +90,24 @@ def _build_report_data(state: GraphState) -> dict[str, Any]:
     }
 
 
-def _render_pdf(html: str, output_path: Path) -> Path:
-    """Génère le PDF via WeasyPrint."""
-    try:
-        from weasyprint import HTML
-    except ImportError as exc:
-        raise RuntimeError(
-            "WeasyPrint n'est pas installé ou ses dépendances système (GTK/Pango) sont manquantes."
-        ) from exc
-
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    HTML(string=html).write_pdf(str(output_path))
-    return output_path
-
-
-def _render_html_report(html: str, output_path: Path) -> Path:
-    """Fallback : sauvegarde le HTML si la génération PDF échoue."""
-    output_path = output_path.with_suffix(".html")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(html, encoding="utf-8")
-    return output_path
-
-
 class ReportGeneratorAgent:
     def __init__(self) -> None:
         self.settings = get_settings()
 
     def run(self, state: GraphState) -> dict[str, Any]:
-        audit_logger.log("report_generator_start", {"incident_id": _generate_incident_id(state)})
-
-        template_dir = self.settings.TEMPLATE_DIR
-        template_path = template_dir / "incident_report_template.html"
-        if not template_path.exists():
-            raise FileNotFoundError(f"Template de rapport introuvable : {template_path}")
-
-        env = Environment(loader=FileSystemLoader(template_dir))
-        template = env.get_template("incident_report_template.html")
+        incident_id = _generate_incident_id(state)
+        audit_logger.log("report_generator_start", {"incident_id": incident_id})
 
         data = _build_report_data(state)
-        html = template.render(**data)
-
-        incident_id = data["incident_id"]
         output_path = self.settings.REPORTS_DIR / f"{incident_id}.pdf"
 
         try:
-            final_path = _render_pdf(html, output_path)
+            final_path = generate_diagnostic_report(data, output_path)
             audit_logger.log("report_generator_pdf", {"path": str(final_path)})
         except Exception as exc:
-            audit_logger.log("report_generator_pdf_fallback", {"error": str(exc)})
-            final_path = _render_html_report(html, output_path)
-            logger.warning("PDF non généré, fallback HTML : %s", final_path)
+            audit_logger.log("report_generator_error", {"error": str(exc)})
+            logger.warning("Échec génération PDF : %s", exc)
+            raise
 
         return {"report_path": str(final_path)}
 

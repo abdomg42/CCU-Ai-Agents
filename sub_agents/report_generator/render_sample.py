@@ -1,19 +1,15 @@
-"""Sample data contract for the incident report template.
+"""Sample script to render a diagnostic PDF using the pure Python renderer."""
+from __future__ import annotations
 
-Run this script to render a sample PDF:
-    python sub_agents/report_generator/render_sample.py
-"""
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
-
-
-TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
+from sub_agents.report_generator.pdf_renderer import generate_diagnostic_report
 
 
 def build_sample_data() -> dict:
-    """Returns the exact dictionary structure expected by the Jinja2 template."""
+    """Returns a sample dictionary structure for the CCU diagnostic report."""
     return {
+        "title": "CCU Diagnostic Report",
         "report_id": "REP-CCU-2026-0001",
         "generated_at": "2026-08-12T14:30:00+00:00",
         "incident_id": "INC-CCU-2026-0001",
@@ -27,7 +23,7 @@ def build_sample_data() -> dict:
             "Customer acc-12345 reported a complete Internet outage on service svc-fiber-12345. "
             "The associated order ord-2026-001 is blocked in CPE provisioning."
         ),
-        "confidence_level": "0.85",
+        "confidence_level": "moyenne",
         "confidence_label": "medium",
         "root_cause": "Perte de signal fibre optique",
         "sources": [
@@ -48,23 +44,12 @@ def build_sample_data() -> dict:
 
 
 def main() -> None:
-    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
-    template = env.get_template("incident_report_template.html")
-
-    data = build_sample_data()
-    html = template.render(**data)
-
     output_path = Path("reports/sample_report.pdf")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    try:
-        from weasyprint import HTML
-        HTML(string=html).write_pdf(str(output_path))
-        print(f"Sample PDF written to {output_path}")
-    except Exception as exc:
-        html_path = output_path.with_suffix(".html")
-        html_path.write_text(html, encoding="utf-8")
-        print(f"PDF generation failed ({exc}); sample HTML written to {html_path}")
+    data = build_sample_data()
+    generate_diagnostic_report(data, output_path)
+    print(f"Sample PDF written to {output_path}")
 
 
 if __name__ == "__main__":

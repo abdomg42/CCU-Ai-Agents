@@ -73,9 +73,6 @@ class Settings:
 
     # Reports
     REPORTS_DIR: Path = PROJECT_ROOT / "reports"
-    TEMPLATE_DIR: Path = (
-        PROJECT_ROOT / "sub_agents" / "report_generator" / "templates"
-    )
 
     # Guardrail
     WHITELIST_PATH: Path = (
