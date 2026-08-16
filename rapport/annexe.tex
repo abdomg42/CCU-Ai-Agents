@@ -1,100 +1,83 @@
-\chapter*{Annexe}\addcontentsline{toc}{chapter}{Annexe}\label{annexe1}
+\chapter*{Annexe}\addcontentsline{toc}{chapter}{Annexe}\label{annexe}
 
-\subsection*{Étapes clés du déroulement de l'attaque}
+\section*{Exemple de requête API}
+Le fichier \texttt{body.json} situé à la racine du projet fournit un exemple de requête pour l'API de diagnostic.
 
+\begin{lstlisting}[language=JSON, caption={Exemple de payload JSON}, label={lst:bodyjson}]
+{
+  "title": "Coupure Internet fibre",
+  "description": "Client acc-12345, service svc-fiber-12345, commande ord-2026-001. Coupure Internet fibre.",
+  "source": "chat",
+  "priority": "P3"
+}
+\end{lstlisting}
 
-Nous allons exploiter quelques failles de ce réseau pour effectuer une attaque man in the middle (MITM).\\
+\section*{Variables d'environnement}
+Le tableau ci-dessous reprend les principales variables d'environnement du fichier \texttt{.env.example}.
 
-Au début, notre machine Windows peut atteindre normalement le routeur R4.
-\begin{figure}[H]
+\begin{table}[H]
     \centering
-    \includegraphics[scale=0.8]{images/ping_b4_1}
-    \caption{Ping vers le routeur R4 avec succès}
-    \label{fig:ping_b4_1}
-\end{figure}
-Quand on essaie de tracer le chemin vers R4, on constate que la machine passe par le routeur R1 légitime du lien pour atteindre R4
-\begin{figure}[H]
-    \centering
-    \includegraphics{images/tracert_b4_1}
-    \caption{Traces du chemin vers R4}
-    \label{fig:tracert_b41}
-\end{figure}
-L'attaquant sur le lien peut alors passer a l'attaque.
-Pour effectuer l'attaque MITM on utilisera l'outil fake\_router6, un utilitaire du package d'outils \textbf{the hacker choice}.
-Ainsi sur la machine d'attaque, on active en un premier lieu le forwarding pour être transparent et ne pas bloquer le transit des paquets.
-\begin{figure}[H]
-    \centering
-    \includegraphics{images/attk/fwrd_activation}
-    \caption{Activation du forwarding des paquets.}
-    \label{fig:activ_fwrd}
-\end{figure}
-Aussi on lance wireshark pour observer le trafic des paquets sur notre interface dans le réseau.\\
--------\\
-Puisque tout est prêt nous allons lancer l'attaque.
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|l|}
+        \hline
+        \rowcolor{iNavy} \textbf{\color{white}Variable} & \textbf{\color{white}Valeur par défaut} \\ \hline
+        MOCK\_LLM & true \\ \hline
+        OLLAMA\_BASE\_URL & http://localhost:11434 \\ \hline
+        OLLAMA\_MODEL & qwen2.5:latest \\ \hline
+        NEO4J\_URI & bolt://localhost:7687 \\ \hline
+        NEO4J\_USER & neo4j \\ \hline
+        NEO4J\_PASSWORD & password \\ \hline
+        EMBEDDING\_PROVIDER & ollama \\ \hline
+        EMBEDDING\_MODEL & mxbai-embed-large:latest \\ \hline
+        VECTOR\_INDEX\_DIM & 1024 \\ \hline
+        VECTOR\_SIMILARITY\_THRESHOLD & 0.75 \\ \hline
+    \end{tabular}
+    \caption{Extrait des variables d'environnement}
+\end{table}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.8]{images/attk/lancement_attk_1}
-    \caption{Initialisation de l'attaque}
-    \label{fig:attk_init_1}
-\end{figure}
+\section*{Commandes utiles}
+\begin{lstlisting}[language=bash, caption={Commandes principales du Makefile}]
+make install      # pip install -r requirements.txt
+make seed         # Seed Neo4j local (schema + mocks + embeddings)
+make test         # pytest tests/  (Neo4j local requis)
+make api          # uvicorn api.main:app --reload
+make docker-up    # docker compose up --build
+make docker-down  # docker compose down
+\end{lstlisting}
 
-L'attaque est en cours et l'attaquant s'annonce comme le routeur par défaut du lien
-nous allons maintenant vérifier la table des routes de notre machine windows.
-\begin{figure}[H]
-    \centering
-    \includegraphics{images/attk/tableRoutes_windows}
-    \caption{Table des routes de la machine victime}
-    \label{fig:win_route_table}
-\end{figure}
-On constate que l'attaquant s'est insère comme passerelle de la victime.
-pour confirmer cela reprenons un tracert vers le routeur r4
-\begin{figure}[H]
-    \centering
-    \includegraphics{images/attk/tracert_b4_2}
-    \caption{Chemin vers b4 pendant l'attaque.}
-    \label{fig:tracert_b42}
-\end{figure}
-On peut voir clairement que la victime passe par l'attaquant pour atteindre le routeur.\\
+\section*{Requête cURL}
+Pour tester l'API en mode texte simplifié :
 
-A présent nous allons essayer de capturer une information envoyée par la victime.
-Pour cela la victime fait un telnet sur le router R4 pour s'y connecter avec les paramètres suivants:\\
-password1:\textbf{cisco}\\
-password2:\textbf{class}
-\begin{figure}[H]
-    \centering
-    \includegraphics{images/attk/telnet_r4}
-    \caption{Connexion telnet au routeur.}
-    \label{fig:telnetr4}
-\end{figure}
+\begin{lstlisting}[language=bash, caption={Appel de l'API diagnose/text}]
+curl -X POST "http://127.0.0.1:8000/diagnose/text" \\
+  -H "Content-Type: application/json" \\
+  -d @body.json
+\end{lstlisting}
 
-Une fois la connexion réussie, nous allons voir avec wireshark les paquets de connexion et y retrouver les paramètres de connexion.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{images/attk/c}
-    \includegraphics[width=1.0\textwidth]{images/attk/i}
-    \includegraphics[width=1.0\textwidth]{images/attk/s}
-    \includegraphics[width=1.0\textwidth]{images/attk/c2}
-    \includegraphics[width=1.0\textwidth]{images/attk/o}   
-    \caption{Premier paramètre de connexion au routeur R4: \textbf{c-i-s-c-o}}
-    \label{fig:param_conn_r4}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{images/attk/param2_c}
-    \includegraphics[width=1.0\textwidth]{images/attk/param2_l}
-    \includegraphics[width=1.0\textwidth]{images/attk/param2_a}
-    \includegraphics[width=1.0\textwidth]{images/attk/param2_s1}
-    \includegraphics[width=1.0\textwidth]{images/attk/param2_s2}
-    \caption{Second paramètre de connexion au routeur R4: \textbf{c-l-a-s-s}}
-    \label{fig:param_conn2}
-\end{figure}
-Les paramètres on été retrouves donc l'attaque a été un succès!
-
-%\subsection*{Mitigations}
-%Pour sécuriser ce réseau afin d'éviter ce genre d'attaque, deux mesures de sécurité peuvent être configurées.
-%\begin{itemize}
-%    \item le SEND
-%    \item le RaGuard
-%\end{itemize}
-
+\section*{Structure du projet}
+\begin{lstlisting}[language=bash, caption={Arborescence simplifiee}]
+diagnostic-technique/
+├── api/
+├── config/
+├── graph/
+│   ├── schema.cypher
+│   ├── queries.py
+│   └── ingestion/
+├── orchestrator/
+│   └── pipeline.py
+├── sub_agents/
+│   ├── intake_parser/
+│   ├── logs_investigator/
+│   ├── context_agent/
+│   ├── rag_ticket_search/
+│   ├── root_cause_reasoner/
+│   ├── ticket_manager/
+│   ├── remediation_explainer/
+│   ├── content_guardrail/
+│   ├── report_generator/
+│   └── notifier/
+├── tests/
+├── ui/
+├── docker/
+└── Makefile
+\end{lstlisting}

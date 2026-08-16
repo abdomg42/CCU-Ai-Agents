@@ -1,38 +1,27 @@
 % !TeX root = ../main.tex
 \addcontentsline{toc}{section}{Introduction}
 \section*{Introduction}
-Ce chapitre se focalise sur l’introduction de l’entreprise d’accueil ainsi que sur la contextualisation du projet. Il débutera par une présentation de l’entreprise hôte et de ses domaines d’activité. Ensuite, nous aborderons la formulation de la problématique, les objectifs du projet, et enfin, nous discuterons de la méthodologie de gestion de projet et de sa planification.
+Ce chapitre pose les fondements du projet. Il présente tout d'abord l'organisme d'accueil, \textbf{Inetum Offshore Maroc}, ainsi que son positionnement dans l'écosystème télécom. Ensuite, il situe le contexte métier du système d'information \textbf{CCU} et la problématique du diagnostic technique. Enfin, il définit les objectifs du projet, le périmètre fonctionnel et la méthodologie adoptée.
 
 \section{Présentation de l'organisme d'accueil}
-Cette première partie présente le groupe Inetum, ses chiffres clés ainsi que sa structure organisationnelle à l'échelle internationale et nationale.
 
 \subsection{Le Groupe Inetum}
-Inetum est une ESN (Entreprise de Services du Numérique) agile, une société de
-services et de solutions digitales, et un groupe international qui aide les entreprises et
-les institutions à tirer le meilleur du digital flow. Aussi acteur européen de référence des
-services informatiques à valeur ajoutée et des logiciels.\\
-À l’international, le Groupe compte 20 filiales en France, Belgique, Luxembourg,
-Suisse, Espagne, Portugal, Angleterre, Pologne, Roumanie, Singapour, Dubaï, Maroc,
-Côte d’ivoire, Cameroun, Angola, Brésil, Colombie, Mexique, USA, Pérou et Panama.
-Avec son profil de multi-spécialiste, Inetum met au service de ses clients une combinaison
-unique de proximité, d’organisation sectorielle et de solutions de qualité industrielle. Le
-groupe qui compte plus de 28.000 collaborateurs a réalisé en 2024 un chiffre d’affaires de
-2,5 M€. Elle est implantée dans toute la France autour de trois grandes régions et avec
-plus de 40 agences.\\
-Le tableau ci-dessous regroupe les informations d'identité et les chiffres clés du groupe au niveau mondial et local :
+Inetum est une ESN (Entreprise de Services du Numérique) agile, une société de services et de solutions digitales, et un groupe international qui aide les entreprises et les institutions à tirer le meilleur du digital flow. Aussi acteur européen de référence des services informatiques à valeur ajoutée et des logiciels.
+
+\medskip
+
+À l'international, le Groupe compte 20 filiales en France, Belgique, Luxembourg, Suisse, Espagne, Portugal, Angleterre, Pologne, Roumanie, Singapour, Dubaï, Maroc, Côte d'Ivoire, Cameroun, Angola, Brésil, Colombie, Mexique, USA, Pérou et Panama. Avec son profil de multi-spécialiste, Inetum met au service de ses clients une combinaison unique de proximité, d'organisation sectorielle et de solutions de qualité industrielle. Le groupe, qui compte plus de 28~000 collaborateurs, a réalisé en 2024 un chiffre d'affaires de 2,5~Md€.
 
 \begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{1.3}
     \begin{tabular}{|l|p{9cm}|}
         \hline
-        % Ajout de \textcolor{white} ici
         \rowcolor{iNavy} \multicolumn{2}{|c|}{\textbf{\textcolor{white}{Fiche d'identité globale}}} \\ \hline
         \textbf{Date de création} & 1970 \\ \hline
         \textbf{Direction} & Vincent ROUAIX, Président-directeur Général \\ \hline
         \textbf{Siège social} & 145, Boulevard Victor Hugo, 93 400 Saint-Ouen, FRANCE \\ \hline
         \textbf{Actionnariat} & Bain Capital Private Equity (Majoritaire depuis 2022) \\ \hline
-        % Ajout de \textcolor{white} ici
         \rowcolor{iNavy} \multicolumn{2}{|c|}{\textbf{\textcolor{white}{Chiffres clés 2024}}} \\ \hline
         \textbf{Chiffre d'affaires} & 2,5 Md€ (Global) / 40 M€ (Maroc) \\ \hline
         \textbf{Effectifs} & 28 000 (Monde) / +800 (Maroc) \\ \hline
@@ -43,23 +32,10 @@ Le tableau ci-dessous regroupe les informations d'identité et les chiffres clé
 \end{table}
 
 \subsection{Inetum Offshore Maroc (IOM)}
-Filiale à 100\% d'Inetum, Inetum Offshore Maroc est le vecteur de développement du Groupe dans les pays francophones du continent africain. Elle est le leader incontesté au Maroc en matière d’intégration et de mise en œuvre de progiciels de gestion. 
+Filiale à 100\% d'Inetum, Inetum Offshore Maroc est le vecteur de développement du Groupe dans les pays francophones du continent africain. Elle est le leader incontesté au Maroc en matière d'intégration et de mise en œuvre de progiciels de gestion.
 
-IOM met à la disposition des entreprises, ses consultants métiers et son
-savoir-faire et propose à ses clients un service complet qui couvre toutes les phases du
-cycle de vie des projets :
-\begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
-    \setlength\parsep{0pt}     % Supprime l'espace entre les blocs
-    \item[---] Conseil,
-    \item[---] Conception,
-    \item[---] Intégration,
-    \item[---] Formation,
-    \item[---] Déploiement et Maintenance.
-\end{itemize}
+IOM met à la disposition des entreprises ses consultants métiers et son savoir-faire, et propose à ses clients un service complet qui couvre toutes les phases du cycle de vie des projets : Conseil, Conception, Intégration, Formation, Déploiement et Maintenance.
 
-Le tableau suivant représente la fiche technique d’Inetum Offshore Maroc, qui résume toutes ses informations :
 \begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{1.3}
@@ -67,12 +43,12 @@ Le tableau suivant représente la fiche technique d’Inetum Offshore Maroc, qui
         \hline
         \textbf{Date de création} & 2011 \\ \hline
         \textbf{Direction} & OUALI Fouzia \\ \hline
-        \textbf{Taille de l’entreprise} & ~1000 collaborateurs \\ \hline
+        \textbf{Taille de l'entreprise} & \textasciitilde 1000 collaborateurs \\ \hline
         \textbf{Siège social} & Casa Nearshore Parc, Shore 28. 100, Bd. Al Qods, Sidi Maârouf, Casablanca \\ \hline
         \textbf{Forme juridique} & Société Anonyme (SA) \\ \hline
         \textbf{Capitale} & 400 000 DHS \\ \hline
     \end{tabular}
-    \caption{Fiche technique d’Inetum Offshore Maroc}
+    \caption{Fiche technique d'Inetum Offshore Maroc}
     \label{tab:fiche_iom}
 \end{table}
 
@@ -80,258 +56,117 @@ Le tableau suivant représente la fiche technique d’Inetum Offshore Maroc, qui
 Inetum structure son expertise autour de quatre "Global Business Lines" (GBL) majeures :
 
 \begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item \textbf{Inetum Consulting (2\% du CA) :} Conseil en stratégie digitale et IA.
-    \item \textbf{Inetum Technologies (64\% du CA) :} Gestion des infrastructures, Cloud et Cybersécurité.
-    \item \textbf{Inetum Solutions (26\% du CA) :} Intégration d'ERP (SAP, Microsoft, Sage).
-    \item \textbf{Inetum Software (8\% du CA) :} Édition de logiciels verticaux.
+    \item \textbf{Inetum Consulting (2\% du CA)} : Conseil en stratégie digitale et IA.
+    \item \textbf{Inetum Technologies (64\% du CA)} : Gestion des infrastructures, Cloud et Cybersécurité.
+    \item \textbf{Inetum Solutions (26\% du CA)} : Intégration d'ERP (SAP, Microsoft, Sage).
+    \item \textbf{Inetum Software (8\% du CA)} : Édition de logiciels verticaux.
 \end{itemize}
 
-\subsection{Secteurs d’activité}
-Inetum est l’un des leaders mondiaux dans le domaine du conseil, des services infor
-matiques et de l’infogérance. Les métiers du groupe s’organisent en 6 grandes disciplines 
-
-\begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
-    \setlength\parsep{0pt}
-    \item \textbf{Conseil :} Accompagnement stratégique.
-    \item \textbf{Services applicatifs et d’infrastructures :} Support et développement.
-    \item \textbf{Intégration systèmes :} Business Solutions, ERP, CRM.
-    \item \textbf{Outsourcing :} Infogérance et gestion externe.
-    \item \textbf{Value Added Reselling :} Revente de solutions à valeur ajoutée.
-    \item \textbf{Software :} Solutions verticales (Assurances, Santé) et transverses (Chronotime).
-\end{itemize}
-
-Le groupe intervient dans l’ensemble des secteurs, pour répondre aux besoins de ses
-clients et leur proposer les solutions les mieux adaptées à leurs métiers spécifiques. Le
-groupe dispose d’une stratégie pertinente et d’un savoir-faire très solide pour développer
-ses relations clients dans plusieurs secteurs.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/secteur d'activite.png}
-    \caption{Secteurs d'activité}
-    \label{fig:secteurs}
-\end{figure}
-
-
-
-\subsection{Organigramme d'Inetum Offshore Maroc}
-Dans le cadre de notre projet, il est essentiel de bien comprendre la structure organisationnelle de l’équipe projet. L’organigramme joue un rôle crucial en définissant les rôles et responsabilités de chaque membre, en facilitant la communication et en assurant une coordination efficace des tâches. Cet organigramme permet également de clarifier les relations hiérarchiques et fonctionnelles au sein de l’équipe. 
-
-L’organigramme détaillé du projet est présenté dans la figure~\ref{fig:org_projet} :
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/organigramme3.png}
-    \caption{Organigramme d'Inetum Offshore Maroc} 
-    \label{fig:org_projet} 
-\end{figure}
-
-J’ai intégré l’équipe \textbf{Back Office} d’Inetum Offshore Maroc au sein de la \textbf{Business Unit Telecom}. Mon travail a été encadré par \textbf{AJ} (Team Lead) et supervisé par \textbf{MAB} (Chef de projet). Dans le cadre du projet, j’ai également collaboré étroitement avec \textbf{PV} (Directeur technique du projet) et \textbf{SM} (Responsable technique et fonctionnel NI2). Cette immersion m’a permis de mieux comprendre les synergies et les interactions entre les pôles technique, fonctionnel et de gestion au sein d'un projet d'envergure internationale.
+\subsection{Secteurs d'activité}
+Inetum intervient dans six grandes disciplines : Conseil, Services applicatifs et d'infrastructures, Intégration systèmes, Outsourcing, Value Added Reselling et Software. Le groupe dispose d'une stratégie pertinente et d'un savoir-faire solide pour développer ses relations clients dans plusieurs secteurs, dont celui des télécommunications.
 
 \subsection{Partenaires et Clients}
-
-Inetum collabore avec des partenaires technologiques de premier plan afin d’enrichir son offre de services et de répondre efficacement aux besoins de ses clients. Grâce à cette stratégie et à son expertise locale, plus de 500 entreprises marocaines lui font confiance pour les accompagner dans leur transformation digitale.
-
-\paragraph{Partenaires stratégiques :}
-\begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
-    \setlength\parsep{0pt}
-    \item \textbf{SAP :} Solutions ERP pour la gestion d’entreprise.
-    \item \textbf{Microsoft :} Technologies cloud et bureautique.
-    \item \textbf{Oracle :} Bases de données et logiciels métiers.
-    \item \textbf{IBM :} Services IT, IA et infrastructure.
-\end{itemize}
+Inetum collabore avec des partenaires technologiques de premier plan : SAP, Microsoft, Oracle et IBM. Grâce à cette stratégie et à son expertise locale, plus de 500 entreprises marocaines lui font confiance pour les accompagner dans leur transformation digitale.
 
 \paragraph{Principaux clients au Maroc :}
 \begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item \textbf{OCP :} Leader mondial dans le secteur des phosphates.
-    \item \textbf{ONCF :} Opérateur national du transport ferroviaire.
-    \item \textbf{Allianz :} Compagnie d’assurance internationale.
-    \item \textbf{Royal Air Maroc :} Compagnie aérienne nationale.
+    \item \textbf{OCP} : Leader mondial dans le secteur des phosphates.
+    \item \textbf{ONCF} : Opérateur national du transport ferroviaire.
+    \item \textbf{Allianz} : Compagnie d'assurance internationale.
+    \item \textbf{Royal Air Maroc} : Compagnie aérienne nationale.
 \end{itemize}
 
 \section{Contexte du projet}
-\subsection{Cadre Général du projet}
-Dans un secteur des télécommunications en constante mutation, l’opérateur télécom DT a initié un programme ambitieux de refonte de son Système d’Information (SI) Commercial. L'objectif principal est de s'affranchir des limitations imposées par des systèmes « legacy » devenus obsolètes, afin de gagner en agilité opérationnelle et de soutenir le déploiement de technologies de nouvelle génération (FTTH, 4G/5G). Cette modernisation repose sur une transition critique : le passage d’une gestion fragmentée des ressources à une architecture unifiée, capable d'offrir une vision transverse du cycle de vie des services, depuis la prise de commande jusqu'à l’activation technique et la facturation.
 
-Pour garantir une maîtrise des risques et une continuité de service, le projet a été scindé en deux phases majeures. Le \textbf{Lot 1}, au cœur de mon intervention, se concentre sur l’implémentation de la solution \textbf{Ni2} Network Inventory. Ce module a pour vocation de devenir la « Source Unique de Vérité » de l'opérateur en remplaçant l'ancien outil d'inventaire, \textbf{GAIA}. Il s'agit d'unifier l'inventaire physique (Outside & Inside Plant) et logique du réseau d'accès pour les technologies cuivre, fibre et liaisons spécialisées. Le succès de cette phase conditionne directement le \textbf{Lot 2}, qui portera sur la gestion commerciale et la facturation, en fournissant des données d'éligibilité et de topologie réseau d'une fiabilité absolue.
+\subsection{Cadre général du projet}
+Dans un secteur des télécommunications en constante mutation, les opérateurs doivent moderniser leur Système d'Information (SI) Commercial pour répondre aux attentes des clients et soutenir le déploiement de nouvelles technologies (FTTH, 4G/5G). Le programme de refonte porte sur le système \textbf{CCU} (Commande et Catalogue Unifiés), qui centralise le catalogue de produits et la gestion des commandes clients.
 
-Dans le cadre de ce \textbf{Lot 1}, mon travail s'est articulé autour de deux axes majeurs de la stratégie de migration. J'ai d'abord contribué de manière collaborative à la migration des données techniques de l'outil GAIA vers Ni2, assurant la cohérence des objets réseau. Par la suite, j'ai pris la responsabilité de l'analyse approfondie du référentiel CRM. Sous la supervision de mon responsable d'équipe et avec le support technique de l'expert Ni2, j'ai mené une étude structurelle et sémantique exhaustive de la base de données CRM, un environnement complexe comprenant plus de 900 tables et de nombreuses vues. Cette analyse a été déterminante pour identifier, extraire et normaliser les données critiques relatives aux clients, aux adresses et aux contacts, permettant ainsi un raccordement précis entre les couches « Service » et « Client » dans le futur inventaire unifié.
+\medskip
+
+Le projet objet de ce mémoire ne porte pas sur la migration de données, mais sur la conception d'un \textbf{agent IA de diagnostic technique} capable d'assister les équipes de support dans la résolution des incidents affectant le SI CCU. L'agent exploite les APIs \textbf{TMF620} (Product Catalog) et \textbf{TMF622} (Product Ordering) du TM Forum pour s'aligner sur les standards de l'industrie télécom.
 
 \subsection{Problématique et enjeux}
-Le premier défi majeur réside dans l'hétérogénéité et le cloisonnement des données techniques actuelles de l'\textbf{opérateur télécom}. Jusqu'à présent, l'inventaire du réseau d'accès est dispersé entre plusieurs sources déconnectées : l'outil GAIA pour le réseau cuivre, le système SIGA pour la cartographie de la fibre, et diverses bases propriétaires pour les équipements actifs. Cette fragmentation engendre une vision parcellaire du réseau, rendant les études d'éligibilité lentes et sujettes à des erreurs humaines. La problématique centrale est donc de réussir la convergence de ces silos d'informations vers une plateforme unique, capable de modéliser avec précision l'intégralité des infrastructures physiques et logiques.
+Les équipes de support technique font face à des incidents dont l'investigation requiert de consulter plusieurs sources disjointes :
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/flux.png}
-    \caption{Architecture cible du SI - Convergence des référentiels vers la solution Ni2.} 
-    \label{fig:flux_si} 
-\end{figure}
-Ce schéma illustre la réponse à la problématique de fragmentation : la solution Ni2 centralise l'inventaire physique et logique, assurant une interopérabilité fluide entre le CRM (domaine commercial) et les plateformes techniques de provisioning (KPSA) et d'intervention (AMIRA).
-\newline
-\newline
-\break
-
-Au-delà de la simple migration technologique, le projet fait face à un verrou analytique de taille : le rapprochement sémantique entre les ressources réseau et le parc clients. L'inventaire technique n'a de valeur que s'il est fidèlement corrélé aux contrats et aux services actifs. Ce défi repose sur la convergence de deux environnements de données massifs :
 \begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item \textbf{Le référentiel technique (GAIA) }: Une base héritée de plus de 900 tables et vues, dont l'analyse structurelle a été finalisée en amont par l'équipe projet. Mon travail s'appuie sur ces résultats pour assurer la cohérence des objets réseau (ports, équipements, câbles).
-    \item \textbf{Le référentiel commercial (CRM) }: Ce volet constitue le cœur de ma mission spécifique. Avec une complexité équivalente à celle de GAIA (plus de 700 tables et vues interdépendantes), la base CRM représente un environnement dense qu'il a fallu explorer en profondeur.
+    \item Les \textbf{logs réseau} et applicatifs, souvent volumineux et difficiles à interpréter rapidement.
+    \item Le \textbf{contexte client} stocké dans le CRM (statut du contrat, services actifs, historique).
+    \item Les \textbf{tickets historiques} résolus, qui contiennent une expertise précieuse mais sont difficiles à exploiter manuellement.
 \end{itemize}
-Ma contribution consiste à mener une rétro-ingénierie du schéma relationnel du CRM afin d’en décoder la structure et d’en extraire « l’essence critique » : les identités clients, les adresses d’installation normalisées. Le défi est d'identifier les clés de jointure permettant de lier chaque client à sa ressource technique correspondante dans Ni2. Une erreur dans ce processus de réconciliation compromettrait gravement la continuité de la facturation et la qualité du support client (gestion des dérangements) après la bascule. Cette analyse, toujours en cours, demande une rigueur méthodologique constante pour filtrer le bruit des données « legacy » et ne retenir que les informations vitales au futur système unifié.
-Enfin, la problématique de cette transition repose sur l'exigence de continuité de service pour un opérateur national. La migration vers Ni2 ne doit souffrir d'aucune perte de données ni d'interruption majeure des processus de livraison. L'enjeu est de transformer un système « legacy » rigide en une « Source Unique de Vérité » agile, conforme aux standards internationaux du TM Forum. Cela nécessite la mise en place d'une stratégie de migration rigoureuse, capable de gérer les rejets en temps réel et de valider, par des itérations successives (Dry Runs), que le nouveau modèle de données supporte efficacement les processus métiers de demain, tels que l'automatisation du provisionnement et la gestion intelligente des dérangements.
 
-\subsection{Périmètre fonctionnel de la solution NI2}
-La solution retenue par l’opérateur télécom repose sur la plateforme Ni2 Unified Inventory. Ce système se distingue par son architecture modulaire et son alignement strict sur les meilleures pratiques du TM Forum, notamment le modèle SID (Shared Information/Data). L'implémentation réalisée dans le cadre du Lot 1 couvre l'intégralité du réseau d'accès à travers quatre piliers fonctionnels interdépendants :
+Cette dispersion des données engendre des temps de diagnostic longs, une dépendance forte à l'expertise humaine et un risque d'erreur. La problématique centrale est donc la suivante : \textbf{comment concevoir un système intelligent capable de corréler automatiquement ces sources pour produire un diagnostic fiable, explicable et actionnable, sans jamais exécuter d'action corrective automatique sur le SI réel ?}
+
+\subsection{Périmètre fonctionnel}
+Le périmètre du projet couvre les fonctionnalités suivantes :
+
 \begin{enumerate}
-\item \textbf{Gestion des infrastructures physiques (OSP et ISP)}: La solution assure la traçabilité complète des composants matériels du réseau, depuis le cœur de site jusqu'à l'abonné :
-\begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
-    \setlength\parsep{0pt}
-    \item \textbf{Inside Plant (ISP) :} Ce module gère l'inventaire détaillé des équipements situés dans les centres techniques et centraux téléphoniques. Il modélise l'occupation spatiale des baies (racks), des châssis et des cartes actives telles que les MSAN ou les OLT.
-    \item \textbf{Outside Plant (OSP) :} Dédié aux infrastructures extérieures, ce module permet de cartographier le réseau de distribution. Il inclut la gestion des structures de support (poteaux, chambres de tirage, conduites) et des composants passifs (câbles, points de concentration, boîtiers d’épissure). L'intégration d'une dimension SIG (Système d'Information Géographique) permet de visualiser ces ressources sur un fond de carte précis.
-\end{itemize}
-
-\item \textbf{Gestion des ressources logiques (Logical Resource Management)}
-Au-dessus de la couche physique, le module LRM assure l'abstraction nécessaire au fonctionnement des services. Sa mission est de gérer les ressources "invisibles" mais critiques :
-Connectivité logique : Modélisation des circuits de bout en bout, des chemins de fibres et des paires de cuivre.
-Adressage et numérotation : Gestion du cycle de vie des adresses IP, des VLANs et de la boîte à numéros (ND/MSISDN). Ce module permet de savoir, en temps réel, quelle capacité logique est disponible, réservée ou assignée sur chaque segment physique du réseau.
-\item \textbf{Gestion des services (Service Management)}
-Ce module constitue le point de convergence entre le monde technique et le monde commercial. Il implémente la couche « Service » du TM Forum pour faire le lien dynamique entre la ressource réseau et le service client final. Pour chaque technologie (Cuivre, Fibre FTTx, ou Liaisons Spécialisées), le système définit :
-Le raccordement client (port physique, paire/fibre).
-Le profil de service (débits, options, qualité de service).
-L'état opérationnel du service (actif, suspendu, résilié).
-\item \textbf{Synthèse des technologies couvertes}
-L'ensemble de ces modules permet à l’opérateur télécom de piloter ses trois grandes familles de produits sur une interface unique :
-Réseau Cuivre : Téléphonie fixe analogique et Internet haut débit (ADSL/VDSL).
-Réseau Fibre (FTTH) : Services voix sur IP et Internet très haut débit.
-Liaisons Spécialisées (LS) : Interconnexions de données point-à-point et accès Internet dédiés pour le segment entreprise (B2B).
+    \item \textbf{Intake intelligent} : normalisation d'un incident exprimé en langage naturel ou structuré.
+    \item \textbf{Collecte multi-source} : récupération parallèle des logs, du contexte client et des tickets similaires.
+    \item \textbf{Raisonnement sur la cause racine} : corrélation des sources avec attribution d'un niveau de confiance.
+    \item \textbf{Gestion des tickets} : mapping ou création d'un ticket dans l'outil de ticketing (Zammad).
+    \item \textbf{Remédiation explicative} : proposition d'actions informatives (non exécutables automatiquement).
+    \item \textbf{Guardrail de contenu} : vérification PII avant envoi externe.
+    \item \textbf{Génération de rapport} : production d'un rapport PDF/HTML.
+    \item \textbf{Notification} : envoi d'email et ajout d'une note dans le ticket.
 \end{enumerate}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/cartographie.png}
-    \caption{Cartographie des modules Ni2.} 
-    \label{fig:cartographie_ni2} 
-\end{figure}
-
 \subsection{Objectifs du projet}
-Le projet de modernisation du Système d’Information de l’\textbf{opérateur télécom} s'articule autour d'objectifs multidimensionnels, visant à transformer en profondeur la gestion des ressources et la relation client.
+Les objectifs du projet se déclinent en quatre axes :
 
-\subsubsection{Unification et Fiabilisation de l'Inventaire Réseau}
-L'objectif primordial de la première phase est la mise en place de la \textbf{Source Unique de Vérité} à travers la solution Ni2 Unified Inventory. Il s'agit de réaliser un « swap » complet de l'outil GAIA pour centraliser l'inventaire physique et logique. Cette unification doit permettre une vision à 360° du réseau d'accès (Cuivre, Fibre et LS), garantissant une donnée d'éligibilité fiable et en temps réel. Cette fiabilité est le socle indispensable pour sécuriser la prise de commande et réduire les échecs techniques lors des raccordements.
-
-\subsubsection{Automatisation de la Chaîne de Livraison}
-Le projet vise une réduction drastique des délais de mise en service (Time-to-Market). Pour ce faire, l'un des objectifs majeurs est l'intégration fluide de Ni2 avec les plateformes d'activation et de gestion de terrain :
 \begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item Automatisation du provisioning via l'interface avec la plateforme \textbf{KPSA}.
-    \item Optimisation des interventions techniques par la génération automatique des ordres de travaux (Work Orders) vers l'outil \textbf{AMIRA}.
-    \item Amélioration du support client par l'implémentation du module de Ticketing (gestion des dérangements), permettant de corréler instantanément un incident signalé à la ressource réseau défaillante.
+    \item \textbf{Centraliser l'investigation} : offrir un point d'entrée unique qui agrège les sources pertinentes à un incident.
+    \item \textbf{Fiabiliser le diagnostic} : réduire les erreurs humaines grâce à une corrélation structurée et à un raisonnement guidé par les données.
+    \item \textbf{Capitaliser l'expertise} : exploiter les tickets historiques via un graphe de connaissances et une recherche sémantique.
+    \item \textbf{Garantir la sécurité} : s'assurer qu'aucune action technique n'est exécutée automatiquement et que les données sensibles sont filtrées.
 \end{itemize}
 
-\subsubsection{Intégrité des Données et Réconciliation Client-Service}
-Un objectif critique, où ma contribution est centrale, concerne la qualité de la migration. Le projet ambitionne de migrer l'intégralité du patrimoine de données de l'opérateur télécom sans perte d'information. Cela implique :
+\section{Méthodologie et planification}
+
+\subsection{Choix méthodologique}
+La conduite du projet s'appuie sur une approche hybride combinant le cycle en V pour la gouvernance globale et la méthode Agile/Scrum pour l'itération technique. Cette approche permet de concilier rigueur de spécification et capacité d'adaptation face à la complexité des systèmes legacy et des modèles d'IA.
+
+Le développement a été découpé en sprints de deux à quatre semaines, avec les rituels suivants :
+
 \begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item L'analyse et la normalisation des données issues de GAIA.
-    \item La rétro-ingénierie du référentiel CRM pour assurer une réconciliation parfaite entre les identités clients et leurs services actifs.
-    \item L'objectif est d'aboutir à une base de données propre, débarrassée des scories des systèmes legacy, afin de garantir la continuité de la facturation et du service après la bascule.
+    \item \textbf{Backlog produit} : centralisation des fonctionnalités (agents, API, ingestion, tests).
+    \item \textbf{Sprints thématiques} : intake, collecteurs, raisonnement, guardrail, reporting, notification.
+    \item \textbf{Daily stand-ups} : synchronisation rapide avec les encadrants et l'équipe technique.
+    \item \textbf{Démos et rétrospectives} : validation des livrables et amélioration continue.
 \end{itemize}
 
-\subsubsection{Préparation de la Convergence Commerciale}
-Enfin, le succès du \textbf{Lot 1} est la condition \textit{sine qua non} pour atteindre l'objectif final de l'opérateur télécom : la convergence fixe-mobile. En stabilisant l'inventaire réseau dans Ni2, le projet prépare le terrain pour le \textbf{Lot 2} (Migration vers Comarch). L'objectif à terme est de permettre la commercialisation d'offres « multi-play » et « multi-lignes », simplifiant ainsi le catalogue de produits et offrant une expérience client unifiée et moderne.
-\begin{figure}[H]
+\subsection{Planification}
+Le tableau \ref{tab:planning} résume les grandes phases du projet.
+
+\begin{table}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/planninglot1.png}
-    %\caption{Macro planning du Lot 1.} 
-    \label{fig:planning_lot1} 
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/planninglot2.png}
-    %\caption{Macro planning du Lot 2.} 
-    \label{fig:planning_lot2} 
-\end{figure}
-
-\subsection{Conduite de projet}
-\subsection{Choix méthodologique : Le cycle en V itératif}
-Pour répondre aux exigences de sécurité et de criticité liées à la migration des données d’un opérateur télécom, le projet a adopté une structure \textbf{hybride}. Si la feuille de route globale suit la rigueur d'un \textbf{Cycle en V}, indispensable pour sécuriser les phases de spécifications, de conception et de validation finale, l'exécution opérationnelle a été orchestrée par l'agilité \textbf{Scrum}. Cette approche permet de concilier une gouvernance contractuelle forte avec une flexibilité technique indispensable face à la complexité des systèmes \textbf{legacy}.\\
-L’équipe a opté pour un fonctionnement en mode Agile sur l'intégralité des activités du \textbf{Lot 1}. La gestion du projet a ainsi été découpée en cycles de travail de courte durée appelés \textbf{Sprints}/\textbf{Jalons}, d'une durée de 2 à 4 semaines. Ce rythme a permis de transformer la migration massive de données en une série de livraisons incrémentales et régulières, tout en permettant de prioriser les tâches essentielles créatrices de valeur.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/cycleV.png}
-    \caption{Cadre de gouvernance globale en Cycle en V.} 
-    \label{fig:Cycle_en_V} 
-\end{figure}
-
-La branche descendante du cycle a permis de figer les spécifications fonctionnelles de la solution Ni2 (modélisation des réseaux cuivre et fibre). Mon travail s’est situé au cœur de la \textbf{phase de Réalisation}. Cette étape est le socle des phases montantes du cycle (Tests et Recette). En effet, la qualité de l’analyse que j’ai menée sur la base de données du référentiel CRM conditionne directement la réussite des \textbf{Dry Runs} et de la recette finale avant le passage en production (Lot 2), ainsi que la contribution de la migration de données depuis le référentiel GAIA vers Ni2. \\
-
-Si le \textbf{Cycle en V} donne la direction, l'exécution quotidienne au sein du \textbf{Lot 1} a été pilotée par la méthodologie \textbf{Scrum}. Cette approche itérative est la seule capable de gérer l'incertitude liée à la rétro-ingénierie de bases de données massives.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/scrum.png}
-    \caption{Processus de la méthode SCRUM} 
-    \label{fig:Scrum} 
-\end{figure}
-
-Nous avons découpé le projet en cycles de travail appelés \textbf{Sprints} \textbf{(ou Jalons)} de 2 à 4 semaines. Cette méthode a permis de transformer une mission titanesque en livrables concrets :
-\begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
-    \setlength\parsep{0pt}
-    \item \textbf{Le Backlog :} Il centralisait toutes les tâches (analyse, scripts SQL, tests).
-    \item \textbf{Les Sprints :} Segmentation de l'analyse par thèmes (Location, Service and Customer, Device ..), sécurisant chaque brique de donnée avant de passer à la suivante.
-    \item \textbf{Les Rituels :} Les Daily Scrums permettaient une synchronisation rapide avec mon Team Lead et l'équipe Ni2 pour lever les verrous techniques sur les vues SQL les plus complexes.
-\end{itemize}
-
-La conduite du projet a bénéficié d'une synergie de compétences :
-\begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
-    \setlength\parsep{0pt}
-    \item \textbf{Team Lead} : Garant de la méthodologie et de la cohérence de la stratégie de migration.
-    \item \textbf{Equipe Ni2} : Support critique pour aligner les extractions SQL avec le méta-modèle de la cible.
-    \item \textbf{Equipe Inetum} : Travail collaboratif pour la reprise des données GAIA et CRM.
-\end{itemize}
-
-\subsection{Planification du projet}
-La figure \ref{fig:Gantt} représente le diagramme de Gantt qui résume toutes les tâches que j’ai effectuées au cours de mon projet de fin d’études.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/gantt.png}
-    \caption{Planification du projet - Diagramme de Gantt} 
-    \label{fig:Gantt} 
-\end{figure}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|l|p{8cm}|l|}
+        \hline
+        \rowcolor{iNavy} \textbf{\color{white}Phase} & \textbf{\color{white}Description} & \textbf{\color{white}Durée} \\ \hline
+        Analyse & Étude du SI CCU, APIs TMF et sources de données & 2 semaines \\ \hline
+        Conception & Architecture agentique, modèle de données Neo4j, flux & 3 semaines \\ \hline
+        Réalisation & Implémentation des agents, API, ingestion & 5 semaines \\ \hline
+        Validation & Tests pytest, golden incidents, recette & 2 semaines \\ \hline
+        Documentation & Rédaction du rapport et démonstration & 2 semaines \\ \hline
+    \end{tabular}
+    \caption{Planification macro du projet}
+    \label{tab:planning}
+\end{table}
 
 \section*{Conclusion}
-Ce premier chapitre a permis de présenter le contexte général du projet, notamment un bref descriptif de l’organisme d’accueil, ainsi que la problématique de l’entreprise cliente. Ce chapitre a permis également l’annonce de la méthodologie adoptée pour la conduite du projet ainsi que son planning de réalisation. Le chapitre suivant se concentrera sur le projet.
-
-
-% --- Fin de la présentation entreprise ---
-%\newpage
-%\section{Contexte et Problématique}
-% Ici on passera à la problématique du projet
-%\section{-}
-%blablabla
-
-%\addcontentsline{toc}{section}{Conclusion}
-%\section*{Conclusion}
+Ce premier chapitre a présenté le contexte général du projet, l'organisme d'accueil, la problématique du diagnostic technique CCU, les objectifs et la méthodologie adoptée. Le chapitre suivant détaille la conception de l'architecture agentique et du graphe de connaissances.

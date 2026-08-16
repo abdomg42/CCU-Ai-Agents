@@ -1,280 +1,145 @@
 % !TeX root = ../main.tex
 \addcontentsline{toc}{section}{Introduction}
 \section*{Introduction}
-À l'issue du premier chapitre, qui a posé les fondements du projet et défini le périmètre de l'intervention, ce second chapitre entre au cœur de la démarche technique. Il s'articule autour de deux axes complémentaires : l'analyse approfondie des systèmes sources verrou analytique central du projet, et la conception de la stratégie de migration, depuis l'architecture du pipeline ETL jusqu'aux mécanismes de validation itérative. \\*
-La migration de données constitue l'étape la plus critique du projet de modernisation du SI Commercial de l'opérateur télécom. Elle conditionne directement la qualité initiale de l'inventaire dans Ni2, la capacité du système à supporter les processus métiers, et la fiabilité de l'ensemble des interfaces du SI. Toute erreur ou incohérence introduite à ce stade se propagera dans les processus opérationnels et fragilisera la crédibilité de la plateforme cible. La rigueur analytique et la conception méthodique de la stratégie constituent donc des prérequis absolus à la réussite du projet.
+Ce chapitre présente la conception de l'architecture agentique du diagnostic technique CCU. Il décrit le pipeline global orchestré par LangGraph, le rôle de chaque agent, le modèle de données partagé, le graphe Neo4j et le mécanisme de recherche augmentée par graphe (GraphRAG).
 
-\section{Analyses des systèmes sources}
-Les données à migrer proviennent de deux systèmes sources distincts, chacun doté de sa propre structure, de sa propre logique métier et de ses propres contraintes techniques. Leur analyse préalable constitue la fondation de toute décision de conception relative à la migration.
-\subsection{GAIA : le référentiel réseau legacy}
-GAIA constitue le système d'inventaire réseau existant de l'opérateur télécom. Il a été conçu pour gérer l'ensemble des ressources du réseau d'accès fixe et Internet : les localisations géographiques (sites, infrastructures, armoires, poteaux), les équipements actifs (MSAN, OLT, ONU), la connectivité physique (câbles, fibres, paires) et logique (services, accès), ainsi que les services clients associés.\\*
-La base de données GAIA repose sur \textbf{Oracle Database}. L'analyse de son schéma a révélé une organisation en plusieurs grandes familles de tables correspondant aux domaines fonctionnels couverts :
+\section{Vue d'ensemble du pipeline}
+L'architecture repose sur un graphe d'état (state graph) implémenté avec \textbf{LangGraph}. Chaque nœud du graphe correspond à un agent spécialisé qui lit et écrit dans un état partagé. Le flux de traitement d'un incident suit le cheminement suivant :
+
+\begin{center}
+\texttt{START $\rightarrow$ intake $\rightarrow$ collectors $\rightarrow$ root\_cause $\rightarrow$ ticket\_manager}\\
+\texttt{$\rightarrow$ remediation\_explainer $\rightarrow$ content\_guardrail $\rightarrow$ report\_generator $\rightarrow$ notifier $\rightarrow$ END}
+\end{center}
+
+La figure \ref{fig:architecture_ccu} illustre ce pipeline agentique.
+
+\begin{figure}[H]
+    \centering
+    \input{images/architecture_ccu}
+    \caption{Pipeline agentique du diagnostic technique CCU}
+    \label{fig:architecture_ccu}
+\end{figure}
+
+\section{Modèle de données partagé}
+L'état du graphe est matérialisé par la classe \texttt{GraphState} définie dans \texttt{shared/state.py}. Elle utilise \textbf{Pydantic} pour valider les données à chaque transition. Les champs principaux sont :
+
 \begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item \textbf{Les Locations :}  sous-réseaux, zones réseau, sites clients et fournisseurs, éléments d'infrastructure (armoires, enceintes extérieures, bornes, façades) et supports aériens ;
-    \item \textbf{Les Services \& Customers :} clients, contacts, produits, services actifs, accès et numéros de désignation ;
-    \item \textbf{Les Devices Cuivre :} MSAN, postes de concentration (PC), têtes MFA ;
-    \item \textbf{Les Devices Fibre :} OLT, points de branchement optique (PBO), points d'éclatement de zone (PEZ) ;
-    \item \textbf{La Connectivité :} physique et logique, pour les réseaux cuivre et fibre ;
+    \item \texttt{incident} : description brute de l'incident.
+    \item \texttt{parsed\_incident} : structure normalisée (client, service, commande, type, priorité).
+    \item \texttt{logs}, \texttt{customer\_context}, \texttt{similar\_tickets} : résultats des agents collecteurs.
+    \item \texttt{root\_cause} : cause racine et niveau de confiance.
+    \item \texttt{remediation\_explanation} : explication de la remédiation proposée.
+    \item \texttt{ticket\_mapping} : mapping ou création du ticket.
+    \item \texttt{sanitized\_*} : champs filtrés par le guardrail.
+    \item \texttt{report\_path}, \texttt{email\_sent}, \texttt{zammad\_note\_added} : sorties finales.
+    \item \texttt{traces} : journal d'audit de l'exécution.
 \end{itemize}
 
-Malgré la richesse de son contenu, GAIA présente pluqieurs limitations inhérentes à tout système legacy. La qualité des données n'est pas homogène : certains champs sont mal renseignés, des doublons existent, et les relations entre entités ne sont pas toujours cohérentes. De surcroît, le modèle de données GAIA ne correspond pas directement au modèle de données Ni2, ce qui rend indispensable une phase de transformation et de normalisation. \\*
-Mon rôle sur ce périmètre a consisté à appuyer l'équipe Inetum dans la construction et la validation des scripts d'extraction SQL, à contribuer à la formalisation des règles de mapping entre entités GAIA et objets Ni2, et à participer activement aux cycles de Dry Runs portant sur les jalons 1, 2 et 3.
-
-\section{Le CRM : rétro-ingénierie d'un référentiel complexe}
-\subsection{Contexte et enjeux de la rétro-ingénierie}
-Le CRM constitue le référentiel officiel des clients, contacts et adresses de l'opérateur télécom. Contrairement à GAIA dont la structure était relativement documentée par l'équipe technique d'Inetum, le CRM représentait un véritable défi analytique : sa base de données MSSQL comprend plus de 900 tables et vues, sans documentation fonctionnelle exhaustive accessible. C'est cette complexité qui en fait le \textbf{verrou analytique} du projet, tel que défini dans le premier chapitre.\\*
-L'enjeu de la rétro-ingénierie était double. D'une part, identifier parmi les 900 tables celles qui contiennent les données pertinentes à la migration : \textbf{clients} (entreprises et particuliers, B2B et B2C), \textbf{contacts}, \textbf{adresses de raccordement}, \textbf{contrats de service} et \textbf{numéros de désignation}. D'autre part, comprendre les relations entre ces tables pour construire des requêtes d'extraction cohérentes, restituant une vue complète et intègre de chaque client sans doublons ni données orphelines. Cette mission m'a été confiée en responsabilité complète, constituant ma contribution principale au projet au titre du Jalon 4.
-
-\subsubsection{Démarche méthodologique adoptée}
-Face à l'absence de documentation formelle, j'ai adopté une démarche de rétro-ingénierie progressive articulée en trois étapes successives.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/retroingeCRM.png}
-    \caption{Démarche de rétro-ingénierie du CRM}
-\end{figure}
-
-\begin{enumerate}
-    \item \textbf{Étape 1 — Exploration structurelle :} À partir d'un accès en lecture seule à l'environnement de préproduction CRM, j'ai dressé un inventaire systématique des tables et vues en analysant leurs noms, leur cardinalité (nombre de lignes) et la liste de leurs colonnes. Cette première lecture a permis d'identifier rapidement les tables à forte cardinalité comme candidates prioritaires, celles-ci contenant généralement les entités métier principales : comptes clients, contacts, adresses.
-    \item \textbf{Étape 2 — Analyse des contraintes référentielles :} L'étude des clés primaires (PK), des clés étrangères (FK) et des index a permis de reconstituer le graphe de dépendances entre tables, et ainsi de comprendre la structure relationnelle sans documentation préalable. Cette étape a notamment révélé que les clients sont stockés dans plusieurs tables distinctes selon leur catégorie (B2C vs B2B), avec des hiérarchies de comptes et de contacts imbriquées.
-    \item \textbf{Étape 3 — Analyse sémantique des données :} L'examen des valeurs réelles contenues dans les colonnes clés a permis de confirmer ou d'infirmer les hypothèses formulées à l'étape précédente, d'identifier les colonnes discriminantes (type de client, statut de contrat, périmètre géographique, type de service) et de valider la pertinence des données vis-à-vis du périmètre de migration (réseau fixe et Internet, Lot 1 uniquement).
-\end{enumerate}
-
-\subsection{Identification des entités clés et cartographie des données clients}
-À l'issue de cette démarche exploratoire, j'ai pu identifier les entités clés à migrer et les tables sources correspondantes. Ces entités constituent la matière première du Jalon 4 :
-\begin{itemize}
-    \item Les clients (personnes physiques et morales) avec leurs attributs d'identification : nom/raison sociale, numéro client, catégorie B2C/B2B, statut actif/inactif ;
-    \item Les adresses de raccordement et de facturation, avec leur rattachement géographique ;
-    \item Les contacts associés à chaque compte client ;
-    \item Les numéros de désignation (ND) et les lignes téléphoniques associées, essentiels au raccordement Service-Ressource dans Ni2.
-\end{itemize}
-
-Cette cartographie a constitué la base du document de mapping CRM, qui spécifie pour chaque attribut cible dans Ni2 la table source CRM correspondante, la règle de transformation associée et les cas particuliers à gérer.
-
-
-\subsection{Construction des requêtes d'extraction}
-Sur la base de cette cartographie, j'ai procédé à la construction des scripts d'extraction SQL sous forme de requêtes \textbf{SELECT} portant sur les tables identifiées. Ces requêtes intègrent les jointures nécessaires à la recomposition des entités clients complètes, les filtres sur le périmètre fonctionnel (services Fixe/Internet uniquement), et les transformations simples réalisables directement en SQL (concaténation de champs, normalisation de casses, gestion des valeurs nulles).\\*
-Les requêtes produisent des \textbf{fichiers CSV} au format pivot Ni2, avec des colonnes préfixées selon la convention de l'outil de migration : \textbf{T.} pour les types de catalogue, \textbf{I.} pour les instances, \textbf{REL.} pour les relations. Ces fichiers constituent l'entrée de la phase de chargement dans Ni2.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/headerCSV.png}
-    \caption{Format des colonnes fichiers CSV }
-    \label{fig:fichiersCSV}
-\end{figure}
-
-
-\subsection{Conception de la stratégie de migration}
-\subsubsection{Principes directeurs et objectifs stratégiques}
-La stratégie de migration conçue pour ce projet repose sur un ensemble de principes directeurs qui guident l'ensemble des décisions techniques et organisationnelles :
-\begin{itemize}
-    \item \textbf{Continuité d'activité : } minimiser l'interruption de service pour les équipes opérationnelles, en concentrant l'arrêt des systèmes sur une fenêtre nocturne de 14 heures (de 20h à 10h le lendemain) ;
-    \item \textbf{Reproductibilité : } chaque exécution de migration doit produire des résultats identiques à partir des mêmes données sources, garantissant que les Dry Runs anticipent fidèlement le comportement de la migration finale ;
-    \item \textbf{Contrôlabilité  : } à chaque étape, des indicateurs de qualité (KPIs) permettent de mesurer l'avancement et de décider en connaissance de cause de poursuivre ou d'activer la procédure de retour arrière ;
-    \item \textbf{Intégrité des données sources : } la migration ne modifie aucune donnée dans GAIA ou le CRM. En cas d'échec, les systèmes sources peuvent être remis en service sans restauration de données, simplifiant ainsi considérablement la procédure de rollback.
-\end{itemize}
-
-\subsubsection{Le modèle de données cible : Ni2 Unified Inventory}
-Ni2 Unified Inventory est une plateforme CMDB (Configuration Management Database) unifiée, conçue pour gérer l'inventaire des ressources télécoms de manière cohérente et structurée. Son modèle de données est organisé autour de trois grandes familles d'objets :
-\begin{itemize}
-    \item \textbf{Les Locations : } zones réseau, sous-réseaux, sites clients et fournisseurs, infrastructures physiques ;
-    \item \textbf{Les Clients & Services : } clients B2B et B2C, contacts, contrats, services actifs, accès et numéros ;
-    \item \textbf{Les Devices & Connectivity : } équipements actifs (MSAN, OLT, ONU, PBO, PEZ), connectivité physique et logique.
-\end{itemize}
-
-Chaque objet Ni2 est caractérisé par un ensemble d'attributs typés, un type de catalogue, et des relations avec d'autres objets. La richesse du modèle relationnel de Ni2, notamment les liens topologiques entre ressources réseau et les liens Service-Ressource, constitue précisément la valeur ajoutée par rapport aux systèmes legacy. Elle implique en contrepartie que la migration ne se limite pas à un simple transfert de données : elle doit reconstruire ces relations à partir des informations disponibles dans GAIA et le CRM.
-
-\subsubsection{Règles de mapping et de transformation}
-Le document de \textbf{Low Level Design Migration} constitue la référence technique exhaustive du projet. Il spécifie pour chaque objet Ni2 cible : la table source (GAIA ou CRM), les attributs sources avec leurs règles de transformation, et les conditions de création des relations.\\*
-Les transformations couvrent plusieurs catégories d'opérations :
-\begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
-    \setlength\parsep{0pt}
-    \item \textbf{Conversion de formats : } normalisation des dates, codes pays, formats de numéros téléphoniques ;
-    \item \textbf{Normalisation des valeurs : } alignement des listes de valeurs entre codifications GAIA/CRM et valeurs Ni2 (statuts, catégories, types d'équipement) ;
-    \item \textbf{Enrichissement : } calcul de certains attributs Ni2 à partir de combinaisons de champs sources ;
-    \item \textbf{Gestion des valeurs manquantes : } définition de valeurs par défaut pour les attributs obligatoires dans Ni2 sans équivalent dans les systèmes sources ;
-    \item \textbf{Création de relations : } reconstitution des liens topologiques et fonctionnels, notamment les associations Service-Ressource.
-\end{itemize}
-
-\subsubsection{Réconciliation inter-systèmes GAIA / CRM}
-L'une des complexités spécifiques de ce projet tient au fait que les données clients sont présentes dans les deux systèmes sources : \textbf{GAIA} stocke une représentation des clients en lien avec leurs ressources réseau, tandis que le \textbf{CRM} en est le référentiel officiel. Ces deux représentations ne sont pas nécessairement synchronisées : des clients peuvent exister dans l'un sans l'autre, et les attributs d'un même client peuvent différer entre les deux systèmes.\\*
-Une étape de réconciliation en amont de l'injection dans Ni2 est donc indispensable. Elle consiste à identifier les enregistrements représentant le même client dans GAIA et le CRM, à les fusionner selon des règles d'arbitrage validées avec les équipes métier de l'opérateur telecom, et à éliminer les doublons potentiels. Cette étape est réalisée directement dans les scripts de migration, par des jointures et des logiques de déduplication basées sur des clés de réconciliation définies pour chaque entité (numéro client CRM, numéro de ligne, identifiant GAIA).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/index.png}
-    \caption{Processus de réconciliation inter-systèmes}
-    \label{fig:reconc}
-\end{figure}
-Les données clients existent dans les deux systèmes sources avec des représentations différentes, la réconciliation aligne, fusionne et déduplique avant injection dans Ni2.
-
-\subsection{Architecture technique de la migration}
-\subsubsection{Vue d'ensemble du framework Java}
-L'outil de migration Ni2 est un framework Java qui implémente le pattern \textbf{ETL (Extract, Transform, Load)} pour le transfert de données vers la CMDB Ni2. Son architecture repose sur deux composants centraux :
-\begin{itemize}
-    \item \textbf{AbstractSampleScript : } gère la connexion à la CMDB Ni2 et l'authentification, prépare l'environnement d'exécution, et structure le cycle de vie du script (lecture des arguments, exécution, nettoyage) ;
-    \item \textbf{ImportScriptTools : } constitue le moteur du framework. Il expose les méthodes de création et de mise à jour des objets dans la CMDB, gère le catalogue des types, crée les associations entre objets, et optimise les performances via un mécanisme de cache interne.
-\end{itemize}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/archiGeneraleNI2.png}
-    \caption{Architecture générale du framework de migration Ni2}
-    \label{fig:archiNi2}
-\end{figure}
-
-Le framework propose deux modes de migration. Le mode SQL Sync, via fichiers CSV intermédiaires, est recommandé pour les migrations massives et constitue le mode retenu pour ce projet. Le mode Java Direct, qui exécute les requêtes SQL directement sur la base source, n'est pas utilisé dans ce contexte.
-
-\subsubsection{Le processus SQL Sync par fichiers CSV}
-Le mode SQL Sync fonctionne en deux phases distinctes, schématisées dans la figure ci-dessous.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/procesImport.png}
-    \caption{Processus de migration SQL Sync}
-    \label{fig:SQLSync}
-\end{figure}
-
-\begin{enumerate}
-    \item \textbf{Phase 1 – Extraction. } Des requêtes SQL sont exécutées sur les bases sources (Oracle pour GAIA, MSSQL pour le CRM) via les utilitaires \textbf{psql/sqlcmd}. Les résultats sont exportés en fichiers CSV. En cas de volumétries importantes, les fichiers sont découpés en lots via le script splitCSV.py. Chaque fichier CSV contient des colonnes préfixées selon la convention Ni2 : \textbf{T.} pour les types de catalogue, \textbf{I./I2./I3.} pour les instances, \textbf{REL.} pour les relations.
-    \item \textbf{Phase 2 – Importation dans Ni2. } Les fichiers CSV sont traités par le composant \textbf{DefaultCSVToNi2}. L'importation suit un ordre strict : les types de catalogue sont créés en premier, puis les instances, et enfin les relations. Un système de commit progressif garantit la stabilité transactionnelle et limite l'impact d'éventuelles erreurs sur le reste du traitement.
-\end{enumerate}
-
-\subsubsection{Organisation des répertoires et ordre d'exécution}
-Le framework organise les scripts SQL dans une structure de répertoires stricte, définissant l'ordre obligatoire d'exécution pour respecter les dépendances des données. La structure \textbf{syncSQL/} comprend sept phases séquentielles :
-\begin{itemize}
-    \setlength\itemsep{0.1em}  % Réduit l'espace entre les lignes
-    \setlength\parskip{0pt}    % Supprime l'espace de paragraphe
-    \setlength\parsep{0pt}
-    \item \textbf{reconcile\_types/ (Phase 1) : } assure l'existence des types de catalogue dans Ni2 ;
-    \item \textbf{add\_all/ (Phase 2) : } opérations en bloc si nécessaire ;
-    \item \textbf{add\_inst/ (Phase 3) :  } création des nouvelles instances ;
-    \item \textbf{delete\_inst/ (Phase 4) : } suppression des données obsolètes ;
-    \item \textbf{reconcile\_inst/ (Phase 5) : } mise à jour des instances existantes ;
-    \item \textbf{add\_rel/ (Phase 6) : } création des associations entre objets ;
-    \item \textbf{add\_rel\_name/ (Phase 7) : } relations nommées.
-\end{itemize}
-Cette organisation garantit que les objets référencés dans les associations existent déjà dans la base Ni2 au moment de leur création, prévenant ainsi toute erreur d'intégrité référentielle.
-
-\subsubsection{Gestion des erreurs et journalisation}
-L'architecture du framework implémente une stratégie de gestion des erreurs à trois niveaux pour garantir la résilience et l'intégrité du traitement :
-\begin{itemize}
-    \item Niveau ligne (Row-level) : les erreurs sur un enregistrement individuel sont journalisées et le traitement passe à la ligne suivante. Cette résilience évite qu'une donnée corrompue bloque l'ensemble de la migration ;
-    \item Niveau lot (Batch-level) : les erreurs lors du commit d'un lot déclenchent un rollback de ce lot, garantissant la cohérence transactionnelle ;
-    \item Niveau script (Script-level) : les erreurs critiques (échec de connexion, absence d'un type parent obligatoire) déclenchent un arrêt immédiat du script (Fail Fast) pour prévenir la corruption massive des données.
-\end{itemize}
-
-La journalisation suit une hiérarchie de quatre niveaux : \textbf{ERROR} (échecs de transaction majeurs), \textbf{WARN} (problèmes de qualité des données), \textbf{INFO} (points de progression), et \textbf{DEBUG} (détail fin de l'exécution). L'analyse des journaux constitue l'outil principal pour le diagnostic et la correction des rejets lors des Dry Runs.
-
-\subsection{Stratégie de validation : les Dry Runs itératifs}
-\subsubsection{Philosophie des cycles itératifs}
-La stratégie de validation repose sur une approche itérative de migrations à blanc, les \textbf{Dry Runs}. Cette approche est fondée sur un constat opérationnel : la complexité d'une migration de données à grande échelle rend impossible une validation exhaustive en amont. Seule l'exécution réelle du processus complet permet de détecter les incohérences de données, les cas limites non couverts par les règles de mapping, et les problèmes de performance.\\
-Les Dry Runs servent simultanément plusieurs objectifs : affiner les procédures et outils de migration, détecter et corriger les incohérences de données, tester les indicateurs de qualité, mesurer les temps d'exécution, et évaluer le niveau de préparation des équipes. Le succès du dernier Dry Run est un prérequis non négociable à la décision de procéder à la migration réelle.\\
-La stratégie prévoit cinq Dry Runs progressifs dont les objectifs et les périmètres sont différenciés, formant une courbe de montée en qualité maîtrisée jusqu'au Go Live.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/dry runs.png}
-    \caption{Stratégie de validation par Dry Runs itératifs}
-    \label{fig:dryRuns}
-\end{figure}
-
-\subsubsection{Phase préparatoire}
-Avant le démarrage des Dry Runs formels, une phase préparatoire est consacrée à la construction et à la mise au point des outils de migration. Des extractions partielles des thèmes à migrer sont réalisées progressivement selon l'ordre cohérent de migration des entités (Locations en premier, puis Clients et Services, puis Devices). Ces extractions servent de données de test lors du développement et de la validation des scripts. Cette phase nécessite des échanges fréquents et continus entre l'équipe DT en charge des extractions et l'équipe Inetum responsable de la migration.
-
-\subsubsection{Les Dry Runs Partiels (jalons 1, 2 et 3)}
-Les trois premiers Dry Runs sont dits \textbf{partiels} : chacun couvre un périmètre thématique correspondant à un jalon de livraison de la migration. Leur objectif commun est de valider que le système cible Ni2 est prêt à recevoir les données.\\
-Le Dry Run Partiel n°1 (Jalon 1) porte sur les Locations et les Services & Customer. Il vise à vérifier que les scripts d'extraction génèrent les fichiers CSV au bon format, que les outils d'importation Ni2 fonctionnent correctement, et que les volumétries attendues sont retrouvées dans Ni2 avec les bons attributs.
-Le Dry Run Partiel n°2 (Jalon 2) couvre les Devices et la Connectivité Cuivre, ainsi que les formulaires de commande hors intégrations externes (création d'une nouvelle demande de service, modification, création automatique des ordres de travail).
-Le Dry Run Partiel n°3 (Jalon 3) intègre les données clients issues du CRM — périmètre de ma responsabilité directe — les Devices et la Connectivité Fibre, et les workflows de commande avec les intégrations complètes (workflow de demande de service, workflow de modification, workflow des ordres de travail). À l'issue de ces trois itérations, la totalité du périmètre fonctionnel est migrée en environnement de migration.
+La classe \texttt{ParsedIncident} formalise les attributs extraits lors de l'intake :
 
 \begin{table}[H]
     \centering
-    \renewcommand{\arraystretch}{1.5} % Pour aérer le tableau
-    \begin{tabular}{|l|p{9cm}|l|}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|p{10cm}|}
         \hline
-        \rowcolor{iNavy} % Utilise la couleur bleue définie précédemment
-        \textbf{\color{white} Jalon} & \textbf{\color{white} Contenu} & \textbf{\color{white} Dry Run Partiel} \\ \hline
-        
-        \textbf{Jalon 1} & 
-        Location \newline 
-        Service \& Customer & 
-        Dry Run Partiel n°1 \\ \hline
-        
-        \textbf{Jalon 2} & 
-        \textbf{Cuivre} : Device/Physical/Logical Connectivity \newline 
-        \textbf{Commande} (excluant les intégrations) : \newline 
-        -- Création du formulaire d'une nouvelle demande de service \newline 
-        -- Création du formulaire d'une modification de service \newline 
-        -- Création automatique des OT & 
-        Dry Run Partiel n°2 \\ \hline
-        
-        \textbf{Jalon 3} & 
-        Clients CRM \newline 
-        \textbf{Fibre} : Device/Physical/Logical Connectivity \newline 
-        \textbf{Commande} (incluant les intégrations) : \newline 
-        -- Workflow d'une demande de service \newline 
-        -- Workflow d'une modification de service \newline 
-        -- Workflow des OT & 
-        Dry Run Partiel n°3 \\ \hline
+        \rowcolor{iNavy} \textbf{\color{white}Attribut} & \textbf{\color{white}Description} \\ \hline
+        service\_id & Identifiant du service concerné (ex. svc-fiber-12345) \\ \hline
+        order\_id & Identifiant de la commande (ex. ord-2026-001) \\ \hline
+        customer\_id & Identifiant du client (ex. acc-12345) \\ \hline
+        incident\_type & Type d'incident : fibre, sim, mobile, lan, billing, autre \\ \hline
+        description & Texte décrivant l'incident \\ \hline
+        priority & Priorité P1, P2 ou P3 \\ \hline
     \end{tabular}
-    \caption{Planification des jalons}
-    \label{tab:jalons_projet}
+    \caption{Attributs de l'incident normalisé}
+    \label{tab:parsed_incident}
 \end{table}
 
-\subsubsection{Le Dry Run Full}
-Le Dry Run Full constitue la première migration de bout-en-bout sur l'ensemble du périmètre, à partir de données proches des données de production extraites des environnements de préproduction GAIA et CRM. Son déroulement suit une méthodologie séquentielle avec arrêt à chaque étape pour vérification et validation.\\
-Ses objectifs sont multiples : valider les extractions et détecter les incohérences entre GAIA et CRM, valider les logiques de transformation des données, réaliser des tests complets de cas d'usage métier (prise de commande cuivre et fibre, modification de service, traitement d'un dérangement), et produire une première estimation fiable du temps de migration et des performances du processus.
+\section{Les agents du pipeline}
 
-\subsubsection{Le Dry Run à blanc}
-Le Dry Run à blanc constitue la répétition générale de la migration finale. Il est exécuté directement sur l'environnement de production Ni2, à partir de données issues des systèmes de production GAIA et CRM à la date de la migration. Son objectif est de valider la procédure de Cut Over dans ses conditions réelles, de caler le minutage précis de chaque activité, et de produire un plan des activités de migration fiable pour le Go Live.
-Contrairement aux Dry Runs précédents orientés sur la qualité des données et le bon fonctionnement des outils, le Dry Run à blanc est avant tout un exercice de gestion de projet : il valide le séquencement des activités, la coordination entre les équipes, et confirme que la migration peut être menée à terme dans la fenêtre de 14 heures impartie.
+\subsection{Intake parser}
+L'agent \texttt{intake\_parser} a pour mission de normaliser l'incident brut. Il combine une phase de parsing heuristique par expressions régulières et une validation/ajustement par LLM structuré lorsque le modèle est disponible. En mode \texttt{MOCK\_LLM=true}, le système fonctionne de manière déterministe sans dépendance externe.
 
-\subsubsection{Critères d'acceptance : KPIs quantitatifs et tests qualitatifs}
-La mesure de la qualité de la migration s'appuie sur deux types d'évaluations complémentaires, dont la liste définitive est discutée et validée avec le client.\\
-\textbf{KPIs quantitatifs.}  Ces indicateurs consistent en des comptages d'objets dans Ni2 après migration, comparés aux volumes attendus calculés depuis les systèmes sources. Ils couvrent trois thèmes : les Locations (zones réseau, sites, éléments d'infrastructure, supports aériens), les Clients & Services (clients, contacts, produits, services, accès, numéros assignés et libres), et les Devices & Connectivity (équipements par type : MSAN, OLT, PBO, PEZ, ONU, etc.).\\
-\textbf{Tests qualitatifs. } Ces tests vérifient la cohérence fonctionnelle des données migrées et leur conformité au modèle Ni2. Ils incluent notamment : l'analyse complète d'un échantillon de clients migrés (attributs, adresses, services) ; la vérification des équipements avec leurs modules, slots et connectivité de ports ; et la réalisation de cas d'usage complets sur données migrées (prise de commande cuivre, prise de commande fibre, modification de service avec ajout/suppression, transfert, cession, et traitement d'un dérangement).\\
+\subsection{Collecteurs parallèles}
+Les trois agents collecteurs s'exécutent en parallèle dans le nœud \texttt{collectors} :
 
-\subsection{Gestion des risques opérationnels}
-\subsubsection{Politique de gestion des rejets}
-La gestion des rejets est structurée à trois niveaux correspondant aux phases du processus ETL, chacun disposant de son propre plan d'action.\\
-\textbf{Au niveau 1} (données sources GAIA ou CRM), les rejets issus d'anomalies dans les systèmes sources font l'objet d'une notification à l'équipe DT, qui prend en charge l'analyse et la correction à la source. Une nouvelle extraction peut être nécessaire selon la nature des corrections apportées.\\
-\textbf{Aux niveaux 2} (transformation) et \textbf{3} (chargement dans Ni2), les rejets sont traités par l'équipe de migration par ajustement des règles de transformation ou de la configuration d'injection (introduction de valeurs par défaut, ajustement des règles métier), en accord avec l'opérateur telecom. Chaque ligne est associée à un statut \textbf{(succès, warning ou rejet)} accompagné du message d'erreur détaillé, permettant un audit précis et une réexécution ciblée sur les seuls objets non migrés.
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \texttt{logs\_investigator} : synthétise les logs réseau et applicatifs pertinents.
+    \item \texttt{context\_agent} : récupère le contexte client et contractuel dans le CRM.
+    \item \texttt{rag\_ticket\_search} : recherche des tickets historiques similaires dans Neo4j.
+\end{itemize}
+
+Le parallélisme est mis en œuvre via \texttt{asyncio.gather}, avec un fallback \texttt{ThreadPoolExecutor} en cas de boucle déjà active.
+
+\subsection{Root cause reasoner}
+L'agent \texttt{root\_cause\_reasoner} corrèle les sources collectées pour établir une cause racine. Il retourne un niveau de confiance (faible, moyenne, forte) et une liste de \texttt{source\_ids}. Si aucune source suffisante n'est disponible, il retourne une cause \texttt{indéterminée} avec une confiance faible, ce qui constitue un mécanisme de refus d'hallucination.
+
+\subsection{Ticket manager}
+L'agent \texttt{ticket\_manager} détermine s'il faut créer un nouveau ticket ou rattacher l'incident à un ticket existant. Il s'appuie sur le client, le service et les tickets similaires déjà présents.
+
+\subsection{Remediation explainer}
+L'agent \texttt{remediation\_explainer} produit un texte informatif décrivant les actions recommandées. Conformément au principe de sécurité du projet, ces actions ne sont jamais exécutées automatiquement.
+
+\subsection{Content guardrail}
+Le guardrail \texttt{pii\_sanitizer} filtre les informations personnelles identifiables (PII) avant toute génération de rapport ou notification externe. Il classe également les actions selon une liste blanche pour refuser tout comportement non autorisé.
+
+\subsection{Report generator et notifier}
+L'agent \texttt{report\_generator} produit un rapport PDF/HTML à partir d'un template Jinja2, avec WeasyPrint ou un fallback HTML. L'agent \texttt{notifier} envoie l'email et ajoute une note interne dans Zammad.
+
+\section{Graphe de connaissances Neo4j}
+
+\subsection{Modèle de données graphe}
+Le graphe Neo4j stocke les entités métiers et leurs relations. Il sert à la fois de base de connaissances structurée et de support à la recherche vectorielle. Les principaux nœuds sont : \texttt{Client}, \texttt{Subscription}, \texttt{Order}, \texttt{Product}, \texttt{Ticket} et \texttt{LogEvent}.
+
+La figure \ref{fig:data_model_ccu} représente le modèle de données graphe.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/index2.png}
-    \caption{Politique de gestion des rejets selon les phases du processus ETL}
-    \label{fig:gestionRejets}
+    \input{images/data_model_ccu}
+    \caption{Modèle de données du graphe Neo4j}
+    \label{fig:data_model_ccu}
 \end{figure}
 
-\subsubsection{Procédure de rollback}
-La stratégie de retour arrière est déclenchée si la décision de Go/No Go prononcée à l'issue des validations post-chargement est défavorable. Les conditions de déclenchement incluent des écarts significatifs et non récupérables sur les KPIs quantitatifs, des anomalies bloquantes lors des tests qualitatifs, un dépassement de la fenêtre de Cut Over compromettant la réouverture des agences, ou une défaillance technique majeure. \\
-La procédure de rollback suit une séquence ordonnée : décision formelle No Go (DT), arrêt des scripts de migration en cours (Inetum), restauration de la base Ni2 PROD depuis la sauvegarde réalisée en pré-migration (Inetum), remise en service de GAIA (DT), remise en service du CRM selon le scénario d'arrêt retenu (DT), réactivation des intégrations et synchronisations inter-systèmes dans l'ordre défini au chronogramme (DT/Inetum), et validation du bon fonctionnement (DT).
+\subsection{Contraintes et index vectoriel}
+Le fichier \texttt{graph/schema.cypher} définit les contraintes d'unicité sur chaque entité et crée un index vectoriel sur les embeddings des tickets. Cet index permet d'effectuer une recherche de similarité cosine nativement dans Neo4j.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/index3.png}
-    \caption{Stratégie de retour arrière en cas de No Go}
-    \label{fig:rollback}
-\end{figure}
+\begin{lstlisting}[language=SQL, caption={Extrait du schema.cypher}, label={lst:schema_cypher}]
+CREATE CONSTRAINT ticket_id IF NOT EXISTS
+FOR (t:Ticket) REQUIRE t.id IS UNIQUE;
 
-Un point d'attention essentiel de cette stratégie tient à la nature non destructive de la migration : elle ne modifie aucune donnée dans les systèmes sources. La principale complexité du rollback réside donc dans la réactivation correcte et ordonnée des synchronisations et intégrations, dont un redémarrage désordonné ou partiel pourrait créer des incohérences inter-systèmes.
+CREATE VECTOR INDEX ticket_embeddings IF NOT EXISTS
+FOR (t:Ticket) ON (t.embedding)
+OPTIONS {indexConfig: {
+    `vector.dimensions`: __VECTOR_DIM__,
+    `vector.similarity_function`: 'cosine'
+}};
+\end{lstlisting}
 
-\subsubsection{Gestion des gels des systèmes sources}
-La fenêtre de Cut Over nécessite l'arrêt coordonné de GAIA et du CRM afin de figer l'état des données à migrer et de garantir leur cohérence et leur intégrité tout au long du processus. Cet arrêt couvre trois actions distinctes pour chaque système : la désactivation des intégrations et synchronisations automatiques, la fermeture des accès utilisateurs, et l'arrêt du système lui-même.\\
-Pour le CRM, dont l'arrêt est plus critique car ce système gère d'autres périmètres métier (Mobile, Entreprises) hors scope de cette migration, deux scénarios sont étudiés en coordination avec DT : un arrêt complet (Scénario A, plus simple techniquement mais impliquant une indisponibilité globale), ou un arrêt ciblé des fonctionnalités Fixe/Internet uniquement (Scénario B, plus complexe mais préservant la continuité opérationnelle pour les autres périmètres).
+\subsection{Recherche GraphRAG}
+La requête principale \texttt{search\_similar\_incidents}, définie dans \texttt{graph/queries.py}, combine deux mécanismes :
 
+\begin{enumerate}
+    \item \textbf{Recherche vectorielle} : l'incident courant est vectorisé par un provider d'embedding, puis Neo4j retourne les tickets les plus proches en termes de cosine similarity.
+    \item \textbf{Filtre de proximité de graphe} : seuls les tickets liés au même produit ou au même type de commande que l'incident courant sont conservés.
+\end{enumerate}
 
+Cette approche \textbf{GraphRAG} améliore la précision par rapport à une simple recherche sémantique en intégrant la structure relationnelle du graphe.
 
+\subsection{Provider d'embeddings}
+L'interface \texttt{EmbeddingProvider} définie dans \texttt{graph/embedding\_provider.py} permet de changer de provider d'embedding (Ollama, sentence-transformers, OpenAI, Voyage AI) sans modifier le reste du code. Le provider Ollama est utilisé par défaut avec le modèle \texttt{mxbai-embed-large:latest}.
 
+\section{API REST et interface utilisateur}
 
+\subsection{FastAPI et streaming SSE}
+L'API est développée avec \textbf{FastAPI}. La route \texttt{/diagnose/stream} retourne un flux d'événements Server-Sent Events (SSE), chaque événement correspondant à un nœud traversé par le graphe LangGraph. Cette approche permet au client (chatbot ou outil externe) de suivre la progression du diagnostic en temps réel.
 
+\subsection{Chatbot Next.js}
+L'interface utilisateur est un chatbot développé avec \textbf{Next.js}. Il affiche la trace d'exécution des agents, le badge de création du ticket et la carte de rapport avec le lien de téléchargement PDF.
 
-\addcontentsline{toc}{section}{Conclusion}
 \section*{Conclusion}
-Ce deuxième chapitre a présenté l'analyse des systèmes sources et la conception de la stratégie de migration dans toutes ses dimensions : analytique, architecturale et organisationnelle. La rétro-ingénierie du CRM, conduite en responsabilité autonome, a constitué ma contribution technique majeure au projet, permettant de lever le verrou analytique identifié dans le premier chapitre et de construire les fondations du Jalon 4. La conception du pipeline ETL, structurée autour du framework Java Ni2 et du processus SQL Sync, offre une base technique robuste, reproductible et contrôlable pour la migration. \\
-L'approche par Dry Runs itératifs, adossée à des critères d'acceptance quantitatifs et qualitatifs, garantit une montée en qualité progressive et une maîtrise des risques tout au long du cycle de projet, jusqu'au Go Live. Le chapitre suivant sera consacré à la mise en œuvre opérationnelle de cette stratégie : l'exécution concrète des Dry Runs, l'analyse des résultats et des anomalies détectées, et les ajustements apportés au cours des cycles itératifs afin d'atteindre les critères d'acceptance définis.
-
+Ce chapitre a présenté l'architecture agentique du projet : un pipeline LangGraph modulaire, un état partagé validé par Pydantic, des agents spécialisés et un graphe de connaissances Neo4j exploitant la recherche GraphRAG. Le chapitre suivant détaille l'implémentation technique de ces composants.

@@ -1,0 +1,57 @@
+\begin{thebibliography}{1}
+
+\bibitem{goyal2023graphrag}
+P.~Goyal, V.~Chettiar, et~al.
+\newblock Graphrag: Unlocking llm discovery on narrative private data.
+\newblock {\em Microsoft Research Blog}, 2023.
+
+\bibitem{langgraph2024}
+{LangChain Inc.}
+\newblock Langgraph: Build stateful, multi-agent applications with llms.
+\newblock \url{https://langchain-ai.github.io/langgraph/}, 2024.
+\newblock Consulté en 2026.
+
+\bibitem{lewis2020retrieval}
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir
+  Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim
+  Rocktäschel, Sebastian Riedel, and Douwe Kiela.
+\newblock Retrieval-augmented generation for knowledge-intensive nlp tasks.
+\newblock In {\em Advances in Neural Information Processing Systems}, 2020.
+
+\bibitem{neo4j2024}
+{Neo4j Inc.}
+\newblock Neo4j graph database platform.
+\newblock \url{https://neo4j.com/}, 2024.
+\newblock Consulté en 2026.
+
+\bibitem{ollama2024}
+{Ollama Inc.}
+\newblock Ollama: Get up and running with large language models locally.
+\newblock \url{https://ollama.com/}, 2024.
+\newblock Consulté en 2026.
+
+\bibitem{ouyang2022training}
+Long Ouyang, Jeffrey Wu, Xu~Jiang, Diogo Almeida, Carroll Wainwright, Pamela
+  Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et~al.
+\newblock Training language models to follow instructions with human feedback.
+\newblock In {\em Advances in Neural Information Processing Systems}, 2022.
+
+\bibitem{pydantic2024}
+{Pydantic Services Inc.}
+\newblock Pydantic: Data validation using python type hints.
+\newblock \url{https://docs.pydantic.dev/}, 2024.
+\newblock Consulté en 2026.
+
+\bibitem{fastapi2024}
+Sebastián Ramírez.
+\newblock Fastapi: Modern, fast web framework for building apis with python.
+\newblock \url{https://fastapi.tiangolo.com/}, 2024.
+\newblock Consulté en 2026.
+
+\bibitem{tmforum2024}
+{TM Forum}.
+\newblock Tm forum apis: Tmf620 product catalog and tmf622 product ordering.
+\newblock \url{https://www.tmforum.org/oda/open-apis/}, 2024.
+\newblock Consulté en 2026.
+
+\end{thebibliography}

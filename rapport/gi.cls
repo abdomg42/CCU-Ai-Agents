@@ -1,4 +1,4 @@
-﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GI Template Class - Minimal Fixed Version (pdfLaTeX compatible)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
@@ -11,8 +11,8 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[french,english]{babel} % If you write in French]{babel}
-\usepackage{arabtex}
-\usepackage{utf8}
+% \usepackage{arabtex}  % desactive pour eviter la dependance a scalefnt
+% \usepackage{utf8}       % encodage arabtex
 \usepackage{pifont}  % for some special characters 
 
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor} % les couleurs avec les divers modes d'appels
@@ -41,7 +41,7 @@
             ]{hyperref}
 
 %\usepackage[nonumberlist, acronym, toc]{glossaries} %Mise en forme du glossaire
-\usepackage[acronym, toc]{glossaries} %Mise en forme du glossaire
+% \usepackage[acronym, toc]{glossaries} % desactive pour eviter la dependance a datatool
 %\usepackage[nonumberlist,style=altlist]{glossaries}
 % \renewcommand*{\glsgroupskip}{}
 % \renewcommand*{\glsseeformat}[3][\seename]{%
@@ -214,14 +214,14 @@ frame=leftline
 \newcommand\conclusion{\chapter*{Conclusion Générale}\phantomsection\addcontentsline{toc}{chapter}{Conclusion}}
 \newcommand\resume{\chapter*{Résumé}\phantomsection\addcontentsline{toc}{chapter}{Résumé}}
 \newcommand\resumeAn{\chapter*{Abstract}\phantomsection\addcontentsline{toc}{chapter}{Abstract}}
-\newcommand\resumeAr{\chapter*{\RL{mol_h.s}}\phantomsection\addcontentsline{toc}{chapter}{\RL{mol_h.s}}}
+\newcommand\resumeAr{\chapter*{Résumé en arabe}\phantomsection\addcontentsline{toc}{chapter}{Résumé en arabe}}
 \newcommand\annexe{\chapter*{}\phantomsection\addcontentsline{toc}{chapter}{Annexes}}
 
 %\renewcommand\glsaddall{\chapter*{Glossaire}\phantomsection\addcontentsline{toc}{chapter}{Glossaire}}
 
 %\newcommand\resume{\subsubsection*{}\phantomsection\addcontentsline{toc}{chapter}{Résumé / Abstract}}
 
-\renewcommand\printglossaries{\chapter*{Glossaire}\phantomsection\addcontentsline{toc}{chapter}{Glossaire}}
+% \renewcommand\printglossaries{\chapter*{Glossaire}\phantomsection\addcontentsline{toc}{chapter}{Glossaire}}
 
 %\renewcommand\printsigles{\chapter*{Sigles et Abréviations}\phantomsection\addcontentsline{toc}{chapter}{Sigles et Abréviations}}
 \newenvironment{fquote}{%
@@ -306,9 +306,9 @@ frame=leftline
 
 
 % enlever le point à la fin
-\renewcommand*{\glspostdescription}{}
+% \renewcommand*{\glspostdescription}{}  % necessite glossaries
 % mettre deux points apres les titres
-\renewcommand{\glsnamefont}[1]{\textbf{#1 :  }}
+% \renewcommand{\glsnamefont}[1]{\textbf{#1 :  }}  % necessite glossaries
 
 
 
@@ -323,9 +323,9 @@ frame=leftline
 \footnotemark[\value{#1}]
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{nomencl}
-\renewcommand{\nomname}{Sigles et abréviations}
-\makenomenclature
+% \usepackage{nomencl}  % non utilise
+% \renewcommand{\nomname}{Sigles et abréviations}
+% \makenomenclature
 
 % Simple Title Page Command
 \newcommand{\pageDeGarde}{%
@@ -420,7 +420,7 @@ frame=leftline
 
 % Initialize
 \makeindex
-\makeglossaries
+% \makeglossaries
 
 \author{}
 \date{}

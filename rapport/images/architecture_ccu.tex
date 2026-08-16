@@ -1,0 +1,47 @@
+\begin{tikzpicture}[
+    node distance=0.9cm and 0.6cm,
+    box/.style={rectangle, rounded corners, draw=iNavy, fill=fondBleu, text=iNavy, font=\small\bfseries, minimum width=2.8cm, minimum height=0.9cm, align=center},
+    smallbox/.style={rectangle, rounded corners, draw=RoyalBlue, fill=white, text=black, font=\scriptsize, minimum width=2.6cm, minimum height=0.7cm, align=center},
+    arrow/.style={-{Stealth[length=2mm]}, thick, iNavy},
+    label/.style={font=\scriptsize\itshape, text=gray}
+]
+
+% Main flow nodes
+\node[box] (start) {START};
+\node[box, below=of start] (intake) {intake\_parser};
+\node[box, below=2.2cm of intake] (root) {root\_cause\_reasoner};
+\node[box, below=of root] (ticket) {ticket\_manager};
+\node[box, below=of ticket] (remediation) {remediation\_explainer};
+\node[box, below=of remediation] (guardrail) {content\_guardrail};
+\node[box, below=of guardrail] (report) {report\_generator};
+\node[box, below=of report] (notifier) {notifier};
+\node[box, below=of notifier] (end) {END};
+
+% Collector nodes (parallel)
+\node[smallbox, left=1.2cm of root, yshift=1.6cm] (logs) {logs\_investigator};
+\node[smallbox, left=of root, yshift=1.6cm] (context) {context\_agent};
+\node[smallbox, right=of root, yshift=1.6cm] (rag) {rag\_ticket\_search};
+
+% Arrows main flow
+\draw[arrow] (start) -- (intake);
+\draw[arrow] (intake) -- ++(0,-0.8) -| (logs);
+\draw[arrow] (intake) -- ++(0,-0.8) -| (context);
+\draw[arrow] (intake) -- ++(0,-0.8) -| (rag);
+\draw[arrow] (logs) |- (root);
+\draw[arrow] (context) |- (root);
+\draw[arrow] (rag) |- (root);
+\draw[arrow] (root) -- (ticket);
+\draw[arrow] (ticket) -- (remediation);
+\draw[arrow] (remediation) -- (guardrail);
+\draw[arrow] (guardrail) -- (report);
+\draw[arrow] (report) -- (notifier);
+\draw[arrow] (notifier) -- (end);
+
+% Collector label
+\node[label, below=0.15cm of intake, xshift=0cm] {agents collecteurs en parallèle};
+
+% Side outputs
+\node[right=0.6cm of report, font=\scriptsize, align=left] {PDF/HTML};
+\node[right=0.6cm of notifier, font=\scriptsize, align=left] {email +\\note Zammad};
+
+\end{tikzpicture}

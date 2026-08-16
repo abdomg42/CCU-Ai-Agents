@@ -1,582 +1,191 @@
 % !TeX root = ../main.tex
 \addcontentsline{toc}{section}{Introduction}
 \section*{Introduction}
-Le Chapitre 2 a posé le cadre conceptuel et architectural de la migration : analyse des systèmes sources, conception du pipeline ETL, stratégie de validation par Dry Runs et politique de gestion des risques. Tout était formalisé sur le papier. Le présent chapitre marque le passage du conçu au réalisé.\\
-La réalisation s'articule en deux temps distincts, reflétant l'organisation en jalons du projet :
-\begin{itemize}
-	\item Les Jalons 1, 2 et 3 portent sur la migration de GAIA, le système d'inventaire réseau existant, vers Ni2 Unified Inventory. Cette phase recouvre cinq thèmes d'inventaire traités séquentiellement : \textbf{Locations}, \textbf{Services \& Customers}, \textbf{Device global}, \textbf{Devices Cuivre} et \textbf{Devices MSAN}.
-	\item Le Jalon 4 constitue la contribution la plus structurante de ce stage : la migration du CRM. Cette phase comprend la rétro-ingénierie de la base de données, l'identification et le filtrage des tables sources, la conception des scripts de transformation, l'import en environnement DEV, la validation de la réconciliation et les tests d'intégration de bout en bout avec les systèmes Façade et CRM.
-\end{itemize}
+Ce chapitre détaille la réalisation technique du projet. Il présente la stack utilisée, l'implémentation du pipeline LangGraph, des extraits de code représentatifs des agents, la configuration et les mécanismes de sécurité mis en place.
+
+\section{Stack technique}
+Le projet est développé en Python 3.11 et s'appuie sur un ensemble de bibliothèques et outils open source :
 
 \begin{table}[H]
     \centering
-    \renewcommand{\arraystretch}{1.4}
-    \small % Taille de police légèrement réduite pour tout faire tenir
-    \begin{tabular}{|l|l|p{8cm}|}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|p{10cm}|}
         \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Jalon} & \textbf{\color{white} Thème} & \textbf{\color{white} Tâches réalisées} \\ \hline
-        
-        % JALON 1
-        \multirow{2}{*}{\textbf{Jalon 1}} & \multirow{2}{*}{Migration GAIA} & Location \hfill  \\ \cline{3-3}
-        & & Service \& Customer \hfill  \\ \hline
-        
-        % JALON 2
-        \multirow{2}{*}{\textbf{Jalon 2}} & \multirow{2}{*}{Migration GAIA} & Device (Global) \hfill  \\ \cline{3-3}
-        & & Cuivre : Device / Logical Connectivity \hfill  \\ \hline
-        
-        % JALON 3
-        \textbf{Jalon 3} & Intégration CRM & Création Client, Adresse et Contact (Première itération) \hfill  \\ \hline
-        
-		% JALON 4
-        \multirow{4}{*}{\textbf{Jalon 4}} & \multirow{2}{*}{Migration CRM} & -- Définition du scope des clients à importer \hfill  \newline -- Import en mode réconciliation (Clients, Adresses, Contacts) \hfill  \\ \cline{2-3}
-        & Intégration CRM & Finalisation de la création Client, Adresse et Contact \hfill  \\ \cline{2-3}
-        & \textbf{Migration GAIA} & \textbf{Finalisation des Clients et Adresses (pour permettre la synchronisation avec le CRM)} \hfill  \\ \hline
+        \rowcolor{iNavy} \textbf{\color{white}Composant} & \textbf{\color{white}Rôle} \\ \hline
+        LangGraph & Orchestration agentique sous forme de graphe d'état \\ \hline
+        FastAPI & API REST et streaming Server-Sent Events \\ \hline
+        Neo4j & Base de données graphe et index vectoriel \\ \hline
+        Ollama & Exécution locale des LLM et modèles d'embedding \\ \hline
+        Pydantic & Validation des schémas structurés \\ \hline
+        pytest & Tests unitaires et d'intégration \\ \hline
+        Docker Compose & Conteneurisation de l'API et des services \\ \hline
+        Jinja2 / WeasyPrint & Génération de rapports PDF/HTML \\ \hline
+        Next.js & Interface utilisateur chatbot \\ \hline
     \end{tabular}
-    \caption{Détail des tâches par jalon}
-    \label{tab:repartition_taches}
+    \caption{Stack technique du projet}
+    \label{tab:stack}
 \end{table}
 
-Pour chacun des thèmes traités, le présent chapitre expose le modèle de données Ni2 cible, les scripts ETL développés, les résultats obtenus dans l'environnement DEV et les captures significatives de l'IHM Ni2.
+\section{Implémentation du pipeline}
 
+\subsection{Construction du graphe}
+La classe \texttt{DiagnosticPipeline} dans \texttt{orchestrator/pipeline.py} construit le graphe LangGraph en déclarant les nœuds et les arêtes. Le nœud \texttt{collectors} encapsule le parallélisme des trois agents collecteurs.
 
-\section{Migration GAIA vers Ni2}
-La base GAIA est une base Oracle multi-schémas structurée autour de cinq familles d'objets : emplacements géographiques, clients et services, équipements physiques, connectivité physique et connectivité logique. Son modèle est documenté et les scripts de migration ont été produits en collaboration avec l'équipe Inetum sous supervision du chef de projet Ni2. \\
-Le pipeline ETL repose sur le framework Java propriétaire Ni2 (classes AbstractSampleScript et ImportScriptTools), décrit au Chapitre 2. Chaque script produit un ou plusieurs fichiers CSV pivot qui sont ensuite chargés dans Ni2 via le mécanisme SQL Sync en respectant les sept phases d'import séquentielles.
+\begin{lstlisting}[language=Python, caption={Construction du graphe LangGraph}, label={lst:pipeline}]
+from langgraph.graph import StateGraph, START, END
 
-\subsection{Architecture du pipeline ETL GAIA}
-Avant de détailler thème par thème, il convient de rappeler les invariants du pipeline communs à tous les jalons GAIA :
+class DiagnosticPipeline:
+    def __init__(self) -> None:
+        self.graph = self._build_graph()
+
+    def _build_graph(self) -> StateGraph:
+        builder = StateGraph(GraphState)
+        builder.add_node("intake", run_intake)
+        builder.add_node("collectors", _collect)
+        builder.add_node("root_cause", run_root_cause)
+        builder.add_node("ticket_manager", run_ticket_manager)
+        builder.add_node("remediation_explainer", run_remediation_explanation)
+        builder.add_node("content_guardrail", run_content_guardrail)
+        builder.add_node("report_generator", run_report_generator)
+        builder.add_node("notifier", run_notifier)
+
+        builder.add_edge(START, "intake")
+        builder.add_edge("intake", "collectors")
+        builder.add_edge("collectors", "root_cause")
+        builder.add_edge("root_cause", "ticket_manager")
+        builder.add_edge("ticket_manager", "remediation_explainer")
+        builder.add_edge("remediation_explainer", "content_guardrail")
+        builder.add_edge("content_guardrail", "report_generator")
+        builder.add_edge("report_generator", "notifier")
+        builder.add_edge("notifier", END)
+        return builder.compile()
+\end{lstlisting}
+
+\subsection{Parallélisme des collecteurs}
+La fonction \texttt{\_collect} tente d'abord une exécution asynchrone via \texttt{asyncio.gather}. Si une boucle d'événements est déjà active, elle bascule vers un \texttt{ThreadPoolExecutor}.
+
+\begin{lstlisting}[language=Python, caption={Parallélisme des collecteurs}, label={lst:collectors}]
+async def _collect_async(state: GraphState) -> dict[str, Any]:
+    results = await asyncio.gather(
+        asyncio.to_thread(run_logs, state),
+        asyncio.to_thread(run_context, state),
+        asyncio.to_thread(run_rag, state),
+    )
+    merged: dict[str, Any] = {}
+    for r in results:
+        merged.update(r)
+    return merged
+\end{lstlisting}
+
+\section{Exemples d'agents}
+
+\subsection{Intake parser}
+L'agent d'intake utilise des expressions régulières pour extraire les identifiants métier, puis détermine le type d'incident et la priorité par des règles heuristiques.
+
+\begin{lstlisting}[language=Python, caption={Parsing heuristique de l'incident}, label={lst:intake}]
+class IntakeParserAgent:
+    def _heuristic_parse(self, incident: dict[str, Any]) -> IncidentSchema:
+        text = incident.get("description", "") + " " + incident.get("title", "")
+        service_id = self._extract_field(text, [
+            r"service[_\-]?id\s*[:=]\s*([a-z0-9\-]+)",
+            r"\b(svc-[a-z0-9\-]+)\b",
+        ])
+        order_id = self._extract_field(text, [
+            r"\b(ord-[0-9\-]+)\b",
+        ])
+        customer_id = self._extract_field(text, [
+            r"\b(acc-[0-9]+)\b",
+        ])
+        # Type et priorité determines par mots-cles
+        ...
+\end{lstlisting}
+
+\subsection{Root cause reasoner}
+L'agent de raisonnement implémente une logique déterministe qui s'appuie sur les sources collectées. Si un ticket similaire fournit une cause racine, celle-ci est retenue. Sinon, l'agent applique des règles par type d'incident. En l'absence de source suffisante, il retourne une cause \texttt{indéterminée}.
+
+\begin{lstlisting}[language=Python, caption={Refus d'hallucination dans le root cause reasoner}, label={lst:rootcause}]
+def _deterministic_cause(self, state: GraphState) -> RootCauseSchema:
+    sources, _ = self._collect_sources(state)
+    if not sources:
+        return RootCauseSchema(
+            confidence="faible",
+            cause="indeterminee",
+            explanation="Aucune source suffisante ...",
+            source_ids=[],
+        )
+    # Correlation avec le ticket similaire le plus proche
+    rag = state.similar_tickets or {}
+    similar = rag.get("similar_tickets", [])
+    if similar:
+        best = min(similar, key=lambda t: t.get("distance", 1.0))
+        cause = best.get("root_cause", "indeterminee")
+        ...
+\end{lstlisting}
+
+\subsection{Requête GraphRAG}
+La requête Cypher suivante illustre la combinaison de la recherche vectorielle native Neo4j avec un filtre de proximité de graphe.
+
+\begin{lstlisting}[language=SQL, caption={Recherche GraphRAG dans Neo4j}, label={lst:cypher}]
+CALL db.index.vector.queryNodes($index_name, $candidate_limit, $query_embedding)
+YIELD node AS t, score
+WHERE score >= $threshold
+  AND (size(product_names) = 0 OR EXISTS {
+    MATCH (t)-[:RELATED_TO_PRODUCT]->(p:Product)
+    WHERE p.name IN product_names
+  })
+RETURN t.id AS ticket_id, t.summary AS summary,
+       t.root_cause AS root_cause, t.resolution AS resolution, score
+ORDER BY score DESC
+LIMIT $top_k
+\end{lstlisting}
+
+\section{Configuration et variables d'environnement}
+
+\subsection{Fichier .env}
+Le projet utilise un fichier \texttt{.env} pour la configuration. Le mode \texttt{MOCK\_LLM=true} permet de démarrer sans Ollama, en utilisant une logique déterministe.
 
 \begin{table}[H]
     \centering
-    \renewcommand{\arraystretch}{1.6} % Un peu plus d'espace pour les termes techniques
-    \begin{tabular}{|l|p{11cm}|}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|p{8cm}|}
         \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Phase} & \textbf{\color{white} Description technique des opérations} \\ \hline
-        
-        \textbf{Extraction} & Requêtes SQL complexes sur la base Oracle GAIA : jointures multi-tables, application de filtres de statut (ex : uniquement les objets \textit{En service} ou \textit{Installé}) et dédoublonnage sur clé primaire. \\ \hline
-        
-        \textbf{Transformation} & Normalisation des formats de dates, conversion des codes statut GAIA en énumérations Ni2 et calcul des identifiants universels (\textit{Universal Id}) pour assurer la réconciliation inter-jalons. \\ \hline
-        
-        \textbf{Chargement} & Production de fichiers CSV pivot et import via l'outil \textit{SQL Sync} en respectant la séquence : \texttt{reconcile\_types} $\rightarrow$ \texttt{add\_ins} $\rightarrow$ \texttt{add\_rel\_position} $\rightarrow$ \texttt{add\_rel\_name}. \\ \hline
-        
-        \textbf{Validation} & Audit de fin de chaîne : comptage des objets créés vs attendus, vérification de l'intégrité des relations parent–enfant et tests unitaires sur l'IHM Ni2. \\ \hline
+        \rowcolor{iNavy} \textbf{\color{white}Variable} & \textbf{\color{white}Description} \\ \hline
+        MOCK\_LLM & Mode LLM simulé (true/false) \\ \hline
+        OLLAMA\_BASE\_URL & URL du service Ollama local \\ \hline
+        OLLAMA\_MODEL & Modèle de langage local \\ \hline
+        NEO4J\_URI & URI de connexion Neo4j \\ \hline
+        NEO4J\_USER / NEO4J\_PASSWORD & Credentials Neo4j \\ \hline
+        EMBEDDING\_PROVIDER & Provider d'embedding (ollama, ...) \\ \hline
+        VECTOR\_SIMILARITY\_THRESHOLD & Seuil de similarité cosine \\ \hline
     \end{tabular}
-    \caption{Processus de migration des données (ETL)}
-    \label{tab:processus_etl}
+    \caption{Principales variables d'environnement}
+    \label{tab:env}
 \end{table}
 
-L'environnement d'exécution est composé d'un serveur DEV Ni2 partagé par l'équipe Inetum Offshore Maroc, d'un accès Oracle GAIA en lecture seule et d'un répertoire réseau de dépôt des fichiers CSV. Les logs d'exécution sont conservés par run et analysés selon la politique à trois niveaux (ERROR / WARN / INFO) définie au Chapitre 2.
+\subsection{Makefile}
+Le \texttt{Makefile} fournit les commandes essentielles du projet :
 
-\subsection{Thème Locations}
-\subsubsection{Modèle de données Ni2 cible}
-Le thème Locations regroupe tous les objets décrivant la géographie et l'infrastructure physique du réseau d'accès Fixe/Internet de l'opérateur telecom. Dans Ni2, cette famille se décline en cinq catégories distinctes, chacune associée à des types et sous-types précis définis dans le Low Level Design fonctionnel :
-\subsubsection{Processus technique de migration (ETL)}
-Pour garantir l'intégrité des données lors des phases de migration (GAIA vers Ni2), un processus rigoureux de type ETL (Extraction, Transformation, Chargement) a été mis en place. Le tableau suivant détaille les opérations techniques réalisées à chaque étape :
-
-\subsubsection{Mapping et correspondance des objets (GAIA vers Ni2)}
-Le succès de la migration repose sur une définition précise de la table de correspondance (mapping). Le tableau suivant récapitule la traduction des objets issus de GAIA vers le modèle de données cible de Ni2 :
-
-\begin{table}[H]
-    \centering
-    \resizebox{\textwidth}{!}{ % Ajuste le tableau à la largeur de la page
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|l|l|l|l|l|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Objet GAIA} & \textbf{\color{white} Catégorie Ni2} & \textbf{\color{white} Sous-Catégorie} & \textbf{\color{white} Type} & \textbf{\color{white} Sous-Type Ni2} \\ \hline
-        
-        Ville/Commune & Location & Geographic Entity & Geographic Area & Zone Réseau \\ \hline
-        Sous-réseau & Location & Geographic Entity & Geographic Area & Sous Réseau \\ \hline
-        Adresse site & Address & Civic Address & Generic Civic Address & --- \\ \hline
-        Adresse client & Address & Civic Address & Generic Civic Address & --- \\ \hline
-        Site ONU & Location & Site & Provider Site & Generic Provider Site \\ \hline
-        Site client & Location & Site & Customer Site & Customer Location \\ \hline
-        Poteau / Appui & Location & Infrastructure Entity & Pole & Poteau / Appui Commun \\ \hline
-        Armoire SR & Location & Infrastructure Entity & Exterior Enclosure & Armoire Sous-Répartiteur \\ \hline
-        Armoire Répart. & Location & Infrastructure Entity & Exterior Enclosure & Armoire Répartiteur \\ \hline
-        Immeuble & Location & Infrastructure Entity & Building & Bâtiment \\ \hline
-    \end{tabular}
-    }
-    \caption{Table de correspondance (Mapping) des objets Location GAIA vers Ni2}
-    \label{tab:mapping_objets}
-\end{table}
-
-Les attributs clés pour chaque objet Location suivent les règles de calcul définies : l'identifiant interne Ni2 suit le gabarit LOC-XXXXXXXX (incrément sur 8 digits), l'Universal Id récupère l'identifiant de l'objet dans GAIA lors de la migration initiale, et le champ Full Address est calculé par concaténation de l'adresse municipale, du quartier et de la ville.
-
-\subsubsection{Modélisation des objets relatifs aux « Emplacements »}
-Afin de garantir la cohérence des données au sein de la solution cible, il a été nécessaire de traduire les objets géographiques et techniques de l'ancien système vers une structure arborescente conforme au méta-modèle de Ni2. La Figure \ref{fig:locations_model} ci-après présente la modélisation détaillée des objets relatifs aux \textbf{Emplacements}.\\
-Cette cartographie logique met en exergue la double hiérarchie mise en place : d’une part, la structuration géographique (découpage du territoire en Zones et Sous-Réseaux) et, d’autre part, l'ancrage physique des infrastructures. Le modèle illustre précisément comment chaque site (Provider Site) est lié à une adresse civique unique via la relation \textit{Localizes}, et comment il devient le conteneur physique d'éléments d'infrastructures (Bâtiments, Poteaux, Armoires) via la relation \textit{Contains}. Cette modélisation a servi de guide de référence pour l'écriture des scripts d'extraction, assurant que chaque ressource réseau (ONU, PBO, SR, etc.) soit migrée en conservant son intégrité référentielle et sa position exacte dans la topologie de l'opérateur télécom.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/modele/LocationModel.png}
-    \caption{Modèle de données Ni2 pour le thème Locations}
-    \label{fig:locations_model}
-\end{figure}
-
-\subsubsection{Scripts développés}
-\monBloc{\textbf{Note sur la confidentialité :} Par souci de protection des données sensibles et de la propriété intellectuelle de l’entreprise, l’intégralité de la bibliothèque de scripts développés (comprenant les règles métier critiques et les structures de tables propriétaires) ne peut être présentée dans ce mémoire. Seuls des extraits représentatifs et anonymisés sont exposés pour illustrer la méthodologie technique employée.}\\
-Le passage du modèle théorique aux données exploitables a nécessité le développement d'une suite de scripts SQL complexes. Pour respecter l'intégrité référentielle de Ni2, ces scripts ont été conçus pour être exécutés selon un ordre séquentiel strict (comme le montre le préfixe 01, 02... dans leurs noms), permettant de créer les objets parents avant leurs dépendances.
-Les scripts d'extraction SQL ont été développés pour ce thème, correspondant aux niveaux hiérarchiques du modèle Ni2 :
-\paragraph{Script 1 --- Extraction des entités géographiques (\texttt{GAI\_1LOC\_...\_SousReseau.sql}) :}
-Ce script prépare le format pivot Ni2 en utilisant la nomenclature requise par le framework de migration. Comme l'illustre l'extrait en Figure \ref{fig:script_sql_1}, la requête traite trois couches de données simultanément :
 \begin{itemize}
     \setlength\itemsep{0.1em}
-    \item[---] \textbf{L’Instance (Préfixe I.) :} Mapping des attributs de base (Nom, Acronyme, Statut).
-    \item[---] \textbf{Le Catalogue (Préfixe T.) :} Rattachement au type de modèle défini dans Ni2.
-    \item[---] \textbf{La Relation (Préfixe REL.) :} Création dynamique des liens de parenté (par exemple entre le Pays et le Sous-Réseau) via l'opérateur de jointure.
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \texttt{make install} : installation des dépendances Python.
+    \item \texttt{make seed} : seed de Neo4j (schéma, mocks, embeddings).
+    \item \texttt{make test} : exécution des tests pytest.
+    \item \texttt{make api} : lancement de l'API FastAPI.
+    \item \texttt{make docker-up} / \texttt{make docker-down} : gestion des conteneurs.
 \end{itemize}
 
-\textbf{Expertise technique :} L'utilisation de l'identifiant \textit{UniversalId} (construit par concaténation) assure la traçabilité de l'objet depuis le système source GAIA jusqu'à la cible.
+\section{Sécurité et guardrails}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/modele/ScriptLocation.png} % Remplace par ton nom d'image
-    \caption{Extrait représentatif de la logique d'extraction SQL (Focus : Sous-Réseaux)}
-    \label{fig:script_sql_1}
-\end{figure}
+\subsection{Principe de non-exécution automatique}
+Le projet respecte une règle fondamentale : \textbf{aucune action technique n'est jamais exécutée automatiquement} sur un système réel. L'agent produit des diagnostics, des explications et des rapports, mais toute action corrective reste sous le contrôle d'un opérateur humain.
 
-\paragraph{Script 2 --- Extraction des Sites (\texttt{GAI\_1LOC...\_Adresse**.sql}) :}
-Ce script réalise des jointures entre les tables techniques et les tables d'adresses. Il intègre une logique de déduplication pour répondre aux contraintes de Ni2 qui n'accepte pas de doublons d'adresses strictes.
+\subsection{Guardrail de contenu}
+Le guardrail de contenu filtre les informations personnelles identifiables (PII) avant toute génération de rapport ou notification. Il s'appuie sur une logique de whitelist pour les actions autorisées et refuse toute action hors périmètre.
 
-\paragraph{Script 3 --- Extraction des infrastructures (\texttt{GAI\_1LOC...\_LocEquipment.sql}) :}
-La difficulté de ce script résidait dans le traitement d'une table GAIA polymorphique. J'ai mis en place des structures conditionnelles (\texttt{CASE WHEN}) pour aiguiller chaque équipement vers son sous-type Ni2 exact (Poteau, Armoire, Immeuble).
+\subsection{Refus d'hallucination}
+Le \texttt{root\_cause\_reasoner} retourne systématiquement une cause \texttt{indéterminée} avec une confiance faible lorsqu'il ne peut citer aucune source. Cette mesure limite les diagnostics inventés par le modèle.
 
-
-\subsubsection{Résultats et validation IHM}
-À l'issue du Dry Run 1 partiel (Jalon 1) et afin de valider la conformité de l'import, un audit quantitatif a été réalisé en comparant les données sources (GAIA) et les données cibles (Ni2). Le tableau ci-dessous présente le bilan de la migration pour le périmètre "Location" :
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Objet Location} & \textbf{\color{white} Attendu GAIA} & \textbf{\color{white} Créé Ni2} & \textbf{\color{white} Taux (\%)} \\ \hline
-        
-        Zones Réseau / Sous Réseaux & 156 & 156 & 100 \% \\ \hline
-        Adresse Site & 30 730 & 30 730 & 100 \% \\ \hline
-        Adresse Client & 27 127 & 27 128 & 99,9 \% \\ \hline
-        Sites Fournisseurs (ONU) & 157 & 157 & 100 \% \\ \hline
-        Sites Clients & 36 090 & 30 090 & 100 \% \\ \hline
-        Objets Infrastructure & 7 789 & 7 789 & 100 \% \\ \hline
-    \end{tabular}
-    \caption{Bilan quantitatif de la migration des objets Location}
-    \label{tab:bilan_migration}
-\end{table}
-
-La phase de réconciliation des données relatives aux "Emplacements" a permis de confirmer la robustesse de la stratégie d’importation, avec un taux de succès global atteignant 99,9 \%. En confrontant les comptages issus des sources GAIA aux instances créées dans Ni2 (via des requêtes NQL), les rares écarts identifiés ont été systématiquement analysés dans les fichiers de rejets. Ces anomalies provenaient essentiellement d'incohérences structurelles du système legacy, telles que des adresses orphelines, des champs obligatoires non renseignés ou des références inexistantes dans les tables de jointure techniques de GAIA. Grâce à l’application de règles de gestion correctives validées en concertation avec l’opérateur télécom, l'intégralité du périmètre géographique et des infrastructures physiques a été fiabilisée, garantissant ainsi l'intégrité de la topologie réseau au sein du nouvel inventaire unifié.\\
-Dans l'IHM Ni2, la navigation \textbf{Zone Réseau} → \textbf{Sous Réseau} → \textbf{Site Fournisseur} → \textbf{Armoire} a été vérifiée sur un échantillon de 20 répartiteurs représentatifs. L'arborescence géographique, les attributs d'adresse et les relations de localisation (Localizes) sont correctement établis, conformément au modèle décrit dans le LLD fonctionnel.
-
-\subsection{Thème Services \& Customers}
-\subsubsection{Modèle de données Ni2 cible}
-Le thème Services \& Customers est le plus complexe fonctionnellement car il relie les données commerciales (clients, produits, services) aux données techniques (numéros de désignation, accès réseau). Dans Ni2, il mobilise six catégories d'objets interconnectés :
-\begin{table}[H]
-    \centering
-    \resizebox{\textwidth}{!}{ % Ajuste le tableau à la largeur de la page
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|l|l|l|l|p{6cm}|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Objet} & \textbf{\color{white} Catégorie Ni2} & \textbf{\color{white} Sous-Catégorie} & \textbf{\color{white} Type} & \textbf{\color{white} Description} \\ \hline
-        
-        Client & Actor & Organization & Customer & Generic Customer \\ \hline
-        DT & Actor & Organization & Service Provider & Main Service Provider (Direction Technique) \\ \hline
-        Produit & Service & Package & --- & Catalogue : FTTH, LS/C, LS/F, TLP \\ \hline
-        Service & Service & Business & --- & Services disponibles dans le catalogue \\ \hline
-        Accès & Service & Technical & --- & Accès réseau (FTTH, ADSL, LS...) \\ \hline
-        ND Assigné & Documentation & Comment & Number & ND --- numéro actif rattaché à un service \\ \hline
-        ND Libre & Documentation & Comment & Number & ND --- numéro disponible dans la boîte \\ \hline
-        ND Parent & Documentation & Comment & Number & Parent ND --- boîte de numérotation au répartiteur \\ \hline
-    \end{tabular}
-    }
-    \caption{Mapping des objets Actor et Service vers le modèle Ni2}
-    \label{tab:mapping_services}
-\end{table}
-
-La relation structurante du modèle est la chaîne Client → Produit → Service → Accès → ND. Dans Ni2, cette chaîne est matérialisée par les relations AllocatedTo (entre l'Accès et le Site Client), ConsumesOf (entre le Client et le Produit) et Documents (entre le Produit et les ND). La modélisation des ND Parents, qui représentent les boîtes à numéros au niveau des répartiteurs ONU, conditionne directement le fonctionnement du mécanisme d'attribution automatique de numéros lors des prises de commande Ni2.
-\subsubsection{Modélisation des objets relatifs aux « Clients » et « Services »}
-La modélisation des Services et Clients constitue le pivot logique du nouvel inventaire, car elle assure la convergence entre le référentiel commercial et l’infrastructure technique. Comme l’illustre la planche de modélisation ci-après, cette architecture repose sur une chaîne de dépendances rigoureuse allant de l'entité contractuelle jusqu'à la ressource terminale.\\
-D’un côté, le modèle définit le parcours du client (Actor) qui consomme un Produit (Service Package), lequel se décline en Services métiers (Business) et en Accès techniques (Technical). Cette structure permet de lier dynamiquement un abonné à son emplacement physique (Site Client) via la relation AllocatedTo.\\
-D’un autre côté, une attention particulière est portée à la gestion de la numérotation. Le modèle introduit le concept de "Parent ND", représentant les boîtes à numéros au niveau des répartiteurs (ONU). Cette hiérarchie technique, segmentée par type de boîte (ND, NE) et par autocommutateur (CTB, CTD), est cruciale pour le système : elle permet de gérer l'inventaire des numéros (libres ou assignés) et d'automatiser leur attribution lors des prises de commandes. Cette double approche garantit une traçabilité totale, permettant à l’opérateur télécom de connaître instantanément quelle ressource technique supporte quel service client, et à quelle adresse précise.
-\newpage
-\begin{itemize}
-    \item \textbf{Client/Service/ND}
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/modele/CustomerServiceModel.png}
-    \caption{Modèle de données Ni2 pour le thème clients services}
-    \label{fig:servcus_model}
-\end{figure}
-
-\begin{itemize}
-    \item \textbf{ND / ND Parent}
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/modele/NDModel.png}
-    \caption{Modèle de données Ni2 pour le thème clients services 2}
-\end{figure}
-
-\subsubsection{Scripts développés}
-Les scripts ont été développés pour ce thème, dans l'ordre strict des dépendances :
-\begin{itemize}
-    \item \textbf{Script 1 — GAI\_2CUS...\_Customer.sql :} extraction des clients GAIA avec leurs attributs d'identification (nom, référence externe, catégorie B2B/B2C, document d'identification). L'Universal Id est alimenté par la référence client GAIA pour permettre la réconciliation lors de la migration CRM (Jalon 4). Les attributs non modifiables (Alias, Statut, Catégorie, Référence Client Externe) sont marqués en read-only dans Ni2 car ils seront ultérieurement synchronisés depuis le CRM.
-    \item \textbf{Script 2 — GAI\_2CUS...\_ServicePackage.sql :} extraction des produits et services actifs GAIA. La difficulté technique réside dans la correspondance entre la nomenclature de l'offre GAIA (codes produits propriétaires) et la classification Ni2 Package/Business/Technical. Une table de correspondance (lookup table) a été construite avec le fonctionnel de l'opérateur telecom pour valider les associations.
-    \item \textbf{Script 3 — GAI\_2CUS...\_ParentND.sql :} extraction des boîtes à numéros (ND Parents) depuis le référentiel GAIA. Chaque ND Parent est caractérisé par son TypeDeBoite (ND ou NE), son NumDeBoite (CBN), son Produit associé, son Autocommutateur (CTD ou CTB) et son Site ONU de rattachement. Ces attributs sont définis dans le LLD fonctionnel dans la liste des attributs de l'objet ND Parent.
-    \item \textbf{Script 4 — GAI\_2CUS...\_AssignedND.sql :} extraction des Numéros de Désignation assignés ou libres. Chaque ND est rattaché à son ND Parent (relation Documents) et, pour les ND Assignés, à un Produit via la relation AllocatedTo. Le statut Assigné/Libre est calculé depuis GAIA selon la présence ou l'absence d'un contrat actif associé.
-\end{itemize}
-
-\monBloc{Règle de gestion critique : un ND assigné dans GAIA sans contrat actif associé (cas de résiliation en cours non finalisée) est importé avec le statut Libre dans Ni2, après validation avec le MOA. Cette règle a été documentée dans le fichier de mapping et tracée dans JIRA}
-
-\subsubsection{Résultats et validation IHM}
-La validation du thème Services \& Customers a représenté l'étape la plus complexe de la migration GAIA, avec le traitement de plus de 35 000 packages de services et 50 000 numéros de désignation. Comme le montre le suivi des tests unitaires, les comptages effectués via des requêtes NQL ont permis de valider un Perfect Match sur l'essentiel des instances clients et produits.\\
-Toutefois, la phase de réconciliation a mis en lumière des incohérences critiques au sein du système legacy, notamment concernant les 7 551 numéros de désignation (ND) orphelins. Ces numéros ne disposaient d'aucune référence de répartiteur (ONU) ou de boîte (CBN) exploitable dans GAIA, rendant impossible leur raccordement automatique à un "Parent ND" dans Ni2. De même, l'analyse a révélé des cas de partage d'adresses entre plusieurs clients (27 adresses partagées par deux clients, 3 par trois clients), nécessitant un arbitrage pour garantir l'unicité de la localisation technique.\\
-Malgré ces écarts inhérents à la qualité des données sources, l'implémentation de règles de nettoyage et l'utilisation de l'Universal ID (basé sur la référence GAIA) ont permis d'aboutir à un inventaire commercial parfaitement aligné avec l'inventaire technique, sécurisant ainsi les futurs processus de facturation et de support client.
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Objet Service / Customer} & \textbf{\color{white} Attendu GAIA} & \textbf{\color{white} Créé Ni2} & \textbf{\color{white} Taux (\%)} \\ \hline
-        
-        Clients & 27 127 & 27 127 & 100 \% \\ \hline
-        Services Package & 35 521 & 35 521 & 100 \% \\ \hline
-        ND Parents & 154 & 154 & 100 \% \\ \hline
-        ND Assignés & 35 521 & 35 521 & 100 \% \\ \hline
-        ND Libres & 16 414 & 16 414 & 99,1 \% \\ \hline
-    \end{tabular}
-    \caption{Bilan quantitatif de la migration des objets Service et Customer}
-    \label{tab:bilan_services}
-\end{table}
-
-Les 47 services et 18 ND en écart ont été analysés : ils correspondent à des objets GAIA dont le produit parent était dans un état de transition (ni actif, ni résilié) au moment de l'extraction. Après concertation avec l'équipe fonctionnelle, ces cas ont été traités par une règle de substitution de statut (état Commandé dans Ni2) documentée dans le fichier de mapping.\\
-La validation IHM a porté sur la navigation complète de la chaîne Client → Produit → Service → Accès → ND pour 50 clients échantillons représentatifs des différents profils (B2B, B2C, FTTH, Cuivre, Liaison Spécialisée). La boîte à numéros a été vérifiée en simulant une attribution manuelle et une attribution automatique sur un ND Parent de test, conformément aux cas d'usage décrits dans le Chapitre 5 du LLD.
-
-
-\subsection{Thème Equipement}
-Le thème Equipements est le plus volumineux en nombre d'objets car il couvre l'intégralité du patrimoine physique du réseau d'accès. La classification Ni2 distingue trois familles : les équipements globaux communs aux deux technologies, les équipements spécifiques à la technologie Cuivre et les équipements spécifiques à la technologie Fibre. Ma contribution a porté sur les deux premières familles.\\
-\subsubsection{Devices Globaux}
-Les équipements globaux sont communs aux technologies Cuivre et Fibre. Ils comprennent les objets ONU (répartiteurs physiques), les Nœuds réseau (équipements logiques de modélisation des circuits), les Slots, les Connecteurs, les Ports Physiques et les Ports Logiques.
-\begin{table}[H]
-    \centering
-    \resizebox{\textwidth}{!}{ % Ajuste le tableau à la largeur de la page
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|l|l|l|l|l|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Objet Global} & \textbf{\color{white} Catégorie Ni2} & \textbf{\color{white} Sous-Catégorie} & \textbf{\color{white} Type} & \textbf{\color{white} Sous-Type} \\ \hline
-        
-        ONU (répartiteur) & Device & Equipment & Network Equipment & Repartiteur \\ \hline
-        Nœud ONU & Function & Network & Repartiteur & --- \\ \hline
-        Slot & Location & Placement Entity & Slot & Generic Slot \\ \hline
-        Connecteur & Interface & Media Interface & Connector & Generic Connector \\ \hline
-        Port Physique & Interface & Media Interface & Physical Port & Generic Physical Port \\ \hline
-        Port Logique & Interface & Function Interface & Logical Port & Generic Logical Port \\ \hline
-    \end{tabular}
-    }
-    \caption{Mapping de la hiérarchie des équipements (Devices) vers Ni2}
-    \label{tab:mapping_devices}
-\end{table}
-
-Les équipements globaux constituent le socle commun aux technologies Cuivre et Fibre. Comme l'illustre la Figure  (Modélisation Physique vs Logique), chaque ressource est modélisée selon une hiérarchie stricte.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/modele/Image1.png}
-    \caption{Modélisation de la dualité Physique/Logique et des relations de contenance dans Ni2.}
-    \label{fig:device_global}
-\end{figure}
-
-Cette modélisation est le pilier du raccordement réseau : elle permet de séparer l'emplacement physique (Location/Rack) de la fonction de routage (Node). Les scripts GAI\_3DEV1G...\_Device.sql et GAI\_3DEV1G...\_Node.sql ont été conçu pour traduire cette dualité en créant simultanément l'équipement physique (ONU) et son pendant logique (Nœud), garantissant que chaque port physique soit correctement associé à son interface logique via le mécanisme d'instanciation par modèle de Ni2. 
-
-\subsubsection{Device Cuivre}
-La technologie Cuivre mobilise une hiérarchie d'équipements spécifique : depuis le Poste de Concentration (PC) jusqu'au MSAN en passant par le Sous-Répartiteur (SR). Le modèle hiérarchique Ni2 pour le Cuivre articule ces équipements selon la chaîne ONU → MSAN/Répartiteur → Tête MFA → Amorce → Connecteurs.\\
-
-\begin{table}[H]
-    \centering
-    \resizebox{\textwidth}{!}{ % Ajuste le tableau à la largeur de la page
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|l|l|l|l|l|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Objet Cuivre} & \textbf{\color{white} Catégorie Ni2} & \textbf{\color{white} Sous-Catégorie} & \textbf{\color{white} Type} & \textbf{\color{white} Sous-Type} \\ \hline
-        
-        Poste de Concentration (PC) & Device & Equipment & Passive Equipment & PC \\ \hline
-        Sous-Répartiteur (SR) & Device & Equipment & Passive Equipment & SR \\ \hline
-        Tête MFA & Location & Placement Entity & Partition & MFA \\ \hline
-        Amorce ONU & Device & Module & Network Module & MFA — Copper Panel Module \\ \hline
-        Module SR & Device & Module & Network Module & SR — Copper Panel Module \\ \hline
-        Tête Distribution & Location & Placement Entity & Partition & SR \\ \hline
-        Amorce SR & Device & Module & Network Module & SR — Copper Panel SousModule \\ \hline
-        Amorce PC & Device & Module & Network Module & PC — Copper Panel Module \\ \hline
-    \end{tabular}
-    }
-    \caption{Mapping des objets de l'infrastructure Cuivre vers Ni2}
-    \label{tab:mapping_cuivre}
-\end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/modele/Image3.png}
-    \caption{Modélisation de la décomposition interne d'un équipement actif}
-\end{figure}
-
-La principale difficulté technique, a été de dérouler les associations récursives de GAIA pour reconstruire cette arborescence. En utilisant des Common Table Expressions (CTE) récursives, j'ai pu automatiser l'insertion des données du parent (Châssis) vers les enfants (Slots, puis Cartes, puis Ports). Cette rigueur dans le développement a permis d'atteindre un taux de succès de 100 \% sur les MSAN, assurant que chaque port d'abonné soit précisément localisé dans son emplacement physique au sein du central.
-
-\subsubsection{Devices Cuivre — MSAN}
-Le MSAN (Multi-Service Access Node) est l'équipement central de la technologie Cuivre ADSL/VDSL. Dans Ni2, il est modélisé comme un Network Equipment contenant des Slots, eux-mêmes contenant des Cartes MSAN (Device Module de type Network Module). Chaque Carte porte des Ports Physiques (côté abonnés) et des Ports Logiques associés.\\
-La spécificité du MSAN dans GAIA réside dans la représentation de sa configuration en service : pour chaque port MSAN, GAIA stocke à la fois les informations physiques (numéro de slot, numéro de port) et les informations logiques (profil de débit, VPI/VCI pour ADSL). Les scripts produisent donc simultanément les objets physiques (Device → Slot → Carte → Port Physique) et les objets logiques (Port Logique avec IPAddress), reliés par la relation ImplementedBy.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/modele/Image4.png}
-    \caption{}
-\end{figure}
-
-Le dernier volet de l'audit concerne l'infrastructure physique et les équipements actifs du réseau. Ce contrôle permet de vérifier que la topologie matérielle, des répartiteurs ONU jusqu'aux ports individuels des MSAN, a été fidèlement reconstruite dans Ni2 :
-
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Objet Équipement} & \textbf{\color{white} Attendu GAIA} & \textbf{\color{white} Créé Ni2} & \textbf{\color{white} Taux (\%)} \\ \hline
-        
-        ONU (répartiteurs) & 48 & 48 & 100 \% \\ \hline
-        Nœuds réseau & 312 & 312 & 100 \% \\ \hline
-        PC + SR (Cuivre) & 2 847 & 2 843 & 99,9 \% \\ \hline
-        Modules \& Amorces & 18 432 & 18 405 & 99,9 \% \\ \hline
-        MSAN (équipements) & 38 & 38 & 100 \% \\ \hline
-        Cartes MSAN & 892 & 892 & 100 \% \\ \hline
-        Ports Physiques MSAN & 24 817 & 24 809 & 99,97 \% \\ \hline
-        Connecteurs (MFA/SR) & 89 304 & 89 297 & 99,99 \% \\ \hline
-    \end{tabular}
-    \caption{Bilan quantitatif de la migration des objets Équipement et Infrastructure}
-    \label{tab:bilan_equipements}
-\end{table}
-
-Les résultats de réconciliation présentés dans le Tableau 3.8 confirment la précision de la migration des équipements, avec un taux global de 99,94 \%. La validation au sein de l'IHM Ni2 a permis de confirmer la justesse des relations de contenance : la navigation physique (ONU -> MSAN → Slot -> Carte -> Port) est parfaitement fonctionnelle. Les rares écarts constatés sur les ports (0,03 \%) sont dus à des métadonnées manquantes dans GAIA sur certains équipements anciens, lesquels ont été isolés pour un retraitement manuel par les équipes de l’opérateur télécom
-
-
-\section{Rétro-ingénierie et Migration CRM}
-Le Jalon 4 constitue le défi technique le plus structurant de ce stage. À la différence de GAIA, dont le modèle est documenté et maîtrisé par l'équipe Inetum, le CRM de l'opérateur telecom repose sur une base MSSQL de plus de 900 tables construite de façon incrémentale, sans documentation formelle. L'enjeu dépasse la simple extraction de données : il s'agit de reconstruire, par rétro-ingénierie, une
-connaissance complète du modèle de données avant de pouvoir concevoir le moindre script
-d'extraction. Cette section restitue l'intégralité de la démarche conduite en responsabilité propre.
-
-\subsection{Investigation et Rétro-ingénierie du CRM}
-En l'absence de toute documentation de la base MSSQL, la rétro-ingénierie a été conduite selon trois
-axes successifs, chacun conditionnant la crédibilité du suivant.
-\paragraph{Exploration et identification des entités critiques}: \\
-La première étape a consisté à cartographier les 900+ tables pour en extraire les entités
-fonctionnellement pertinentes pour Ni2 (Clients, Adresses, Contacts). La difficulté principale ne résidait
-pas dans le nombre de tables mais dans leur contenu : les colonnes discriminantes sont codifiées sous
-forme de valeurs numériques sans libellé explicite, rendant toute interprétation directe impossible.
-L'un des défis majeurs a été de traduire les valeurs numériques brutes en règles de gestion métier. Deux filtres critiques ont été identifiés :
-\begin{itemize}
-    \item \textbf{crm\_systemedebillingcode = 171060002} : Ce code identifie les abonnements actifs et facturables. L'information n'étant pas documentée, j'ai dû développer des scripts de recherche transversaux pour localiser les tables de métadonnées. Cette investigation a permis de remonter jusqu'à la table système \textbf{StringMap}, qui fait office de dictionnaire de libellés pour le CRM Microsoft Dynamics. Ce n'est qu'après l'analyse croisée de cette table et la confirmation des équipes de l'opérateur telecom que le mapping a pu être validé.
-    \item \textbf{statecode = 0} : Ce filtre permet d'isoler les enregistrements "Actifs" (non supprimés ou archivés). Bien que standard dans la convention de Microsoft Dynamics CRM, sa validation a nécessité une analyse sémantique du contenu pour confirmer que les données correspondantes étaient bien celles exploitées en production.
-\end{itemize}
-
-\paragraph{Stratégie de pivot en collaboration avec l'équipe Comarch}\\
-Pour concentrer les données utiles et simplifier l'interface avec le pipeline Ni2, une collaboration avec
-l'équipe projet Comarch a abouti à la création de trois tables pivots dédiées à la migration :
-
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.6}
-    \begin{tabular}{|l|l|p{8cm}|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Table pivot} & \textbf{\color{white} Rôle} & \textbf{\color{white} Données portées} \\ \hline
-        
-        \texttt{EXT\_C\_CUSTOMERS} & Principale & Identité client, statut, catégorie B2B/B2C, Universal Id, codes discriminants (\textit{billing code}, \textit{state code}). \\ \hline
-        
-        \texttt{EXT\_C\_CUSTOMERS\_LINK} & Jointure & Relation Client $\leftrightarrow$ Adresse --- matérialise la relation \textit{Consumes} dans le modèle Ni2. \\ \hline
-        
-        \texttt{EXT\_C\_CONTACTS} & Contacts & Coordonnées, rôles (Point focal, Mandataire, Représentant), emails et numéros de téléphone. \\ \hline
-    \end{tabular}
-    \caption{Description des tables pivots utilisées pour la migration CRM}
-    \label{tab:tables_pivots}
-\end{table}
-
-\monBloc{\textbf{Note :} En concentrant les données dans trois tables structurées, on s'affranchit des jointures complexes
-lors de chaque import et on crée un point de contrôle intermédiaire auditable, les tables pivots peuvent
-être vérifiées indépendamment des scripts d'import Ni2.}
-
-\subsection{ Développement des Scripts T-SQL et Fichier de Mapping}
-Avant tout développement script, un fichier Excel de mapping a été élaboré pour formaliser la
-correspondance champ par champ entre le modèle CRM et les attributs Ni2 définis dans le LLD
-fonctionnel. Ce document de référence a servi de contrat entre les
-équipes techniques et fonctionnelles tout au long du Jalon 4. Trois scripts T-SQL ont ensuite été
-développés, chacun implémentant des règles de gestion spécifiques :
-
-\paragraph{\textbf{Script 1 — Adresses} }\\
-Ce script reconstruit une adresse normalisée à partir de champs fragmentés dans le CRM (voie, bâtiment, escalier, étage). La fonction CONCAT\_WS assemble les composantes disponibles en ignorant automatiquement les valeurs NULL, produisant une valeur Full Address conforme à la règle de calcul du LLD : \\ 
-\textbf{CONCAT\_WS(', ', voie, batiment, escalier, etage, quartier, ville) -> Full Address Ni2}\\
-Un identifiant universel (Universal Id) est calculé sur la clé primaire CRM pour garantir la déduplication lors de la réconciliation avec les adresses déjà importées depuis GAIA.
-    
-\paragraph{\textbf{Script 2 — Clients} }\\
-Ce script gère la distinction B2C/ B2B via le champ discriminant CRM, puis construit dynamiquement la relation Consumes entre le Client et son Adresse dans Ni2 via l'Universal Id. Les filtres de qualité suivants sont appliqués de façon systématique : \\ 
-\textbf{\textit{crm\_systemedebillingcode = 171060002 -- abonnements facturables uniquement}} \\ 
-\textbf{\textit{statecode = 0 -- enregistrements actifs (non archivés)}} \\ 
-Ces filtres, définis après concertation avec les équipes de l'opérateur telecom, garantissent que seules les données commercialement actives et techniquement cohérentes sont injectées dans Ni2, une règle de gestion documentée dans le fichier de mapping Excel.
-    
-\paragraph{\textbf{Script 3 — Contacts} }\\
-Ce script implémente une logique de rôles fonctionnels via des structures CASE WHEN pour catégoriser dynamiquement chaque contact et alimenter les responsabilités dans Ni2 : 
-    \begin{lstlisting}[language=SQL, caption={Transformation des rôles contacts}]
-        CASE crm_role 
-            WHEN 'PF'  THEN 'Point focal'
-            WHEN 'MAN' THEN 'Mandataire'
-            WHEN 'REP' THEN 'Représentant'
-            ELSE 'Contact' 
-        END AS "REL2.ContactType"
-    \end{lstlisting}
-
-\subsection{ Pipeline de Déploiement et Environnement d'Exécution}
-L'import des données CRM vers Ni2 s'inscrit dans un pipeline industriel en quatre étapes garantissant
-traçabilité et sécurité des changements à chaque niveau :
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/chapitre 3/crm_deployment_pipeline.png}
-    \caption{Pipeline de déploiement des données CRM vers Ni2}
-\end{figure}
-
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.6}
-    \resizebox{\textwidth}{!}{
-    \begin{tabular}{|c|l|p{7cm}|p{6cm}|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} \#} & \textbf{\color{white} Étape} & \textbf{\color{white} Action} & \textbf{\color{white} Outil / Commande} \\ \hline
-        
-        1 & \textbf{Configuration \& Extraction} & Paramétrage des accès MSSQL et lancement de l'extraction depuis les tables pivots pour générer les fichiers CSV. & \texttt{ni2Credentials.cred} \newline \texttt{./ni2SyncMSSQL.sh -eO -s CRM} \\ \hline
-        
-        2 & \textbf{Gestion de version} & Versionnement des scripts T-SQL et des fichiers CSV générés pour assurer la traçabilité des données migrées. & \textbf{Git} (Dépôt : \texttt{dt-gaia-data-migration}) \\ \hline
-        
-        3 & \textbf{Déploiement Custom Fields} & \textbf{Pré-requis obligatoire :} Build et déploiement des champs personnalisés sur la machine distante, suivis d'un redémarrage des services Ni2. & \textbf{MobaXterm} \newline \texttt{zsh: build + deploy} \newline \texttt{systemctl restart ni2} \\ \hline
-        
-        4 & \textbf{Import parallèle} & Déclenchement de l'importation finale des données vers l'environnement Ni2 Dev avec optimisation des performances. & \texttt{./ni2SyncfromMSSQL.sh -iO} \newline \texttt{-s CRM -nP 6 -v} \\ \hline
-    \end{tabular}
-    }
-    \caption{Pipeline technique de déploiement et d'importation CRM}
-    \label{tab:pipeline_import}
-\end{table}
-
-\monBloc{\textbf{Note : }Le déploiement des Custom Fields (Étape 3) est un pré-requis non négociable : si les champs
-personnalisés ne sont pas présents dans l'instance Ni2 avant l'import, les lignes CSV correspondantes sont ignorées et génèrent d'erreur bloquante. La vérification de leur présence fait partie de la checklist
-pre-import.}
-
-\subsection{Validation, Tests Unitaires et Dossier de Recette}
-La phase de validation a suivi un protocole en trois niveaux, du plus technique au plus fonctionnel,
-aboutissant à la production d'un livrable formel.
-
-\paragraph{Analyse des logs et traitement des rejets}\\
-Après chaque import, les fichiers de log SQL Sync sont analysés systématiquement pour en extraire
-les lignes ERROR et WARN. Pour chaque rejet, la cause est catégorisée (contrainte d'intégrité
-référentielle, valeur de picklist non reconnue, objet parent manquant, doublon sur clé unique) et traitée
-par correction dans le script ou dans les tables pivots, avant re-run sur les enregistrements en erreur
-uniquement.
-
-\paragraph{Tests unitaires sur l'IHM Ni2} \\
-Une fois l'import stabilisé, une vérification visuelle est conduite directement dans l'interface Ni2 sur un
-échantillon représentatif de clients. Les points de contrôle couvrent :
-\begin{itemize}
-    \item Création correcte de l'objet Client (Actor/Customer) avec l'ensemble de ses attributs d'identification, y compris les champs non modifiables récupérés depuis le CRM (Alias, Catégorie, Référence Client Externe)
-    \item  Rattachement correct de l'adresse au client via la relation Consumes — vérification que la Full Address concaténée est cohérente avec les données sources CRM.
-    \item  Effectivité de la réconciliation CRM « GAIA : un client présent dans les deux sources doit apparaître une seule fois dans Ni2, avec ses attributs techniques (GAIA) et commerciaux (CRM) correctement fusionnés.
-    \item Cohérence des rôles de contacts : vérification que les valeurs Point focal, Mandataire, Représentant sont correctement portées dans les champs de responsabilité Ni2
-\end{itemize}
-
-\paragraph{Dossier de Test de Recette (DTR)} \\
-L'ensemble des résultats de validation a été formalisé dans un Dossier de Test de Recette (DTR) fonctionnel, livrable formel du Jalon 4. Ce document synthétise pour chaque cas de test : l'identifiant
-et la description, les données d'entrée utilisées, le résultat observé dans l'IHM Ni2, le statut (PASS /FAIL) et les éventuelles actions correctives appliquées. Le DTR constitue la preuve contractuelle de la
-bonne migration des données CRM et le point de départ des tests d'intégration de bout en bout avec les équipes Façade et CRM.
-
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.5}
-    \resizebox{\textwidth}{!}{ % Ajustement pour faire tenir les 6 colonnes
-    \begin{tabular}{|l|c|c|c|c|c|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Objet migré} & \textbf{\color{white} Source GAIA} & \textbf{\color{white} Source CRM} & \textbf{\color{white} Importé Ni2} & \textbf{\color{white} Rejeté} & \textbf{\color{white} Taux} \\ \hline
-        
-        \textbf{Clients (B2C + B2B)} & 27 112 & 61 062 & 27 112$^{*}$ & 0 & 100 \% \\ \hline
-        
-        \textbf{Adresses normalisées} & 27 127 & 61 062 & 27 127$^{*}$ & 14 & 99,9 \% \\ \hline
-        
-        \textbf{Contacts (avec rôles)} & --- & 454 & 454 & 0 & 100 \% \\ \hline
-        
-        \rowcolor{gray!10}
-        \textbf{Cas de tests (DTR)} & \multicolumn{2}{c|}{16 / 16 validés} & \textbf{PASS} & \textbf{0 FAIL} & \textbf{100 \%} \\ \hline
-    \end{tabular}
-    }
-    \begin{flushleft}
-    \small \textit{* Données réconciliées : les enregistrements GAIA ont été enrichis par les données CRM, le delta a été créé.}
-    \end{flushleft}
-    \caption{Résultats de réconciliation et de validation du Jalon L4 (Migration CRM)}
-    \label{tab:reconciliation_finale}
-\end{table}
-
-Au terme du Jalon 4, la base CRM est intégralement migrée dans Ni2 : les clients, adresses et
-contacts sont créés, reliés et réconciliés avec les données GAIA. Les scripts T-SQL, le fichier de
-mapping Excel et le DTR constituent un corpus documentaire réutilisable pour le Lot 2 du projet
-(migration BSCS/Comarch) et pour la maintenance applicative post Go-Live.
-
-\section{Tests d'intégration de bout en bout Ni2 / Façade / CRM}
-\subsection{Contexte et périmètre des tests}
-Les tests d'intégration de bout en bout constituent la dernière phase du Jalon 4. Ils visent à vérifier que les flux d'échange entre les trois systèmes (CRM, Façade et Ni2) fonctionnent correctement après la migration des données, et que les cas d'usage métier décrits dans le LLD fonctionnel (prises de commande, modifications, dérangements) sont exécutables de façon cohérente.\\
-La Façade désigne ici le composant d'intégration (middleware BSS) qui orchestre les échanges entre le CRM front-office et Ni2. Elle expose les APIs REST de consultation de l'inventaire, de création de commandes et de remontée de résultats. Les tests d'intégration impliquent donc trois acteurs : l'équipe CRM, l'équipe Façade et l'équipe Ni2 (représentée par la stagiaire pour la coordination côté Ni2).
-
-\monBloc{\textbf{Note de planification :} À la suite d'un arbitrage projet, ce module a fait l'objet d'un ajustement de périmètre (\textit{descoping}) pour le Jalon 4. La livraison est désormais programmée pour la semaine du 22 juin, avec un démarrage opérationnel du jalon 5 prévu la semaine du 29 juin.}
-
-
-\section{Bilan de Réalisation et Analyse Critique}
-Cette section dresse une synthèse des résultats obtenus au terme des quatre jalons de migration et analyse les enseignements tirés de cette expérience technique.
-
-\subsection{Synthèse des métriques globales}
-Le tableau suivant récapitule la volumétrie traitée et les taux de succès finaux pour l'ensemble du périmètre du projet :
-
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{|l|l|c|c|c|}
-        \hline
-        \rowcolor{iNavy} 
-        \textbf{\color{white} Jalon} & \textbf{\color{white} Thème} & \textbf{\color{white} Objets source} & \textbf{\color{white} Créés Ni2} & \textbf{\color{white} Taux} \\ \hline
-        
-        J1 & Locations (Géo + Sites + Infra) & 102 274 & 102 274 & 100 \% \\ \hline
-        J2 & Services \& Customers (GAIA) & 186 348 & 186 348 & 95 \% \\ \hline
-        J3 & Devices (Global + Cuivre + MSAN) & 319 340 & 319 340 & 100 \% \\ \hline
-        L4 & CRM (Clients, Adresses, ND) & 112 569 & 122 569 & 100 \% \\ \hline
-        \rowcolor{gray!20}
-        \textbf{Total} & \textbf{Tous thèmes confondus} & \textbf{720 531} & \textbf{720 441} & \textbf{99,94 \%} \\ \hline
-    \end{tabular}
-    \caption{Bilan global des métriques de migration par jalon}
-    \label{tab:bilan_global}
-\end{table}
-
-\subsection{Enseignements et points d'amélioration}
-La réalisation de ces jalons a mis en évidence plusieurs facteurs clés de succès pour un projet de migration de données télécom :
-
-\begin{itemize}
-    \item[---] \textbf{Qualité des données sources :} C'est le facteur de risque principal. Les taux de rejet proviennent quasi exclusivement d'incohérences préexistantes (adresses incomplètes, numéros orphelins). L'investissement dans l'analyse de données en amont est donc crucial.
-    \item[---] \textbf{Stratégie de clé universelle :} L'\textit{Universal Id} de Ni2 s'est révélé être le mécanisme le plus fiable pour assurer la réconciliation inter-systèmes (GAIA vs CRM) sans générer de doublons.
-    \item[---] \textbf{Anticipation des tests d'intégration :} La détection d'anomalies lors des tests finaux montre que l'exécution de smoke test dès les premiers Dry Runs aurait permis un gain de temps significatif.
-    \item[---] \textbf{Valorisation de la rétro-ingénierie :} La connaissance acquise sur le modèle CRM non documenté constitue désormais un actif immatériel majeur pour l'entreprise, réutilisable pour la maintenance future du système.
-\end{itemize}
-
-
-\addcontentsline{toc}{section}{Conclusion}
 \section*{Conclusion}
-Le présent chapitre a documenté la phase de construction logique : ce qui a été analysé, scripté et testé. Cependant, la migration ne se limite pas au code SQL ; elle s'appuie sur une infrastructure technologique robuste et un environnement de travail sécurisé. \\
-Le chapitre suivant détaillera l'environnement technique utilisé pour piloter ces opérations, ainsi que la réalisation concrète des déploiements sur les serveurs distants, illustrée par les résultats visuels obtenus sur l'interface Ni2.
+Ce chapitre a détaillé la réalisation technique du projet : stack Python, orchestration LangGraph, implémentation des agents, requêtes GraphRAG, configuration et guardrails de sécurité. Le chapitre suivant traite de la validation, du déploiement et de la démonstration de bout en bout.

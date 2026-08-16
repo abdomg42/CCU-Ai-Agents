@@ -1,0 +1,26 @@
+\begin{tikzpicture}[
+    node distance=1.6cm,
+    entity/.style={rectangle, rounded corners, draw=iNavy, fill=fondBleu, text=iNavy, font=\small\bfseries, minimum width=2.4cm, minimum height=0.8cm, align=center},
+    relation/.style={-{Stealth[length=2mm]}, thick, iNavy},
+    relabel/.style={font=\scriptsize, text=gray, fill=white, inner sep=1pt}
+]
+
+% Nodes
+\node[entity] (client) {Client};
+\node[entity, right=of client] (sub) {Subscription};
+\node[entity, right=of sub] (order) {Order};
+\node[entity, below=of client] (product) {Product};
+\node[entity, below=of sub] (ticket) {Ticket};
+\node[entity, below=of order] (log) {LogEvent};
+
+% Relationships
+\draw[relation] (client) -- node[relabel, above] {HAS\_SUBSCRIPTION} (sub);
+\draw[relation] (sub) -- node[relabel, above] {SUBSCRIBED\_TO} (product);
+\draw[relation] (client) -- node[relabel, left] {PLACED} (order);
+\draw[relation] (order) -- node[relabel, right] {FOR\_PRODUCT} (product);
+\draw[relation] (sub) -- node[relabel, left] {HAS\_TICKET} (ticket);
+\draw[relation] (order) -- node[relabel, right] {GENERATED} (log);
+\draw[relation, dashed] (ticket) -- node[relabel, below] {RELATED\_TO\_PRODUCT} (product);
+\draw[relation, dashed, bend left=30] (ticket) -- node[relabel, above] {SIMILAR\_TO} (ticket);
+
+\end{tikzpicture}

@@ -38,7 +38,7 @@ content_guardrail (PII)
 report_generator (PDF)
   │
   ▼
-notifier (email + note Zammad)
+notifier (email + note Zammad) 
   │
   ▼
 END
@@ -58,6 +58,7 @@ Les trois agents collecteurs (`logs_investigator`, `context_agent`, `rag_ticket_
 - **Interface d'embedding abstraite** : Ollama par défaut, extensible à sentence-transformers, OpenAI ou Voyage AI
 - **Pydantic** pour tous les schémas de sortie structurés
 - **pytest** pour les tests
+- **Streamlit** pour l'interface utilisateur (remplace Next.js)
 
 ## Structure du projet
 
@@ -98,10 +99,8 @@ diagnostic-technique/
 │   ├── main.py
 │   └── routes/diagnose.py
 ├── tests/
-├── ui/                          # Chatbot Next.js
-│   ├── app/
-│   ├── components/
-│   └── package.json
+├── ui/                          # Interface Streamlit
+│   └── app.py
 ├── docker/
 │   ├── docker-compose.yml
 │   └── Dockerfile
@@ -308,29 +307,28 @@ make seed-tickets
 make seed-zammad
 ```
 
-### 4. Démarrer le chatbot (sans Docker)
+### 4. Démarrer l'interface utilisateur (sans Docker)
 
 ```bash
 # Terminal 1 : backend
 make api
 
-# Terminal 2 : frontend
-cd ui && npm install
+# Terminal 2 : frontend Streamlit
 make ui
 ```
 
-Ouvrir http://localhost:3001.
+Ouvrir http://localhost:8501.
 
 ## Scénario de test de bout en bout
 
 1. Ouvrir Mailhog : http://localhost:8025.
-2. Ouvrir le chatbot : http://localhost:3001.
+2. Ouvrir l'interface Streamlit : http://localhost:8501.
 3. Saisir un message en langage naturel, par exemple :
    > "Client acc-12345, service svc-fiber-12345, commande ord-2026-001. Coupure Internet fibre."
 4. Observer dans le chat :
    - le message utilisateur,
    - la trace agent (intake → collectors → root_cause → ticket_manager → remediation_explainer → content_guardrail → report_generator → notifier),
-   - le `MappingBadge` : "New ticket created (#TICK-CCU-XXXX)",
-   - la `ReportCard` avec le bouton "Download PDF report" et le badge "Email sent to ...".
+   - le badge de mapping : "New ticket created (#TICK-CCU-XXXX)",
+   - la carte de rapport avec le bouton "Download PDF report" et le badge "Email sent to ...".
 5. Dans Mailhog, vérifier la réception d'un email avec le sujet `[CCU] Incident Report INC-CCU-XXXX - medium confidence` et la pièce jointe PDF.
 6. Vérifier dans Zammad (http://localhost:3000) que le nouveau ticket contient une note interne "Full report sent by email".

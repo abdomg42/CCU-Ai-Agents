@@ -1,30 +1,19 @@
-{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode Introduction}{\reset@font\mtcSfont 14}{section*.27}}
-{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {2.1}Analyses des systèmes sources}{\reset@font\mtcSfont 15}{section.2.1}}
-{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.1.1}GAIA : le référentiel réseau legacy}{\reset@font\mtcSSfont 15}{subsection.2.1.1}}
-{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {2.2}Le CRM : rétro-ingénierie d'un référentiel complexe}{\reset@font\mtcSfont 15}{section.2.2}}
-{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.2.1}Contexte et enjeux de la rétro-ingénierie}{\reset@font\mtcSSfont 15}{subsection.2.2.1}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.1.1}Démarche méthodologique adoptée}{\reset@font\mtcSSSfont 16}{subsubsection.2.2.1.1}}
-{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.2.2}Identification des entités clés et cartographie des données clients}{\reset@font\mtcSSfont 17}{subsection.2.2.2}}
-{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.2.3}Construction des requêtes d'extraction}{\reset@font\mtcSSfont 17}{subsection.2.2.3}}
-{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.2.4}Conception de la stratégie de migration}{\reset@font\mtcSSfont 17}{subsection.2.2.4}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.4.1}Principes directeurs et objectifs stratégiques}{\reset@font\mtcSSSfont 17}{subsubsection.2.2.4.1}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.4.2}Le modèle de données cible : Ni2 Unified Inventory}{\reset@font\mtcSSSfont 18}{subsubsection.2.2.4.2}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.4.3}Règles de mapping et de transformation}{\reset@font\mtcSSSfont 18}{subsubsection.2.2.4.3}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.4.4}Réconciliation inter-systèmes GAIA / CRM}{\reset@font\mtcSSSfont 18}{subsubsection.2.2.4.4}}
-{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.2.5}Architecture technique de la migration}{\reset@font\mtcSSfont 19}{subsection.2.2.5}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.5.1}Vue d'ensemble du framework Java}{\reset@font\mtcSSSfont 19}{subsubsection.2.2.5.1}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.5.2}Le processus SQL Sync par fichiers CSV}{\reset@font\mtcSSSfont 20}{subsubsection.2.2.5.2}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.5.3}Organisation des répertoires et ordre d'exécution}{\reset@font\mtcSSSfont 21}{subsubsection.2.2.5.3}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.5.4}Gestion des erreurs et journalisation}{\reset@font\mtcSSSfont 22}{subsubsection.2.2.5.4}}
-{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.2.6}Stratégie de validation : les Dry Runs itératifs}{\reset@font\mtcSSfont 22}{subsection.2.2.6}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.6.1}Philosophie des cycles itératifs}{\reset@font\mtcSSSfont 22}{subsubsection.2.2.6.1}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.6.2}Phase préparatoire}{\reset@font\mtcSSSfont 23}{subsubsection.2.2.6.2}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.6.3}Les Dry Runs Partiels (jalons 1, 2 et 3)}{\reset@font\mtcSSSfont 23}{subsubsection.2.2.6.3}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.6.4}Le Dry Run Full}{\reset@font\mtcSSSfont 24}{subsubsection.2.2.6.4}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.6.5}Le Dry Run à blanc}{\reset@font\mtcSSSfont 24}{subsubsection.2.2.6.5}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.6.6}Critères d'acceptance : KPIs quantitatifs et tests qualitatifs}{\reset@font\mtcSSSfont 24}{subsubsection.2.2.6.6}}
-{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.2.7}Gestion des risques opérationnels}{\reset@font\mtcSSfont 25}{subsection.2.2.7}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.7.1}Politique de gestion des rejets}{\reset@font\mtcSSSfont 25}{subsubsection.2.2.7.1}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.7.2}Procédure de rollback}{\reset@font\mtcSSSfont 26}{subsubsection.2.2.7.2}}
-{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {2.2.7.3}Gestion des gels des systèmes sources}{\reset@font\mtcSSSfont 26}{subsubsection.2.2.7.3}}
-{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode Conclusion}{\reset@font\mtcSfont 27}{subsubsection.2.2.7.3}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode Introduction}{\reset@font\mtcSfont 8}{section*.19}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {2.1}Vue d'ensemble du pipeline}{\reset@font\mtcSfont 8}{section.2.1}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {2.2}Modèle de données partagé}{\reset@font\mtcSfont 9}{section.2.2}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {2.3}Les agents du pipeline}{\reset@font\mtcSfont 10}{section.2.3}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.3.1}Intake parser}{\reset@font\mtcSSfont 10}{subsection.2.3.1}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.3.2}Collecteurs parallèles}{\reset@font\mtcSSfont 10}{subsection.2.3.2}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.3.3}Root cause reasoner}{\reset@font\mtcSSfont 11}{subsection.2.3.3}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.3.4}Ticket manager}{\reset@font\mtcSSfont 11}{subsection.2.3.4}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.3.5}Remediation explainer}{\reset@font\mtcSSfont 11}{subsection.2.3.5}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.3.6}Content guardrail}{\reset@font\mtcSSfont 11}{subsection.2.3.6}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.3.7}Report generator et notifier}{\reset@font\mtcSSfont 11}{subsection.2.3.7}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {2.4}Graphe de connaissances Neo4j}{\reset@font\mtcSfont 11}{section.2.4}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.4.1}Modèle de données graphe}{\reset@font\mtcSSfont 11}{subsection.2.4.1}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.4.2}Contraintes et index vectoriel}{\reset@font\mtcSSfont 12}{subsection.2.4.2}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.4.3}Recherche GraphRAG}{\reset@font\mtcSSfont 12}{subsection.2.4.3}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.4.4}Provider d'embeddings}{\reset@font\mtcSSfont 12}{subsection.2.4.4}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {2.5}API REST et interface utilisateur}{\reset@font\mtcSfont 12}{section.2.5}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.5.1}FastAPI et streaming SSE}{\reset@font\mtcSSfont 12}{subsection.2.5.1}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {2.5.2}Chatbot Next.js}{\reset@font\mtcSSfont 12}{subsection.2.5.2}}

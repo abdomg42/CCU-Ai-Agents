@@ -1,19 +1,18 @@
 \resume
-%\selectlanguage{french}
-
-Dans le cadre de ma formation d’ingénieur, j’ai réalisé mon stage de fin d’études chez \textbf{Inetum Offshore Maroc} pour le projet de transformation numérique d’un \textbf{opérateur telecom}. L’objectif était de centraliser le patrimoine réseau et client dans la solution \textbf{Ni2 Unified Inventory}.
-
-\medskip
-
-La première partie de mon stage a concerné la migration du référentiel technique \textbf{GAIA} (Cuivre et Fibre). Mon rôle consistait à analyser les données sources et à développer des scripts SQL pour reconstruire précisément la topologie du réseau dans Ni2.
+%
+Dans le cadre de ma formation de Master en Réseaux et Systèmes Informatiques, j'ai réalisé mon projet de fin d'études au sein de \textbf{Inetum Offshore Maroc}, au service de la Business Unit Telecom. Le projet porte sur la conception et la réalisation d'un \textbf{agent IA de diagnostic technique} destiné au système d'information \textbf{CCU} (Commande et Catalogue Unifiés) d'un opérateur télécom.
 
 \medskip
 
-La deuxième partie était dédiée à la migration du \textbf{CRM}. J’ai mené un travail de rétro-ingénierie sur une base de données complexe afin de réconcilier les données clients avec l'inventaire technique. J’ai également mis en place un pipeline de déploiement industriel via des scripts Shell pour automatiser et sécuriser l’importation des données.
+L'objectif est d'accélérer et de fiabiliser le traitement des incidents techniques en corrélant automatiquement plusieurs sources de données : les \textbf{logs réseau}, le \textbf{contexte client} issu du CRM et les \textbf{tickets historiques} stockés dans un graphe de connaissances \textbf{Neo4j}. Le système repose sur une orchestration agentique avec \textbf{LangGraph}, une interface d'embedding extensible et un modèle de langage local via \textbf{Ollama}.
 
 \medskip
 
-Ce stage m’a permis de maîtriser la migration de données massives, la rétro-ingénierie et le déploiement sur serveurs distants dans un contexte télécom.
+La première partie du travail a concerné la conception de l'architecture agentique : parsing de l'incident, collecte parallèle des sources, raisonnement sur la cause racine, proposition de remédiation, guardrail de contenu, génération de rapport PDF et notification. La seconde partie a porté sur la réalisation technique : implémentation Python avec \textbf{FastAPI}, base de graphe \textbf{Neo4j} incluant un index vectoriel, ingestion des données mockées, tests avec \textbf{pytest} et conteneurisation via \textbf{Docker Compose}.
+
+\medskip
+
+Ce projet m'a permis d'appréhender les enjeux de l'IA générative appliquée au support télécom, la conception de systèmes multi-agents, la recherche augmentée par graphe (\textbf{GraphRAG}) et le déploiement d'une application LLM en entreprise, tout en respectant une contrainte forte : aucune action corrective n'est exécutée automatiquement sur un système réel.
 
 
 \vspace{1cm}
@@ -22,9 +21,8 @@ Ce stage m’a permis de maîtriser la migration de données massives, la rétro
 \noindent\rule[2pt]{\textwidth}{0.5pt}
 
 {\textbf{Mots clés :}}
-Migration de données, Ni2 Unified Inventory, Rétro-ingénierie, CRM, SQL, opérateur telecom, Réconciliation, ETL, Pipeline de déploiement, Télécom.
+Agent IA, Diagnostic technique, CCU, LangGraph, Neo4j, GraphRAG, FastAPI, TMF620, TMF622, LLM, Ollama, Support télécom.
 \\
 \noindent\rule[2pt]{\textwidth}{0.5pt}
 
 \clearpage
-

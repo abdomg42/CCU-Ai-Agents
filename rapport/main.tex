@@ -1,12 +1,12 @@
 \documentclass{gi}
 
 \usepackage{tikz}
-\setlength{\glsdescwidth}{0.65\textwidth}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric, fit, backgrounds}
 
 \typeMemoire{\textbf{MASTER SCIENCES ET TECHNIQUES}}
 \optionFormation{Réseaux et Systèmes Informatiques (RSI)}
 \etudiant{HAOUD \textbf{HAJAR}}
-\titreDuMemoire{Rétro-ingénierie du Référentiel CRM et Migration des Données Réseau et Client vers la CMDB Ni2 Unified Inventory}
+\titreDuMemoire{Conception et Réalisation d'un Agent IA de Diagnostic Technique pour le Système d'Information CCU via LangGraph et Neo4j GraphRAG}
 \dateSoutenance{25 juin 2026}
 \anneeScolaire{2025 - 2026}
 
@@ -23,13 +23,11 @@
 }
 
 \hypersetup{
-    pdftitle={Rapport de stage de fin d'études},
+    pdftitle={Agent IA de Diagnostic Technique CCU},
     pdfauthor={HAOUD Hajar},
     pdfsubject={pfe},
-    pdfkeywords={--}
+    pdfkeywords={IA, diagnostic technique, CCU, LangGraph, Neo4j, GraphRAG, FastAPI, TMF620, TMF622}
 }
-
-\loadglsentries{glossaire_reduit}
 
 \begin{document}
 
@@ -96,19 +94,26 @@
 \minitoc
 \input{1-partie/1-fichier}
 
-\chapter{Stratégie de Migration}\label{chap:2}
+\chapter{Conception de l'Architecture Agentique}\label{chap:2}
 \minitoc
 \input{2-partie/1-fichier}
 
-\chapter{Migration des Données}\label{chap:3}
+\chapter{Réalisation et Implémentation}\label{chap:3}
 \minitoc
 \input{3-partie/1-fichier}
 
-\chapter{Réalisation}\label{chap:4}
+\chapter{Validation, Déploiement et Démonstration}\label{chap:4}
 \minitoc
 \input{4-partie/1-fichier.tex}
 
 \include{4-conclusion}
 \lhead[]{} \rhead[]{} \chead[]{}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliographie}
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{biblio}
 
 \end{document}

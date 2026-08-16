@@ -1,26 +1,26 @@
 \resumeAn
-%\begin{abstract}
-
-As part of my engineering training, I completed my graduation internship at Inetum Offshore Maroc for a telecom operator's digital transformation project. The objective was to centralize network and customer assets within the \textbf{Ni2 Unified Inventory} solution.
-\medskip
-
-The first part of my internship involved the migration of the \textbf{GAIA} technical repository (Copper and Fiber). My role consisted of analyzing source data and developing SQL scripts to accurately reconstruct the network topology in Ni2.
+%
+As part of my Master's degree in Networks and Computer Systems, I completed my graduation project at \textbf{Inetum Offshore Maroc}, within the Telecom Business Unit. The project focuses on the design and implementation of an \textbf{AI agent for technical diagnosis} targeting the \textbf{CCU} (Commande et Catalogue Unifiés) information system of a telecom operator.
 
 \medskip
 
-The second part was dedicated to the \textbf{CRM} migration. I conducted reverse engineering on a complex database to reconcile customer data with the technical inventory. I also implemented an industrial deployment pipeline via Shell scripts to automate and secure data imports.
+The objective is to accelerate and improve the reliability of technical incident handling by automatically correlating multiple data sources: \textbf{network logs}, \textbf{customer context} from the CRM, and \textbf{historical tickets} stored in a \textbf{Neo4j} knowledge graph. The system relies on an agentic orchestration built with \textbf{LangGraph}, an extensible embedding interface, and a local language model via \textbf{Ollama}.
 
 \medskip
 
-This internship allowed me to master large-scale data migration, reverse engineering, and remote server deployment in a telecom context.
+The first part of the work focused on designing the agentic architecture: incident parsing, parallel source collection, root-cause reasoning, remediation proposal, content guardrail, PDF report generation, and notification. The second part covered the technical implementation: Python implementation with \textbf{FastAPI}, \textbf{Neo4j} graph database including a vector index, ingestion of mocked data, \textbf{pytest} testing, and containerization via \textbf{Docker Compose}.
+
+\medskip
+
+This project allowed me to address the challenges of generative AI applied to telecom support, multi-agent system design, graph-augmented retrieval (\textbf{GraphRAG}), and enterprise LLM deployment, while respecting a strong constraint: no corrective action is ever executed automatically on a real system.
+
 
 \vspace{1cm}
 
 
-
 \noindent\rule[2pt]{\textwidth}{0.5pt}
 
-{\textbf{Keywords :}}
-Data migration, Ni2 Unified Inventory, Reverse Engineering, CRM, SQL, telecom operator, Reconciliation, ETL, Deployment Pipeline, Telecom.
+{\textbf{Keywords:}}
+AI Agent, Technical Diagnosis, CCU, LangGraph, Neo4j, GraphRAG, FastAPI, TMF620, TMF622, LLM, Ollama, Telecom Support.
 \\
 \noindent\rule[2pt]{\textwidth}{0.5pt}

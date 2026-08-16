@@ -1,10 +1,18 @@
 \conclusion
-Au terme de ce projet, réalisé au sein d’Inetum Offshore Maroc, l’objectif majeur de modernisation du Système d’Information de l'opérateur telecom a été pleinement atteint pour le périmètre du Lot 1. Ce stage a représenté une immersion complète dans un projet de transformation numérique d'envergure industrielle, où l'enjeu était de centraliser l'intégralité du patrimoine réseau et client au sein d'une « Source Unique de Vérité » via la solution Ni2 Unified Inventory.\\
+Au terme de ce projet de fin d'études, réalisé au sein d'Inetum Offshore Maroc, les objectifs de conception et de réalisation d'un agent IA de diagnostic technique pour le système d'information CCU ont été atteints. Le travail mené démontre qu'il est possible de combiner orchestration agentique, graphe de connaissances et modèles de langage pour accélérer le diagnostic d'incidents télécom tout en maîtrisant les risques.
 
-Le travail que j'ai mené s'est articulé autour de la convergence entre les infrastructures techniques et les référentiels commerciaux. Sur le volet technique, ma contribution a permis de stabiliser l'inventaire des réseaux cuivre et fibre issu du système GAIA. Concernant le volet commercial, j'ai piloté une démarche de rétro-ingénierie méthodique sur la base de données CRM. Ce travail d'investigation a été indispensable pour décoder les règles de gestion métier et assurer une réconciliation fluide des données clients au sein du nouvel outil.\\
+\medskip
 
-Toutefois, le projet de l'operateur teleco est une aventure technologique qui se poursuit au-delà de la rédaction de ce document. Les travaux réalisés jusqu'ici posent les fondations nécessaires au déploiement du Jalon 5, lequel constitue mon prochain objectif opérationnel. Cette phase à venir sera notamment consacrée à la finalisation des tests d'intégration de bout en bout entre le CRM, la Façade et Ni2, afin de valider la fluidité des processus métiers dans leur globalité.\\
+La première contribution de ce projet est architecturale. Le pipeline conçu autour de \textbf{LangGraph} articule de manière modulaire les étapes d'analyse d'un incident : parsing, collecte parallèle des sources, raisonnement sur la cause racine, gestion du ticket, génération de remédiation, guardrail de contenu, production de rapport et notification. Cette décomposition en agents spécialisés facilite l'évolution, le test et l'audit du système.
 
-Sur le plan personnel, ce stage est un véritable catalyseur pour mon profil d'ingénieure en Réseaux et Systèmes Informatiques. Il m'a permis de développer une solide expertise en SQL avancé et en gestion de systèmes d'information massifs, tout en m'apprenant à évoluer avec agilité dans un environnement de production international.\\
+\medskip
 
-En conclusion, si ce mémoire documente une étape clé de la migration, il témoigne surtout d'une dynamique de travail continue. La fiabilisation de l'inventaire technique et la réconciliation commerciale déjà accomplies représentent un succès intermédiaire décisif, ouvrant la voie à la livraison finale du Lot 1 et, à terme, à la modernisation complète des services de l'opérateur.
+La seconde contribution est technique. L'intégration de \textbf{Neo4j} comme base de graphe et d'index vectoriel permet de stocker les entités métier et d'effectuer une recherche de tickets similaires combinant similarité sémantique et proximité de graphe. L'utilisation de \textbf{FastAPI}, de \textbf{Pydantic} et d'une interface d'embedding extensible assure un socle robuste et industrialisable.
+
+\medskip
+
+Enfin, la démarche de validation, fondée sur des tests automatisés avec \textbf{pytest} et un jeu de \textbf{golden incidents}, garantit la reproductibilité et la mesure de la performance du système. Le déploiement via \textbf{Docker Compose} et le scénario de bout en bout valident la faisabilité opérationnelle de la solution.
+
+\medskip
+
+Sur le plan personnel, ce projet m'a permis d'approfondir les concepts d'IA générative appliquée au support, de conception multi-agents, de bases de données graphe et de déploiement d'applications LLM en contexte entreprise. Les perspectives d'évolution incluent l'enrichissement du graphe avec des données temps réel, l'amélioration du raisonnement par LLM local et l'intégration de mécanismes de feedback humain pour affiner continuellement la qualité du diagnostic.

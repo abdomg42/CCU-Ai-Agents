@@ -8,8 +8,8 @@ help:
 	@echo "  make seed-zammad      - Injecte les tickets mockés dans Zammad"
 	@echo "  make test             - Lance pytest"
 	@echo "  make api              - Démarre l'API FastAPI en local (port 8000)"
-	@echo "  make ui               - Démarre le chatbot Next.js (dev server port 3001)"
-	@echo "  make ui-build         - Build le chatbot Next.js"
+	@echo "  make ui               - Démarre l'interface Streamlit (port 8501)"
+	@echo "  make ui-build         - Vérifie que l'app Streamlit se charge sans erreur"
 	@echo "  make docker-up        - Démarre toute l'infrastructure via Docker Compose"
 	@echo "  make docker-down      - Arrête les conteneurs Docker Compose"
 
@@ -33,10 +33,10 @@ api:
 	uvicorn api.main:app --reload
 
 ui:
-	cd ui && npm run dev
+	streamlit run ui/app.py
 
 ui-build:
-	cd ui && npm run build
+	python -c "import streamlit, ui.app"
 
 docker-up:
 	cd docker && docker compose up --build
