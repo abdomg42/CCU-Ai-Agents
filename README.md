@@ -288,7 +288,7 @@ Le plus simple est Docker Compose :
 make docker-up
 ```
 
-Cela démarre : API FastAPI (8000), Neo4j (7474/7687), Zammad (3000), Mailhog (8025/1025), Splunk (18000/8088), Prism (4010).
+Cela démarre : API FastAPI (8000), Zammad (3000), Splunk (18000/8088), Prism (4010). Neo4j doit être démarré séparément sur l'hôte.
 
 > Sous Windows, WeasyPrint a besoin des librairies GTK/Pango. Le Dockerfile installe les dépendances Debian nécessaires, la génération PDF fonctionne donc dans le conteneur. En local sans Docker, l'agent génère un fallback HTML si les librairies système sont manquantes.
 
@@ -321,14 +321,13 @@ Ouvrir http://localhost:8501.
 
 ## Scénario de test de bout en bout
 
-1. Ouvrir Mailhog : http://localhost:8025.
-2. Ouvrir l'interface Streamlit : http://localhost:8501.
-3. Saisir un message en langage naturel, par exemple :
+1. Démarrer l'interface Streamlit : http://localhost:8501.
+2. Saisir un message en langage naturel, par exemple :
    > "Client acc-12345, service svc-fiber-12345, commande ord-2026-001. Coupure Internet fibre."
-4. Observer dans le chat :
+3. Observer dans le chat :
    - le message utilisateur,
    - la trace agent (intake → collectors → root_cause → ticket_manager → remediation_explainer → content_guardrail → report_generator → notifier),
    - le badge de mapping : "New ticket created (#TICK-CCU-XXXX)",
    - la carte de rapport avec le bouton "Download PDF report" et le badge "Email sent to ...".
-5. Dans Mailhog, vérifier la réception d'un email avec le sujet `[CCU] Incident Report INC-CCU-XXXX - medium confidence` et la pièce jointe PDF.
-6. Vérifier dans Zammad (http://localhost:3000) que le nouveau ticket contient une note interne "Full report sent by email".
+4. Vérifier la réception de l'email de notification dans la boîte des destinataires configurés (`REPORT_RECIPIENTS`).
+5. Vérifier dans Zammad (http://localhost:3000) que le nouveau ticket contient une note interne "Full report sent by email".

@@ -20,14 +20,16 @@ services:
       - ZAMMAD_URL=http://zammad:3000
       - ZAMMAD_TOKEN=${ZAMMAD_TOKEN:-}
       - ZAMMAD_DEFAULT_GROUP=Users
-      - SMTP_HOST=mailhog
-      - SMTP_PORT=1025
-      - SMTP_FROM=diagnostic-agent@ccu.local
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-}
+      - SMTP_USE_TLS=${SMTP_USE_TLS:-true}
       - REPORT_RECIPIENTS=${REPORT_RECIPIENTS:-noc@ccu.local,support@ccu.local}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
     depends_on:
       - zammad
-      - mailhog
     command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
   zammad-postgres:
@@ -69,13 +71,6 @@ services:
       timeout: 10s
       retries: 10
       start_period: 120s
-
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: diagnostic_mailhog
-    ports:
-      - "1025:1025"
-      - "8025:8025"
 
   splunk:
     image: splunk/splunk:latest

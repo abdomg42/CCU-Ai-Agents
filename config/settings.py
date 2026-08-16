@@ -58,10 +58,13 @@ class Settings:
     ZAMMAD_TOKEN: str = os.getenv("ZAMMAD_TOKEN", "")
     ZAMMAD_DEFAULT_GROUP: str = os.getenv("ZAMMAD_DEFAULT_GROUP", "Users")
 
-    # Mailhog (SMTP local pour les tests de notification)
-    SMTP_HOST: str = os.getenv("SMTP_HOST", "localhost")
-    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "1025"))
-    SMTP_FROM: str = os.getenv("SMTP_FROM", "diagnostic-agent@ccu.local")
+    # SMTP configuration
+    SMTP_HOST: str = os.getenv("SMTP_HOST", "")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER: str = os.getenv("SMTP_USER", "")
+    SMTP_PASS: str = os.getenv("SMTP_PASS", "")
+    SMTP_FROM: str = os.getenv("SMTP_FROM", os.getenv("SMTP_USER", ""))
+    SMTP_USE_TLS: bool = os.getenv("SMTP_USE_TLS", "true").lower() in {"1", "true", "yes"}
     REPORT_RECIPIENTS: list[str] = [
         addr.strip()
         for addr in os.getenv("REPORT_RECIPIENTS", "noc@ccu.local, support@ccu.local").split(",")
