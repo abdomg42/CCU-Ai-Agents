@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00494",
+  "summary": "Error in Equipment Configuration",
+  "description": "Sales Agent encountered an error when trying to onboard an additional location for merchant ID 12345. The system displayed a 'Duplicate Location' error message.",
+  "root_cause": "undetermined",
+  "resolution": "Resolved by clearing the browser cache and reloading the Customer UI. PDF now loads successfully.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.829032+00:00",
+  "tmf621": {
+    "id": "INC00494",
+    "href": "/tmf621/troubleTicket/INC00494",
+    "creationDate": "2026-08-17T20:43:35.829032+00:00",
+    "description": "Error in Equipment Configuration",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

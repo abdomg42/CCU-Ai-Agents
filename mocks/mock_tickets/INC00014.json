@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00014",
+  "summary": "Error accessing merchant agreement PDF",
+  "description": "Sales Agent encountered an issue where merchant data input was not saving correctly in the Sales UI, leading to incomplete merchant profiles and delays in onboarding.",
+  "root_cause": "undetermined",
+  "resolution": "Rectified the issue by performing a data refresh to fetch and display the accurate merchant information in the Sales UI.",
+  "tags": [
+    "hardware"
+  ],
+  "priority": "P1",
+  "status": "new",
+  "category": "Hardware",
+  "created_at": "2026-08-17T20:43:35.830586+00:00",
+  "tmf621": {
+    "id": "INC00014",
+    "href": "/tmf621/troubleTicket/INC00014",
+    "creationDate": "2026-08-17T20:43:35.830586+00:00",
+    "description": "Error accessing merchant agreement PDF",
+    "severity": "P1",
+    "priority": "P1",
+    "status": "new",
+    "type": "Hardware"
+  }
+}

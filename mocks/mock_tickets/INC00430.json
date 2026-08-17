@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00430",
+  "summary": "Access permission error preventing merchant fee configuration",
+  "description": "Sales Agent experienced frequent network timeouts when selecting equipment for a merchant, causing delays in the onboarding process.",
+  "root_cause": "undetermined",
+  "resolution": "Reviewed and adjusted the permission settings for the Merchant UI, allowing the merchant to successfully e-sign the agreement and proceed with onboarding.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.830586+00:00",
+  "tmf621": {
+    "id": "INC00430",
+    "href": "/tmf621/troubleTicket/INC00430",
+    "creationDate": "2026-08-17T20:43:35.830586+00:00",
+    "description": "Access permission error preventing merchant fee configuration",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00080",
+  "summary": "Unable to add new location for merchant ID 12345",
+  "description": "Sales Agent encountered a hardware compatibility issue while configuring fees for a merchant, leading to incorrect fee settings.",
+  "root_cause": "undetermined",
+  "resolution": "Reconfigured POS terminals with the correct settings based on merchant requirements, ensuring transactions are processed accurately.",
+  "tags": [
+    "access"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Access",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00080",
+    "href": "/tmf621/troubleTicket/INC00080",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Unable to add new location for merchant ID 12345",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Access"
+  }
+}

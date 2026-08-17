@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00277",
+  "summary": "Sales UI not loading merchant data",
+  "description": "Sales Agent encountered an error when trying to add a new POS system for a high-volume merchant, leading to delays in onboarding process.",
+  "root_cause": "undetermined",
+  "resolution": "Identified a database inconsistency causing the false error message. Resolved the issue by correcting the location mapping in the database, allowing the Sales Agent to proceed with adding the new location.",
+  "tags": [
+    "access"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Access",
+  "created_at": "2026-08-17T20:43:35.830586+00:00",
+  "tmf621": {
+    "id": "INC00277",
+    "href": "/tmf621/troubleTicket/INC00277",
+    "creationDate": "2026-08-17T20:43:35.830586+00:00",
+    "description": "Sales UI not loading merchant data",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Access"
+  }
+}

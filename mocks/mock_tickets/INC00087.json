@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00087",
+  "summary": "Merchant UI displaying blank screen post-login",
+  "description": "A Merchant is unable to e-sign the agreement as they are encountering a login error when trying to access the Customer UI, leading to a delay in the onboarding process.",
+  "root_cause": "undetermined",
+  "resolution": "Developers identified a bug in the linking functionality and released a hotfix. Sales Agent successfully added the new location to the existing merchant ID.",
+  "tags": [
+    "lan",
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.828026+00:00",
+  "tmf621": {
+    "id": "INC00087",
+    "href": "/tmf621/troubleTicket/INC00087",
+    "creationDate": "2026-08-17T20:43:35.828026+00:00",
+    "description": "Merchant UI displaying blank screen post-login",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

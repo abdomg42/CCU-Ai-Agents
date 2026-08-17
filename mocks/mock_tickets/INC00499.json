@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00499",
+  "summary": "Access Rights Restriction",
+  "description": "When a merchant attempts to e-sign the agreement in the Customer UI, the interface becomes unresponsive, preventing completion of the signing process.",
+  "root_cause": "undetermined",
+  "resolution": "Identified a permission issue specific to the Sales Agent's account and provided the necessary access rights, allowing seamless equipment selection for merchant onboarding.",
+  "tags": [
+    "pon",
+    "software"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.836564+00:00",
+  "tmf621": {
+    "id": "INC00499",
+    "href": "/tmf621/troubleTicket/INC00499",
+    "creationDate": "2026-08-17T20:43:35.836564+00:00",
+    "description": "Access Rights Restriction",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "Software"
+  }
+}

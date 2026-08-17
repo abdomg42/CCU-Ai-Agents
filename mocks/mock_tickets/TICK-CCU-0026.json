@@ -1,9 +1,9 @@
 {
-  "ticket_id": "TICK-CCU-0002",
+  "ticket_id": "TICK-CCU-0026",
   "summary": "Order stuck in CRM acknowledged state",
-  "description": "Investigation ongoing; root cause not yet identified.",
-  "root_cause": "undetermined",
-  "resolution": "",
+  "description": "Order remains in 'acknowledged' for 45 minutes; downstream provisioning cannot start.",
+  "root_cause": "Timeout CRM lors de la récupération du profil client",
+  "resolution": "CRM profile retried and order moved to inProgress.",
   "tags": [
     "crm_sync",
     "mobile_5g_enterprise"
@@ -12,13 +12,13 @@
   "status": "new",
   "category": "crm_sync",
   "product_type": "Mobile 5G Enterprise",
-  "client_id": "CLI-00002",
-  "order_id": "ORD-CCU-0002",
+  "client_id": "CLI-00026",
+  "order_id": "ORD-CCU-0026",
   "created_at": "2026-08-17T20:43:38.721882+00:00",
   "related_log_pattern": "CRM_API_TIMEOUT order_id={order_id} duration=45000ms",
   "tmf621": {
-    "id": "TICK-CCU-0002",
-    "href": "/tmf621/troubleTicket/TICK-CCU-0002",
+    "id": "TICK-CCU-0026",
+    "href": "/tmf621/troubleTicket/TICK-CCU-0026",
     "creationDate": "2026-08-17T20:43:38.721882+00:00",
     "description": "Order stuck in CRM acknowledged state",
     "severity": "P2",
@@ -27,13 +27,13 @@
     "type": "crm_sync",
     "relatedParty": [
       {
-        "id": "CLI-00002",
+        "id": "CLI-00026",
         "role": "customer"
       }
     ],
     "relatedObject": [
       {
-        "id": "ORD-CCU-0002",
+        "id": "ORD-CCU-0026",
         "role": "order"
       }
     ]

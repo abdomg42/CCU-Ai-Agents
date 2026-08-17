@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00112",
+  "summary": "Error message 'Invalid Signature' when attempting to e-sign Agreement",
+  "description": "Sales Agent reports that configured fees and services for a new merchant are not saving upon submission, leading to incorrect pricing in the agreement.",
+  "root_cause": "undetermined",
+  "resolution": "A backend synchronization issue was identified and resolved by initiating a manual sync process. Sales Agent confirmed that the fees and services configurations were now accurately displayed.",
+  "tags": [
+    "pon",
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.805991+00:00",
+  "tmf621": {
+    "id": "INC00112",
+    "href": "/tmf621/troubleTicket/INC00112",
+    "creationDate": "2026-08-17T20:43:35.805991+00:00",
+    "description": "Error message 'Invalid Signature' when attempting to e-sign Agreement",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

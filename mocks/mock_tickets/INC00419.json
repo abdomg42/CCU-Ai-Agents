@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00419",
+  "summary": "Merchant ID duplication error during new location setup",
+  "description": "Sales Agent encountered an issue where a specific POS terminal model, 'ABC-2000', could not be selected while configuring equipment for a merchant.",
+  "root_cause": "undetermined",
+  "resolution": "The issue was resolved by conducting a thorough network analysis to identify and address the root cause of the latency spikes. By optimizing network configurations and addressing bottlenecks, consistent API response times were restored, enhancing the efficiency of the onboarding process.",
+  "tags": [
+    "pon",
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.836564+00:00",
+  "tmf621": {
+    "id": "INC00419",
+    "href": "/tmf621/troubleTicket/INC00419",
+    "creationDate": "2026-08-17T20:43:35.836564+00:00",
+    "description": "Merchant ID duplication error during new location setup",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

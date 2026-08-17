@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00332",
+  "summary": "Sales Agent unable to access fee configuration page",
+  "description": "Merchants are unable to view the PDF Merchant Agreement after logging in to the Customer UI.",
+  "root_cause": "undetermined",
+  "resolution": "Assisted the Merchant in resetting their password and provided guidance on securely accessing the UI, allowing them to successfully e-sign the agreement.",
+  "tags": [
+    "network"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Network",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00332",
+    "href": "/tmf621/troubleTicket/INC00332",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Sales Agent unable to access fee configuration page",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Network"
+  }
+}

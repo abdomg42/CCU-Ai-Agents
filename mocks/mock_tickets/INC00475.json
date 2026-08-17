@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00475",
+  "summary": "Merchant UI displaying blank screen post-login",
+  "description": "Sales Agent raised a concern that the merchant data being displayed in the Sales UI is showing incorrect information not matching the actual details provided.",
+  "root_cause": "undetermined",
+  "resolution": "Discovered a backend API communication issue preventing data transfer. Resolved the API connection problem, allowing merchant data to flow seamlessly to the Processing stage for further processing.",
+  "tags": [
+    "hardware",
+    "lan"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Hardware",
+  "created_at": "2026-08-17T20:43:35.826468+00:00",
+  "tmf621": {
+    "id": "INC00475",
+    "href": "/tmf621/troubleTicket/INC00475",
+    "creationDate": "2026-08-17T20:43:35.826468+00:00",
+    "description": "Merchant UI displaying blank screen post-login",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Hardware"
+  }
+}

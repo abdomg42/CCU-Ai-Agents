@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00258",
+  "summary": "Authentication error when logging in to review Agreement",
+  "description": "Sales Agent encounters an issue where equipment selection dropdown menu is unresponsive for a specific merchant profile.",
+  "root_cause": "undetermined",
+  "resolution": "Identified a configuration error in the API authentication settings, which was corrected to restore data retrieval functionality.",
+  "tags": [
+    "pon",
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.828026+00:00",
+  "tmf621": {
+    "id": "INC00258",
+    "href": "/tmf621/troubleTicket/INC00258",
+    "creationDate": "2026-08-17T20:43:35.828026+00:00",
+    "description": "Authentication error when logging in to review Agreement",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

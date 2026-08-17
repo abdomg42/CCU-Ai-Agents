@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00463",
+  "summary": "Network timeout errors during merchant data submission",
+  "description": "Sales Agent experiences an issue where the submission button for the Merchant Agreement e-signature is unclickable, preventing progress to the processing stage.",
+  "root_cause": "undetermined",
+  "resolution": "The network timeout issue was addressed by optimizing network settings and increasing timeout thresholds, allowing Sales Agents to successfully complete the equipment selection process without further interruptions.",
+  "tags": [
+    "access"
+  ],
+  "priority": "P1",
+  "status": "new",
+  "category": "Access",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00463",
+    "href": "/tmf621/troubleTicket/INC00463",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Network timeout errors during merchant data submission",
+    "severity": "P1",
+    "priority": "P1",
+    "status": "new",
+    "type": "Access"
+  }
+}

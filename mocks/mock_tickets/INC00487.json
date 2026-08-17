@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00487",
+  "summary": "Login credentials not working for merchant",
+  "description": "Merchant facing difficulties in submitting the e-signed Merchant Agreement through the UI, hindering the onboarding process.",
+  "root_cause": "undetermined",
+  "resolution": "The problem was resolved by performing a system cache refresh, ensuring that the equipment selection dropdown functioned properly and allowed Sales Agents to choose equipment efficiently.",
+  "tags": [
+    "access"
+  ],
+  "priority": "P1",
+  "status": "new",
+  "category": "Access",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00487",
+    "href": "/tmf621/troubleTicket/INC00487",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Login credentials not working for merchant",
+    "severity": "P1",
+    "priority": "P1",
+    "status": "new",
+    "type": "Access"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00035",
+  "summary": "Unable to link new location to existing merchant ID",
+  "description": "A merchant is unable to log in to the Customer UI to review and e-sign the Merchant Agreement due to login credentials not being accepted.",
+  "root_cause": "undetermined",
+  "resolution": "The issue was identified as a data synchronization error and was resolved by refreshing the equipment database to populate the missing dropdown options for selection.",
+  "tags": [
+    "access"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Access",
+  "created_at": "2026-08-17T20:43:35.830586+00:00",
+  "tmf621": {
+    "id": "INC00035",
+    "href": "/tmf621/troubleTicket/INC00035",
+    "creationDate": "2026-08-17T20:43:35.830586+00:00",
+    "description": "Unable to link new location to existing merchant ID",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Access"
+  }
+}

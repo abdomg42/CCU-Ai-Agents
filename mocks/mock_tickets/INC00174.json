@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00174",
+  "summary": "Merchant ID not recognized for additional location",
+  "description": "Sales Agent noticed that any changes made to fees/services configurations for a merchant are not saving properly in the system.",
+  "root_cause": "undetermined",
+  "resolution": "The network team identified a routing issue causing the intermittent connections and resolved it by optimizing the network configuration to ensure stable and uninterrupted service.",
+  "tags": [
+    "network"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Network",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00174",
+    "href": "/tmf621/troubleTicket/INC00174",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Merchant ID not recognized for additional location",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Network"
+  }
+}

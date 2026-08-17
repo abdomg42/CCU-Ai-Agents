@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00233",
+  "summary": "Hardware failure on Sales Agent's device",
+  "description": "Intermittent latency spikes were observed, causing delays in API responses during merchant data input by Sales Agents. This variability in response times impacted the overall speed of onboarding operations.",
+  "root_cause": "undetermined",
+  "resolution": "Implemented additional data backup mechanisms in the review stage to prevent further data loss incidents, ensuring a smoother onboarding experience for merchants.",
+  "tags": [
+    "access",
+    "pon"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "Access",
+  "created_at": "2026-08-17T20:43:35.830586+00:00",
+  "tmf621": {
+    "id": "INC00233",
+    "href": "/tmf621/troubleTicket/INC00233",
+    "creationDate": "2026-08-17T20:43:35.830586+00:00",
+    "description": "Hardware failure on Sales Agent's device",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "Access"
+  }
+}

@@ -1,39 +1,39 @@
 {
-  "ticket_id": "TICK-CCU-0003",
+  "ticket_id": "TICK-CCU-0027",
   "summary": "SIM ICCID not provisioned in HLR",
-  "description": "Investigation ongoing; root cause not yet identified.",
-  "root_cause": "undetermined",
-  "resolution": "",
+  "description": "New SIM activation fails with HSS 'Unknown subscriber' response.",
+  "root_cause": "ICCID SIM non provisionnée dans le HLR",
+  "resolution": "Reprovisioned ICCID in HLR and resent activation request.",
   "tags": [
     "provisioning",
     "forfait_nano_sim"
   ],
   "priority": "P2",
-  "status": "new",
+  "status": "open",
   "category": "provisioning",
   "product_type": "Forfait Nano SIM",
-  "client_id": "CLI-00003",
-  "order_id": "ORD-CCU-0003",
+  "client_id": "CLI-00027",
+  "order_id": "ORD-CCU-0027",
   "created_at": "2026-08-17T20:43:38.721882+00:00",
   "related_log_pattern": "HSS_UNKNOWN_SUBSCRIBER imsi={client_id} iccid=",
   "tmf621": {
-    "id": "TICK-CCU-0003",
-    "href": "/tmf621/troubleTicket/TICK-CCU-0003",
+    "id": "TICK-CCU-0027",
+    "href": "/tmf621/troubleTicket/TICK-CCU-0027",
     "creationDate": "2026-08-17T20:43:38.721882+00:00",
     "description": "SIM ICCID not provisioned in HLR",
     "severity": "P2",
     "priority": "P2",
-    "status": "new",
+    "status": "open",
     "type": "provisioning",
     "relatedParty": [
       {
-        "id": "CLI-00003",
+        "id": "CLI-00027",
         "role": "customer"
       }
     ],
     "relatedObject": [
       {
-        "id": "ORD-CCU-0003",
+        "id": "ORD-CCU-0027",
         "role": "order"
       }
     ]

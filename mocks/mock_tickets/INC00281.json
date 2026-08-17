@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00281",
+  "summary": "Fee configuration tool malfunction in Sales UI",
+  "description": "Upon configuring fees and services for a new location linked to an existing merchant ID, the Sales Agent noticed that the settings were missing or not applied. This led to discrepancies in the merchant agreement.",
+  "root_cause": "undetermined",
+  "resolution": "Reviewed and adjusted the permission settings for the Merchant UI, allowing the merchant to successfully e-sign the agreement and proceed with onboarding.",
+  "tags": [
+    "pon",
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.830586+00:00",
+  "tmf621": {
+    "id": "INC00281",
+    "href": "/tmf621/troubleTicket/INC00281",
+    "creationDate": "2026-08-17T20:43:35.830586+00:00",
+    "description": "Fee configuration tool malfunction in Sales UI",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00049",
+  "summary": "Sales Agent unable to access fee configuration page",
+  "description": "New Sales Agent reported inability to configure fees/services due to access denial, hindering merchant onboarding process; Sales Agent affected.",
+  "root_cause": "undetermined",
+  "resolution": "Conducted network diagnostics, discovered a bottleneck in the network infrastructure. Implemented QoS settings to prioritize data submission traffic and alleviate timeouts.",
+  "tags": [
+    "access"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Access",
+  "created_at": "2026-08-17T20:43:35.811425+00:00",
+  "tmf621": {
+    "id": "INC00049",
+    "href": "/tmf621/troubleTicket/INC00049",
+    "creationDate": "2026-08-17T20:43:35.811425+00:00",
+    "description": "Sales Agent unable to access fee configuration page",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Access"
+  }
+}

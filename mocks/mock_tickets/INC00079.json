@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00079",
+  "summary": "Inability to scan documents due to scanner malfunction",
+  "description": "Sales Agent observes that the system is inaccurately calculating processing fees for a specific merchant account, leading to discrepancies in the final agreement.",
+  "root_cause": "undetermined",
+  "resolution": "Replaced the malfunctioning hardware component on the Sales Agent's device, ensuring seamless continuation of the merchant data input process.",
+  "tags": [
+    "pon",
+    "software"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00079",
+    "href": "/tmf621/troubleTicket/INC00079",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Inability to scan documents due to scanner malfunction",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "Software"
+  }
+}

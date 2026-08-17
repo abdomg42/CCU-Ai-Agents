@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00214",
+  "summary": "Login credentials not working for merchant",
+  "description": "Sales Agent encountered an error while trying to onboard an additional location for an existing merchant ID. The system failed to save the new location details.",
+  "root_cause": "undetermined",
+  "resolution": "The access issue was traced back to a permission setting error and was resolved by adjusting the agent's role permissions to grant access to the required module.",
+  "tags": [
+    "hardware"
+  ],
+  "priority": "P1",
+  "status": "new",
+  "category": "Hardware",
+  "created_at": "2026-08-17T20:43:35.814207+00:00",
+  "tmf621": {
+    "id": "INC00214",
+    "href": "/tmf621/troubleTicket/INC00214",
+    "creationDate": "2026-08-17T20:43:35.814207+00:00",
+    "description": "Login credentials not working for merchant",
+    "severity": "P1",
+    "priority": "P1",
+    "status": "new",
+    "type": "Hardware"
+  }
+}

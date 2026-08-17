@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00326",
+  "summary": "Sales Agent unable to access merchant equipment options",
+  "description": "Merchants are unable to view the PDF Merchant Agreement after logging in to the Customer UI.",
+  "root_cause": "undetermined",
+  "resolution": "Performed a system cache refresh to reload the merchant data and ensured proper data mapping to display information accurately in the Sales UI.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.836564+00:00",
+  "tmf621": {
+    "id": "INC00326",
+    "href": "/tmf621/troubleTicket/INC00326",
+    "creationDate": "2026-08-17T20:43:35.836564+00:00",
+    "description": "Sales Agent unable to access merchant equipment options",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

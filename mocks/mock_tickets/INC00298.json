@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00298",
+  "summary": "Sales UI not loading for Sales Agent",
+  "description": "The Merchant reported a touchscreen malfunction on their device, making it impossible for them to e-sign the agreement in the Customer UI, hindering the onboarding progress.",
+  "root_cause": "undetermined",
+  "resolution": "Provided Sales Agent with a list of supported hardware for the fee configuration tool and assisted in setting up a compatible device, resolving the issue.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.805991+00:00",
+  "tmf621": {
+    "id": "INC00298",
+    "href": "/tmf621/troubleTicket/INC00298",
+    "creationDate": "2026-08-17T20:43:35.805991+00:00",
+    "description": "Sales UI not loading for Sales Agent",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

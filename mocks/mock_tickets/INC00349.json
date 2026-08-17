@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00349",
+  "summary": "Intermittent connection issues while configuring services",
+  "description": "A merchant is unable to log in to the Customer UI to review and e-sign the Merchant Agreement due to login credentials not being accepted.",
+  "root_cause": "undetermined",
+  "resolution": "Identified a database inconsistency causing the false error message. Resolved the issue by correcting the location mapping in the database, allowing the Sales Agent to proceed with adding the new location.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P1",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00349",
+    "href": "/tmf621/troubleTicket/INC00349",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Intermittent connection issues while configuring services",
+    "severity": "P1",
+    "priority": "P1",
+    "status": "new",
+    "type": "Software"
+  }
+}

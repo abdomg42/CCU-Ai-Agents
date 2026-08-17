@@ -1,9 +1,9 @@
 {
-  "ticket_id": "TICK-CCU-0001",
+  "ticket_id": "TICK-CCU-0025",
   "summary": "Fiber signal loss on OLT North",
-  "description": "Investigation ongoing; root cause not yet identified.",
-  "root_cause": "undetermined",
-  "resolution": "",
+  "description": "Customer reports total Internet outage. OLT logs show RX power below -28 dBm on the PON port.",
+  "root_cause": "Perte de signal fibre optique",
+  "resolution": "Technician re-terminated fiber at the PTO.",
   "tags": [
     "network",
     "fibre_pro_500"
@@ -12,13 +12,13 @@
   "status": "new",
   "category": "network",
   "product_type": "Fibre Pro 500",
-  "client_id": "CLI-00001",
-  "order_id": "ORD-CCU-0001",
+  "client_id": "CLI-00025",
+  "order_id": "ORD-CCU-0025",
   "created_at": "2026-08-17T20:43:38.721882+00:00",
   "related_log_pattern": "OLT_RX_POWER_LOW pon-port=3/1/7",
   "tmf621": {
-    "id": "TICK-CCU-0001",
-    "href": "/tmf621/troubleTicket/TICK-CCU-0001",
+    "id": "TICK-CCU-0025",
+    "href": "/tmf621/troubleTicket/TICK-CCU-0025",
     "creationDate": "2026-08-17T20:43:38.721882+00:00",
     "description": "Fiber signal loss on OLT North",
     "severity": "P2",
@@ -27,13 +27,13 @@
     "type": "network",
     "relatedParty": [
       {
-        "id": "CLI-00001",
+        "id": "CLI-00025",
         "role": "customer"
       }
     ],
     "relatedObject": [
       {
-        "id": "ORD-CCU-0001",
+        "id": "ORD-CCU-0025",
         "role": "order"
       }
     ]

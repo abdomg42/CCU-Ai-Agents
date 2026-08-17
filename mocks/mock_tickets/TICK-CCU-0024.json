@@ -1,0 +1,36 @@
+{
+  "ticket_id": "TICK-CCU-0024",
+  "summary": "Catalog eligibility conflict for 5G add-on",
+  "description": "Order rejected by product catalog because the 5G roaming add-on is not eligible for the base plan.",
+  "root_cause": "Product option not eligible for current base product",
+  "resolution": "Selected compatible add-on and resubmitted order.",
+  "tags": [
+    "catalog_eligibility",
+    "mobile_5g_enterprise"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "catalog_eligibility",
+  "product_type": "Mobile 5G Enterprise",
+  "client_id": "CLI-00024",
+  "order_id": null,
+  "created_at": "2026-08-17T20:43:38.721882+00:00",
+  "related_log_pattern": "CATALOG_ELIGIBILITY_ERROR product_id=5G_ROAM base_plan=",
+  "tmf621": {
+    "id": "TICK-CCU-0024",
+    "href": "/tmf621/troubleTicket/TICK-CCU-0024",
+    "creationDate": "2026-08-17T20:43:38.721882+00:00",
+    "description": "Catalog eligibility conflict for 5G add-on",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "catalog_eligibility",
+    "relatedParty": [
+      {
+        "id": "CLI-00024",
+        "role": "customer"
+      }
+    ],
+    "relatedObject": []
+  }
+}

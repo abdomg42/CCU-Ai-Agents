@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00445",
+  "summary": "Fees/services configuration not saving",
+  "description": "Sales Agents reported missing equipment options in the selection dropdown menu, limiting their ability to choose the appropriate devices for merchants.",
+  "root_cause": "undetermined",
+  "resolution": "Identified the network issue as a temporary outage due to a hardware failure. Network Ops team swiftly resolved the hardware problem, restored connectivity, and ensured the successful submission of location data for the merchant ID.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00445",
+    "href": "/tmf621/troubleTicket/INC00445",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Fees/services configuration not saving",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Software"
+  }
+}

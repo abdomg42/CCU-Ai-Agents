@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00251",
+  "summary": "Unable to select equipment for merchant",
+  "description": "Certain sales agents are facing an access permission error that is blocking them from configuring fees and services for specific merchants. This issue is hindering the customization of service offerings.",
+  "root_cause": "undetermined",
+  "resolution": "The network timeout issue was addressed by optimizing network settings and increasing timeout thresholds, allowing Sales Agents to successfully complete the equipment selection process without further interruptions.",
+  "tags": [
+    "access"
+  ],
+  "priority": "P1",
+  "status": "new",
+  "category": "Access",
+  "created_at": "2026-08-17T20:43:35.805991+00:00",
+  "tmf621": {
+    "id": "INC00251",
+    "href": "/tmf621/troubleTicket/INC00251",
+    "creationDate": "2026-08-17T20:43:35.805991+00:00",
+    "description": "Unable to select equipment for merchant",
+    "severity": "P1",
+    "priority": "P1",
+    "status": "new",
+    "type": "Access"
+  }
+}

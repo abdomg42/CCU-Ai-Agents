@@ -1,0 +1,25 @@
+{
+  "ticket_id": "INC00377",
+  "summary": "Merchant UI not responsive for e-signature",
+  "description": "While configuring equipment for a new merchant, Sales Agent experienced network timeouts leading to delays in selecting the required hardware, affecting the efficiency of onboarding processes.",
+  "root_cause": "undetermined",
+  "resolution": "The network timeout issue was addressed by optimizing network settings and increasing timeout thresholds, allowing Sales Agents to successfully complete the equipment selection process without further interruptions.",
+  "tags": [
+    "network",
+    "pon"
+  ],
+  "priority": "P1",
+  "status": "new",
+  "category": "Network",
+  "created_at": "2026-08-17T20:43:35.830586+00:00",
+  "tmf621": {
+    "id": "INC00377",
+    "href": "/tmf621/troubleTicket/INC00377",
+    "creationDate": "2026-08-17T20:43:35.830586+00:00",
+    "description": "Merchant UI not responsive for e-signature",
+    "severity": "P1",
+    "priority": "P1",
+    "status": "new",
+    "type": "Network"
+  }
+}

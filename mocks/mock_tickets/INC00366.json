@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00366",
+  "summary": "Merchant data not transferring to Processing stage",
+  "description": "Sales Agent observes that the system is inaccurately calculating processing fees for a specific merchant account, leading to discrepancies in the final agreement.",
+  "root_cause": "undetermined",
+  "resolution": "Access permissions for the Sales Agent role were reviewed and corrected to ensure proper access to the fee configuration page, enabling seamless configuration of fees for merchant accounts.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00366",
+    "href": "/tmf621/troubleTicket/INC00366",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Merchant data not transferring to Processing stage",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "Software"
+  }
+}

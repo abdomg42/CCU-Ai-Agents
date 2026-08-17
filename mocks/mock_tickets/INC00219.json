@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00219",
+  "summary": "Error accessing merchant agreement PDF",
+  "description": "Merchant data entered by Sales Agents in the Sales UI is not transferring to the Processing stage even after completion, halting the onboarding process for affected merchants.",
+  "root_cause": "undetermined",
+  "resolution": "Backend developers investigated the issue and resolved the database conflict causing the duplication error. Sales Agent successfully continued with setting up the new location.",
+  "tags": [
+    "hardware"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Hardware",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00219",
+    "href": "/tmf621/troubleTicket/INC00219",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Error accessing merchant agreement PDF",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Hardware"
+  }
+}

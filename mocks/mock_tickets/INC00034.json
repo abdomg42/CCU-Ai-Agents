@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00034",
+  "summary": "Unable to add new equipment for merchant",
+  "description": "Some merchants receive authentication errors when attempting to log in to the Customer UI to review and e-sign the Merchant Agreement, preventing access to the document.",
+  "root_cause": "undetermined",
+  "resolution": "Resolved the issue by clearing the browser cache and refreshing the page, ensuring the PDF now loads correctly for the Merchant.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00034",
+    "href": "/tmf621/troubleTicket/INC00034",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Unable to add new equipment for merchant",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "Software"
+  }
+}

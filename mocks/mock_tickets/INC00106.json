@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00106",
+  "summary": "Inability to submit Merchant Agreement for e-signature",
+  "description": "Sales Agent reported that the system did not recognize the merchant ID when trying to onboard an additional location. This led to a mismatch in data and prevented the new location from being linked to the correct merchant.",
+  "root_cause": "undetermined",
+  "resolution": "User permissions for the Sales Agent were reviewed and updated to ensure proper access to merchant data. The system cache was cleared to reflect the correct merchant ID for the new location.",
+  "tags": [
+    "network"
+  ],
+  "priority": "P2",
+  "status": "new",
+  "category": "Network",
+  "created_at": "2026-08-17T20:43:35.816247+00:00",
+  "tmf621": {
+    "id": "INC00106",
+    "href": "/tmf621/troubleTicket/INC00106",
+    "creationDate": "2026-08-17T20:43:35.816247+00:00",
+    "description": "Inability to submit Merchant Agreement for e-signature",
+    "severity": "P2",
+    "priority": "P2",
+    "status": "new",
+    "type": "Network"
+  }
+}

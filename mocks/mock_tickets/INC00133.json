@@ -1,0 +1,24 @@
+{
+  "ticket_id": "INC00133",
+  "summary": "Login credentials not working for merchant",
+  "description": "An issue arose where fees were calculated inaccurately for a specific equipment bundle, leading to potential financial discrepancies; Sales Agent and Merchant affected.",
+  "root_cause": "undetermined",
+  "resolution": "Identified a bug in the fee calculation algorithm. Patched the software, recalculated fees, and conducted thorough testing to ensure accurate calculations going forward.",
+  "tags": [
+    "software"
+  ],
+  "priority": "P3",
+  "status": "new",
+  "category": "Software",
+  "created_at": "2026-08-17T20:43:35.805991+00:00",
+  "tmf621": {
+    "id": "INC00133",
+    "href": "/tmf621/troubleTicket/INC00133",
+    "creationDate": "2026-08-17T20:43:35.805991+00:00",
+    "description": "Login credentials not working for merchant",
+    "severity": "P3",
+    "priority": "P3",
+    "status": "new",
+    "type": "Software"
+  }
+}
