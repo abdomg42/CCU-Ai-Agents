@@ -1,64 +1,89 @@
-"""Générateur de rapport PDF pur Python (sans HTML/WeasyPrint).
+"""Générateur de rapport PDF via fpdf2.
 
-Génère un PDF A4 structuré directement via des opérateurs PDF bas niveau.
-Aucune dépendance externe (Jinja2/WeasyPrint/Pango) n'est requise.
+Avantages par rapport au générateur "pur Python" précédent :
+- placement d'images (logo) natif,
+- retour à la ligne automatique des paragraphes,
+- mise en page compacte (tableaux, badges colorés, en-tête/pied de page).
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-Colour = tuple[float, float, float]
+from fpdf import FPDF
+from fpdf.enums import XPos, YPos
 
-PAGE_WIDTH = 595
-PAGE_HEIGHT = 842
+from config.settings import get_settings
 
-MARGIN_LEFT = 50
-MARGIN_RIGHT = 50
-MARGIN_TOP = 80
-MARGIN_BOTTOM = 60
 
-LINE_HEIGHT = 14
-LINE_HEIGHT_LARGE = 28
+# Chemins courants de polices Unicode sur Windows / Linux / macOS
+_UNICODE_FONT_CANDIDATES = [
+    # Windows
+    ("C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/arialbd.ttf"),
+    ("C:/Windows/Fonts/calibri.ttf", "C:/Windows/Fonts/calibrib.ttf"),
+    ("C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/segoeuib.ttf"),
+    # Linux (Debian/Ubuntu, RHEL/CentOS, Alpine)
+    ("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
+    ("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+     "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"),
+    # macOS
+    ("/Library/Fonts/Arial.ttf", "/Library/Fonts/Arial Bold.ttf"),
+]
 
-CHARS_PER_LINE = 90
-LABEL_COLUMN_OFFSET = 160
 
-BULLET = "\xb7"
+def _find_unicode_font() -> dict[str, str] | None:
+    """Trouve une police Unicode système avec sa version grasse."""
+    for regular, bold in _UNICODE_FONT_CANDIDATES:
+        reg_path = Path(regular)
+        bold_path = Path(bold)
+        if reg_path.exists():
+            return {
+                "": str(reg_path),
+                "B": str(bold_path) if bold_path.exists() else str(reg_path),
+            }
+    return None
+
+
+PAGE_WIDTH_MM = 210
+PAGE_HEIGHT_MM = 297
+
+MARGIN_LEFT = 15
+MARGIN_RIGHT = 15
+MARGIN_TOP = 15
+MARGIN_BOTTOM = 15
+
+LOGO_PATH = Path(__file__).resolve().parents[2] / "reports" / "logo.png"
+LOGO_WIDTH_MM = 65
 
 DISCLAIMER = (
     "This report is generated automatically by the CCU Diagnostic Agent. "
     "No technical action is executed on production systems."
 )
 
-BLACK: Colour = (0.0, 0.0, 0.0)
-WHITE: Colour = (1.0, 1.0, 1.0)
-GREY_LABEL: Colour = (0.4, 0.4, 0.4)
-BRAND_DARK: Colour = (0.0, 0.2, 0.4)
-BRAND_MID: Colour = (0.12, 0.35, 0.6)
-BRAND_LIGHT: Colour = (0.9, 0.94, 0.98)
-RULE_LIGHT: Colour = (0.82, 0.86, 0.9)
-PAGE_NUM_C: Colour = (0.75, 0.85, 0.95)
+# Couleurs RVB normalisées 0..1 -> fpdf attend 0..255
+BRAND_DARK = (0, 43, 82)
+BRAND_MID = (30, 89, 153)
+BRAND_LIGHT = (230, 240, 250)
+GREY_LABEL = (102, 102, 102)
+GREY_FOOTER = (128, 128, 128)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
-CONFIDENCE_COLOURS: dict[str, Colour] = {
-    "high": (0.1, 0.55, 0.2),
-    "medium": (0.85, 0.55, 0.0),
-    "low": (0.7, 0.15, 0.15),
-    "unknown": (0.4, 0.4, 0.4),
+CONFIDENCE_COLOURS = {
+    "high": (26, 140, 51),
+    "medium": (217, 140, 0),
+    "low": (179, 38, 38),
+    "unknown": (102, 102, 102),
 }
 
-PRIORITY_COLOURS: dict[str, Colour] = {
-    "p1": (0.7, 0.1, 0.1),
-    "p2": (0.85, 0.45, 0.0),
-    "p3": (0.1, 0.5, 0.2),
-    "unknown": (0.4, 0.4, 0.4),
+PRIORITY_COLOURS = {
+    "p1": (179, 26, 26),
+    "p2": (217, 115, 0),
+    "p3": (26, 128, 51),
+    "unknown": (102, 102, 102),
 }
-
-
-def _escape(text: str) -> str:
-    return str(text).replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
 
 
 def _safe(value: Any, default: str = "--") -> str:
@@ -76,307 +101,238 @@ def _confidence_label(confidence: str | None) -> str:
     return "unknown"
 
 
-def _priority_colour(priority: str) -> Colour:
+def _priority_colour(priority: str) -> tuple[int, int, int]:
     return PRIORITY_COLOURS.get(str(priority).lower().replace(" ", ""), PRIORITY_COLOURS["unknown"])
 
 
-def _confidence_colour(confidence: str | None) -> Colour:
+def _confidence_colour(confidence: str | None) -> tuple[int, int, int]:
     return CONFIDENCE_COLOURS.get(_confidence_label(confidence), CONFIDENCE_COLOURS["unknown"])
 
 
-@dataclass
-class _PDFBuilder:
-    _pages: list[list[str]] = field(default_factory=list)
-    _current_page: list[str] = field(default_factory=list)
-    _page_number: int = field(default=1)
-    current_y: int = PAGE_HEIGHT - MARGIN_TOP
+def _format_iso(iso: str) -> str:
+    """Raccourcit une date ISO en format lisible."""
+    try:
+        dt = datetime.fromisoformat(iso)
+        return dt.strftime("%Y-%m-%d %H:%M UTC")
+    except Exception:
+        return iso
 
-    def _advance(self, amount: int) -> None:
-        self.current_y -= amount
 
-    def _ensure_space(self, needed: int) -> None:
-        if self.current_y < MARGIN_BOTTOM + needed:
-            self._new_page()
+class _DiagnosticPDF(FPDF):
+    """FPDF personnalisé avec en-tête (logo) et pied de page."""
 
-    def _new_page(self) -> None:
-        if self._current_page:
-            self._pages.append(self._current_page)
-        self._current_page = []
-        self._page_number += 1
-        self.current_y = PAGE_HEIGHT - MARGIN_TOP
+    def __init__(self, report_id: str = "") -> None:
+        super().__init__()
+        self.report_id = report_id
+        self.set_auto_page_break(auto=True, margin=MARGIN_BOTTOM)
+        self.set_margins(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT)
 
-    @staticmethod
-    def _text_op(text: str, x: float, y: float, size: int, colour: Colour) -> str:
-        r, g, b = colour
-        return (
-            f"BT /F1 {size} Tf {x:.1f} {y:.1f} Td "
-            f"{r:.3f} {g:.3f} {b:.3f} rg ({_escape(text)}) Tj ET"
-        )
+        # Police Unicode si disponible, sinon Helvetica (Latin-1)
+        font_family = "ReportFont"
+        font_files = _find_unicode_font()
+        if font_files:
+            for style, path in font_files.items():
+                self.add_font(font_family, style, path)
+        else:
+            # Fallback : on reste sur Helvetica et on nettoiera le texte
+            font_family = "Helvetica"
+        self._font_family = font_family
 
-    @staticmethod
-    def _rect_op(x: float, y: float, w: float, h: float, colour: Colour) -> str:
-        r, g, b = colour
-        return f"{r:.3f} {g:.3f} {b:.3f} rg {x:.1f} {y:.1f} {w:.1f} {h:.1f} re f"
+    def header(self) -> None:
+        # Logo sur fond blanc en haut à gauche
+        logo_path = self._logo_path()
+        logo_height = LOGO_WIDTH_MM * (371 / 1280)  # ratio du logo Inetum
+        if logo_path.exists():
+            self.image(str(logo_path), x=MARGIN_LEFT, y=4, w=LOGO_WIDTH_MM)
 
-    @staticmethod
-    def _line_op(
-        x1: float, y1: float, x2: float, y2: float, colour: Colour, width: float = 0.5
-    ) -> str:
-        r, g, b = colour
-        return (
-            f"{width:.2f} w {r:.3f} {g:.3f} {b:.3f} RG "
-            f"{x1:.1f} {y1:.1f} m {x2:.1f} {y2:.1f} l S"
-        )
+        # Titre et ID du rapport à droite, alignés verticalement avec le logo
+        title_y = 4 + (logo_height / 2) - 6
+        self.set_xy(MARGIN_LEFT + LOGO_WIDTH_MM + 8, title_y)
+        self.set_font(self._font_family, "B", 14)
+        self.set_text_color(*BRAND_DARK)
+        self.cell(0, 9, "CCU DIAGNOSTIC REPORT", align="L")
 
-    def _emit(self, op: str) -> None:
-        self._current_page.append(op)
+        self.set_xy(-MARGIN_RIGHT - 70, title_y + 7)
+        self.set_font(self._font_family, "", 8)
+        self.set_text_color(*GREY_LABEL)
+        self.cell(70, 5, self.report_id, align="R")
 
-    def draw_text(
-        self, text: str, x: float, size: int, colour: Colour = BLACK, advance: bool = True
-    ) -> None:
-        self._emit(self._text_op(text, x, self.current_y, size, colour))
-        if advance:
-            self._advance(LINE_HEIGHT)
+        # Bandeau de marque sous le logo (fond bleu foncé)
+        self.set_fill_color(*BRAND_DARK)
+        self.rect(0, 22, PAGE_WIDTH_MM, 7, style="F")
 
-    def draw_rect(self, x: float, y: float, w: float, h: float, colour: Colour = BRAND_LIGHT) -> None:
-        self._emit(self._rect_op(x, y, w, h, colour))
+        # Trait de séparation
+        self.set_draw_color(*BRAND_MID)
+        self.set_line_width(0.5)
+        self.line(MARGIN_LEFT, 31, PAGE_WIDTH_MM - MARGIN_RIGHT, 31)
 
-    def draw_line(
-        self, x1: float, y1: float, x2: float, y2: float, colour: Colour = BLACK, width: float = 0.5
-    ) -> None:
-        self._emit(self._line_op(x1, y1, x2, y2, colour, width))
+    def footer(self) -> None:
+        self.set_y(-12)
+        self.set_draw_color(*BRAND_MID)
+        self.set_line_width(0.3)
+        self.line(MARGIN_LEFT, self.get_y(), PAGE_WIDTH_MM - MARGIN_RIGHT, self.get_y())
+        self.set_font(self._font_family, "", 7)
+        self.set_text_color(*GREY_FOOTER)
+        self.cell(0, 5, DISCLAIMER, align="L")
+        self.set_x(-MARGIN_RIGHT - 20)
+        self.cell(20, 5, f"Page {self.page_no()}", align="R")
 
-    def build(self, path: Path, total_pages: int) -> None:
-        if self._current_page:
-            self._pages.append(self._current_page)
-
-        objects: list[str] = []
-
-        def add_obj(content: str) -> int:
-            objects.append(content)
-            return len(objects)
-
-        font_id = add_obj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
-        page_ids: list[int] = []
-        content_ids: list[int] = []
-
-        for page_idx, page in enumerate(self._pages, 1):
-            ops = list(page)
-
-            br, bg, bb = BRAND_DARK
-            ops.insert(0, f"{br:.3f} {bg:.3f} {bb:.3f} rg 0 {PAGE_HEIGHT - 50:.1f} {PAGE_WIDTH:.1f} 50 re f")
-            ops.insert(1, self._text_op("CCU DIAGNOSTIC REPORT", 50, PAGE_HEIGHT - 22, 9, WHITE))
-            ops.insert(
-                2,
-                self._text_op(
-                    f"Page {page_idx} of {total_pages}", PAGE_WIDTH - 110, PAGE_HEIGHT - 22, 8, PAGE_NUM_C
-                ),
-            )
-
-            footer_y = MARGIN_BOTTOM - 20
-            ops.append(
-                self._line_op(
-                    MARGIN_LEFT, footer_y + 12, PAGE_WIDTH - MARGIN_RIGHT, footer_y + 12, BRAND_DARK, 0.5
-                )
-            )
-            ops.append(self._text_op(DISCLAIMER, MARGIN_LEFT, footer_y, 7, GREY_LABEL))
-
-            stream = "\n".join(ops)
-            enc_len = len(stream.encode("latin-1", "replace"))
-            content_id = add_obj(f"<< /Length {enc_len} >>\nstream\n{stream}\nendstream")
-            content_ids.append(content_id)
-            page_ids.append(add_obj(""))
-
-        kids = " ".join(f"{p} 0 R" for p in page_ids)
-        pages_id = add_obj(f"<< /Type /Pages /Kids [{kids}] /Count {len(page_ids)} >>")
-
-        for i, pid in enumerate(page_ids):
-            objects[pid - 1] = (
-                "<< /Type /Page "
-                f"/Parent {pages_id} 0 R "
-                "/MediaBox [0 0 595 842] "
-                f"/Resources << /Font << /F1 {font_id} 0 R >> >> "
-                f"/Contents {content_ids[i]} 0 R >>"
-            )
-
-        catalog_id = add_obj(f"<< /Type /Catalog /Pages {pages_id} 0 R >>")
-
-        parts: list[str] = ["%PDF-1.4\n"]
-        offsets: list[int] = [0]
-        for i, obj in enumerate(objects, 1):
-            offsets.append(sum(len(p.encode("latin-1", "replace")) for p in parts))
-            parts.append(f"{i} 0 obj\n{obj}\nendobj\n")
-
-        xref_offset = sum(len(p.encode("latin-1", "replace")) for p in parts)
-        parts.append(f"xref\n0 {len(objects) + 1}\n")
-        parts.append("0000000000 65535 f \n")
-        for off in offsets[1:]:
-            parts.append(f"{off:010d} 00000 n \n")
-        parts.append(
-            f"trailer\n<< /Size {len(objects) + 1} /Root {catalog_id} 0 R >>\n"
-            f"startxref\n{xref_offset}\n%%EOF"
-        )
-
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes("".join(parts).encode("latin-1", "replace"))
+    def _logo_path(self) -> Path:
+        # Permet d'outrepasser le chemin via les settings si un logo alternatif est défini.
+        settings = get_settings()
+        custom = getattr(settings, "REPORT_LOGO_PATH", None)
+        if custom:
+            return Path(custom)
+        return LOGO_PATH
 
 
 class ReportRenderer:
+    """Facade conservée pour compatibilité ascendante."""
+
     def __init__(self) -> None:
-        self._pdf = _PDFBuilder()
+        self._pdf: _DiagnosticPDF | None = None
 
     def add_heading1(self, text: str) -> None:
-        self._pdf._ensure_space(60)
-        band_h = 40
-        self._pdf.draw_rect(0, self._pdf.current_y - band_h + 24, PAGE_WIDTH, band_h, BRAND_DARK)
-        self._pdf.draw_text(text, MARGIN_LEFT, 20, WHITE)
-        self._pdf._advance(20)
+        pdf = self._pdf
+        assert pdf is not None
+        pdf.set_font(pdf._font_family, "B", 16)
+        pdf.set_text_color(*WHITE)
+        pdf.set_fill_color(*BRAND_DARK)
+        pdf.set_draw_color(*BRAND_DARK)
+        pdf.cell(0, 8, f"  {text}  ", new_x=XPos.LMARGIN, new_y=YPos.NEXT, fill=True)
+        pdf.ln(2)
 
     def add_heading2(self, text: str) -> None:
-        self._pdf._ensure_space(50)
-        self._pdf._advance(12)
-        self._pdf.draw_text(text, MARGIN_LEFT, 13, BRAND_MID)
-        rule_y = self._pdf.current_y + 2
-        self._pdf.draw_line(MARGIN_LEFT, rule_y, PAGE_WIDTH - MARGIN_RIGHT, rule_y, BRAND_MID, 0.8)
-        self._pdf._advance(8)
+        pdf = self._pdf
+        assert pdf is not None
+        pdf.set_font(pdf._font_family, "B", 11)
+        pdf.set_text_color(*BRAND_MID)
+        pdf.cell(0, 7, text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.set_draw_color(*BRAND_MID)
+        pdf.set_line_width(0.3)
+        x = pdf.get_x()
+        y = pdf.get_y()
+        pdf.line(x, y, PAGE_WIDTH_MM - MARGIN_RIGHT, y)
+        pdf.ln(1)
 
     def add_paragraph(self, text: str, size: int = 10) -> None:
-        self._pdf._ensure_space(40)
-        safe_text = _escape(_safe(text, "No information provided"))
-        line_buffer = ""
-        for word in safe_text.split():
-            if len(line_buffer) + len(word) > CHARS_PER_LINE:
-                self._pdf.draw_text(line_buffer, MARGIN_LEFT, size)
-                self._pdf._ensure_space(20)
-                line_buffer = word
-            else:
-                line_buffer += (" " if line_buffer else "") + word
-        if line_buffer:
-            self._pdf.draw_text(line_buffer, MARGIN_LEFT, size)
-        self._pdf._advance(6)
-
-    def add_key_value(self, label: str, value: Any) -> None:
-        self._pdf._ensure_space(20)
-        self._pdf._emit(
-            self._pdf._text_op(
-                _escape(_safe(label, "N/A")),
-                MARGIN_LEFT,
-                self._pdf.current_y,
-                9,
-                GREY_LABEL,
-            )
-        )
-        self._pdf._emit(
-            self._pdf._text_op(
-                _escape(_safe(value, "Unknown")),
-                MARGIN_LEFT + LABEL_COLUMN_OFFSET,
-                self._pdf.current_y,
-                9,
-                BLACK,
-            )
-        )
-        self._pdf._advance(LINE_HEIGHT)
+        pdf = self._pdf
+        assert pdf is not None
+        pdf.set_font(pdf._font_family, "", size)
+        pdf.set_text_color(*BLACK)
+        safe_text = _safe(text, "No information provided")
+        pdf.multi_cell(0, 4.5, safe_text)
+        pdf.ln(1)
 
     def add_metadata_block(self, pairs: list[tuple[str, str]]) -> None:
-        self._pdf._ensure_space(len(pairs) * LINE_HEIGHT + 24)
-        box_top = self._pdf.current_y + 8
-        box_h = len(pairs) * LINE_HEIGHT + 14
-        self._pdf.draw_rect(
-            MARGIN_LEFT,
-            box_top - box_h,
-            PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT,
-            box_h,
-            BRAND_LIGHT,
-        )
-        self._pdf.draw_line(MARGIN_LEFT, box_top, PAGE_WIDTH - MARGIN_RIGHT, box_top, BRAND_MID, 0.4)
-        self._pdf.draw_line(
-            MARGIN_LEFT,
-            box_top - box_h,
-            PAGE_WIDTH - MARGIN_RIGHT,
-            box_top - box_h,
-            BRAND_MID,
-            0.4,
-        )
-        self._pdf._advance(8)
-        for label, value in pairs:
-            self._pdf._emit(
-                self._pdf._text_op(
-                    _escape(label),
-                    MARGIN_LEFT + 8,
-                    self._pdf.current_y,
-                    9,
-                    GREY_LABEL,
-                )
-            )
-            self._pdf._emit(
-                self._pdf._text_op(
-                    _escape(value),
-                    MARGIN_LEFT + 8 + LABEL_COLUMN_OFFSET,
-                    self._pdf.current_y,
-                    9,
-                    BLACK,
-                )
-            )
-            self._pdf._advance(LINE_HEIGHT)
-        self._pdf._advance(10)
+        pdf = self._pdf
+        assert pdf is not None
+
+        col1_w = 55
+        col2_w = PAGE_WIDTH_MM - MARGIN_LEFT - MARGIN_RIGHT - col1_w
+        row_h = 5.5
+
+        pdf.set_fill_color(*BRAND_LIGHT)
+        pdf.set_draw_color(*BRAND_MID)
+        pdf.set_line_width(0.2)
+
+        # Bordure extérieure
+        start_y = pdf.get_y()
+        total_h = len(pairs) * row_h + 3
+        pdf.rect(MARGIN_LEFT, start_y, PAGE_WIDTH_MM - MARGIN_LEFT - MARGIN_RIGHT, total_h, style="D")
+
+        for i, (label, value) in enumerate(pairs):
+            y = start_y + 1.5 + i * row_h
+            pdf.set_xy(MARGIN_LEFT + 2, y)
+            pdf.set_font(pdf._font_family, "B", 9)
+            pdf.set_text_color(*GREY_LABEL)
+            pdf.cell(col1_w, row_h, label)
+
+            pdf.set_xy(MARGIN_LEFT + col1_w + 2, y)
+            pdf.set_font(pdf._font_family, "", 9)
+            pdf.set_text_color(*BLACK)
+            display_value = _safe(value)
+            if label.lower() in {"generated", "detected"} and display_value not in ("--", "N/A"):
+                display_value = _format_iso(display_value)
+            pdf.cell(col2_w, row_h, display_value)
+
+        pdf.set_xy(MARGIN_LEFT, start_y + total_h + 1)
 
     def add_priority_badge(self, priority: str) -> None:
-        self._pdf._ensure_space(30)
+        pdf = self._pdf
+        assert pdf is not None
         colour = _priority_colour(priority)
         label = f"  Priority: {str(priority).upper()}  "
-        badge_w = len(label) * 5.8
-        self._pdf.draw_rect(MARGIN_LEFT, self._pdf.current_y - 4, badge_w, 17, colour)
-        self._pdf._emit(self._pdf._text_op(_escape(label), MARGIN_LEFT, self._pdf.current_y + 2, 9, WHITE))
-        self._pdf._advance(24)
+        pdf.set_font(pdf._font_family, "B", 9)
+        pdf.set_fill_color(*colour)
+        pdf.set_text_color(*WHITE)
+        pdf.cell(pdf.get_string_width(label) + 4, 7, label, fill=True, new_x=XPos.RIGHT, new_y=YPos.TOP)
+        pdf.set_text_color(*BLACK)
 
     def add_confidence_badge(self, confidence: str | None) -> None:
-        self._pdf._ensure_space(30)
+        pdf = self._pdf
+        assert pdf is not None
         colour = _confidence_colour(confidence)
         label = f"  Confidence: {_confidence_label(confidence).upper()}  "
-        badge_w = len(label) * 5.8
-        self._pdf.draw_rect(MARGIN_LEFT, self._pdf.current_y - 4, badge_w, 17, colour)
-        self._pdf._emit(self._pdf._text_op(_escape(label), MARGIN_LEFT, self._pdf.current_y + 2, 9, WHITE))
-        self._pdf._advance(24)
+        pdf.set_font(pdf._font_family, "B", 9)
+        pdf.set_fill_color(*colour)
+        pdf.set_text_color(*WHITE)
+        pdf.cell(pdf.get_string_width(label) + 4, 7, label, fill=True, new_x=XPos.RIGHT, new_y=YPos.TOP)
+        pdf.set_text_color(*BLACK)
+
+    def add_key_value(self, label: str, value: Any) -> None:
+        pdf = self._pdf
+        assert pdf is not None
+        pdf.set_font(pdf._font_family, "B", 9)
+        pdf.set_text_color(*GREY_LABEL)
+        pdf.cell(50, 5, f"{label}:")
+        pdf.set_font(pdf._font_family, "", 9)
+        pdf.set_text_color(*BLACK)
+        pdf.cell(0, 5, _safe(value), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.ln(1)
 
     def add_list(self, items: list[str] | None) -> None:
+        pdf = self._pdf
+        assert pdf is not None
+        pdf.set_font(pdf._font_family, "", 10)
+        pdf.set_text_color(*BLACK)
         for item in items or ["No data available"]:
-            self._pdf._ensure_space(20)
-            self._pdf._emit(self._pdf._text_op(BULLET, MARGIN_LEFT + 4, self._pdf.current_y, 12, BRAND_MID))
-            self._pdf._emit(
-                self._pdf._text_op(
-                    _escape(_safe(item, "N/A")),
-                    MARGIN_LEFT + 18,
-                    self._pdf.current_y,
-                    9,
-                    BLACK,
-                )
-            )
-            self._pdf._advance(LINE_HEIGHT)
-        self._pdf._advance(6)
+            pdf.set_x(MARGIN_LEFT + 4)
+            pdf.cell(4, 5, "\xb7", new_x=XPos.RIGHT, new_y=YPos.TOP)
+            pdf.multi_cell(0, 5, _safe(item))
+        pdf.ln(1)
 
     def add_section_break(self) -> None:
-        self._pdf._advance(LINE_HEIGHT_LARGE)
+        pdf = self._pdf
+        assert pdf is not None
+        pdf.ln(2)
 
     def save(self, path: Path) -> Path:
-        total = len(self._pdf._pages) + (1 if self._pdf._current_page else 0)
-        self._pdf.build(path, total)
+        assert self._pdf is not None
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self._pdf.output(str(path))
         return path
 
 
 def generate_diagnostic_report(report: dict[str, Any], output_path: Path) -> Path:
-    """Génère un rapport PDF de diagnostic CCU.
-
-    `report` attend les clés utilisées par `ReportGeneratorAgent._build_report_data`.
-    """
+    """Génère un rapport PDF de diagnostic CCU avec logo et mise en page compacte."""
     renderer = ReportRenderer()
+    renderer._pdf = _DiagnosticPDF(report_id=_safe(report.get("report_id")))
+    pdf = renderer._pdf
+    pdf.add_page()
+
+    # L'origine d'écriture commence sous l'en-tête dessiné automatiquement
+    pdf.set_xy(MARGIN_LEFT, 33)
 
     renderer.add_heading1(_safe(report.get("title"), "CCU Diagnostic Report"))
+
+    # Badges côte à côte pour gagner de la place verticale
     renderer.add_priority_badge(report.get("priority"))
     renderer.add_confidence_badge(report.get("confidence_level"))
+    pdf.ln(8)
 
     renderer.add_metadata_block(
         [
-            ("Report ID", _safe(report.get("report_id"))),
             ("Incident ID", _safe(report.get("incident_id"))),
             ("Generated", _safe(report.get("generated_at"))),
             ("Detected", _safe(report.get("detected_at"))),

@@ -23,9 +23,9 @@ def build_sample_data() -> dict:
             "Customer acc-12345 reported a complete Internet outage on service svc-fiber-12345. "
             "The associated order ord-2026-001 is blocked in CPE provisioning."
         ),
-        "confidence_level": "moyenne",
+        "confidence_level": "medium",
         "confidence_label": "medium",
-        "root_cause": "Perte de signal fibre optique",
+        "root_cause": "Optical fiber signal loss on the OLT serving the customer premises",
         "sources": [
             "log-olt-001 (RX power < -28 dBm)",
             "TICK-2025-014 (similar fiber outage)",

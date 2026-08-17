@@ -18,6 +18,18 @@ datasets>=3.0.0
 
 # UI
 streamlit>=1.38.0
+plotly>=5.0.0
+pyvis>=0.3.0
+streamlit-agraph>=0.0.45
+
+# Database
+psycopg2-binary>=2.9.0
+
+# Messaging
+kafka-python-ng>=2.2.0
+
+# PDF generation
+fpdf2>=2.8.0
 
 # Development / test dependencies
 pytest-asyncio>=0.23.0

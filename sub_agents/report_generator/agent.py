@@ -68,7 +68,7 @@ def _build_report_data(state: GraphState) -> dict[str, Any]:
     detected_at = incident.get("detected_at") or generated_at
 
     return {
-        "title": incident.get("title", "CCU Diagnostic Report"),
+        "title": incident.get("title", "AI Diagnostic Report"),
         "report_id": report_id,
         "generated_at": generated_at,
         "incident_id": incident_id,
