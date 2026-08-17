@@ -31,10 +31,11 @@ def add_diagnostic_note(ticket_id: str, incident_id: str, report_path: str) -> d
         logger.warning("Impossible d'ajouter une note Zammad : ID Zammad introuvable dans %s", ticket_id)
         return {"added": False, "reason": "no_zammad_id", "ticket_id": ticket_id}
 
+    report_name = Path(report_path).name if report_path else ""
     body = (
-        f"Diagnostic agent report generated for incident {incident_id}.\n"
-        f"Report path: {report_path}\n\n"
-        "Full report sent by email."
+        f"Rapport de diagnostic généré pour l'incident {incident_id}.\n"
+        f"Fichier : {report_name}\n\n"
+        "Le rapport complet a été envoyé par email aux destinataires configurés."
     )
 
     try:

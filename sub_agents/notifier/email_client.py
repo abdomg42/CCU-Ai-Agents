@@ -34,16 +34,69 @@ class EmailClient:
         self.use_tls = settings.SMTP_USE_TLS
         self.recipients = settings.REPORT_RECIPIENTS
 
-    def build_subject(self, incident_id: str, confidence_label: str) -> str:
-        return f"[CCU] Incident Report {incident_id} - {confidence_label} confidence"
+    def build_subject(self, context: dict[str, Any]) -> str:
+        incident_id = context.get("incident_id", "N/A")
+        incident_type = context.get("incident_type", "")
+        priority = context.get("priority", "")
+        parts = ["[CCU] Incident détecté"]
+        if incident_type:
+            parts.append(incident_type)
+        if priority:
+            parts.append(f"priorité {priority}")
+        parts.append(f"{incident_id}")
+        return " - ".join(parts)
 
-    def build_body(self, incident_id: str, report_path: str) -> str:
-        return (
-            f"Please find attached the diagnostic report for incident {incident_id}.\n\n"
-            f"Report path: {report_path}\n\n"
-            "This message was generated automatically by the CCU Diagnostic Agent. "
-            "No technical action has been executed on production systems."
-        )
+    def build_body(self, context: dict[str, Any]) -> str:
+        incident_id = context.get("incident_id", "N/A")
+        report_path = context.get("report_path", "")
+        report_name = Path(report_path).name if report_path else ""
+
+        lines = [
+            "Bonjour,",
+            "",
+            f"Un incident a été détecté pour le client {context.get('customer_id', 'N/A')}.",
+            "",
+            "Détails de l'incident :",
+            f"  - ID incident     : {incident_id}",
+            f"  - Service         : {context.get('service_id', 'N/A')}",
+            f"  - Commande        : {context.get('order_id', 'N/A')}",
+            f"  - Type de produit : {context.get('incident_type', 'N/A')}",
+            f"  - Priorité        : {context.get('priority', 'N/A')}",
+            f"  - Confiance       : {context.get('confidence', 'N/A')}",
+            "",
+            "Résumé :",
+            f"{context.get('what_happened', 'Aucune information disponible.')}",
+            "",
+            "Cause racine :",
+            f"{context.get('root_cause', 'Indéterminée')}",
+            "",
+            "Actions recommandées :",
+        ]
+
+        recommendation = context.get("recommendation", "")
+        if recommendation:
+            for line in recommendation.split("\n"):
+                line = line.strip()
+                if line:
+                    if line.startswith(("-", "*")):
+                        lines.append(line)
+                    else:
+                        lines.append(f"- {line}")
+        else:
+            lines.append("- Voir le rapport complet en pièce jointe.")
+
+        lines.extend([
+            "",
+            "Veuillez consulter le rapport complet en pièce jointe.",
+            "",
+            "Cordialement,",
+            "CCU Diagnostic Agent",
+            "",
+            "--",
+            "Ce message est généré automatiquement. Aucune action technique n'est exécutée sur les systèmes de production.",
+        ])
+
+        return "\n".join(lines)
 
     def send_report(
         self,
@@ -51,6 +104,7 @@ class EmailClient:
         confidence_label: str,
         report_path: str,
         recipients: list[str] | None = None,
+        context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Envoie le rapport par email avec pièce jointe."""
         recipients = recipients or self.recipients
@@ -58,11 +112,16 @@ class EmailClient:
             logger.warning("Aucun destinataire configuré pour l'envoi de rapport.")
             return {"sent": False, "reason": "no_recipients", "recipients": []}
 
+        context = context or {}
+        context.setdefault("incident_id", incident_id)
+        context.setdefault("confidence", confidence_label)
+        context.setdefault("report_path", report_path)
+
         msg = EmailMessage()
         msg["From"] = self.from_addr
         msg["To"] = ", ".join(recipients)
-        msg["Subject"] = self.build_subject(incident_id, confidence_label)
-        msg.set_content(self.build_body(incident_id, report_path))
+        msg["Subject"] = self.build_subject(context)
+        msg.set_content(self.build_body(context))
 
         path = Path(report_path)
         if path.exists():

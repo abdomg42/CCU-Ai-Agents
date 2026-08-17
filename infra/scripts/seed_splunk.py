@@ -31,8 +31,8 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 DEFAULT_SPLUNK_HOST = "localhost"
-DEFAULT_MGMT_PORT = 8088
-DEFAULT_HEC_PORT = 8089
+DEFAULT_MGMT_PORT = 8089
+DEFAULT_HEC_PORT = 8088
 DEFAULT_ADMIN_USER = "admin"
 DEFAULT_ADMIN_PASS = "SplunkAdmin123!"
 DEFAULT_INDEX = "main"

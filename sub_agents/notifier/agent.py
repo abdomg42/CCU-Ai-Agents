@@ -40,6 +40,26 @@ def _incident_id(state: GraphState) -> str:
     return f"INC-{parsed.customer_id or 'UNKNOWN'}"
 
 
+def _build_email_context(state: GraphState) -> dict[str, Any]:
+    incident = state.incident or {}
+    parsed = _as_parsed(state.parsed_incident)
+    root = state.root_cause or {}
+
+    return {
+        "incident_id": _incident_id(state),
+        "customer_id": parsed.customer_id or incident.get("customer_id", "N/A"),
+        "service_id": parsed.service_id or incident.get("service_id", "N/A"),
+        "order_id": parsed.order_id or incident.get("order_id", "N/A"),
+        "incident_type": parsed.incident_type or incident.get("incident_type", "N/A"),
+        "priority": parsed.priority or incident.get("priority", "N/A"),
+        "confidence": root.get("confidence", "N/A"),
+        "what_happened": state.sanitized_what_happened or incident.get("description", ""),
+        "root_cause": state.sanitized_root_cause or root.get("cause", "Indéterminée"),
+        "recommendation": state.sanitized_recommendation or state.remediation_explanation or "",
+        "report_path": state.report_path or "",
+    }
+
+
 class NotifierAgent:
     def run(self, state: GraphState) -> dict[str, Any]:
         audit_logger.log("notifier_start", {"report_path": state.report_path})
@@ -48,11 +68,13 @@ class NotifierAgent:
         confidence_label = _confidence_label(state)
         report_path = state.report_path or ""
         mapping = state.ticket_mapping or {}
+        context = _build_email_context(state)
 
         email_result = EmailClient().send_report(
             incident_id=incident_id,
             confidence_label=confidence_label,
             report_path=report_path,
+            context=context,
         )
 
         zammad_result = {"added": False}
