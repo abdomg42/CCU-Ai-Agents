@@ -15,7 +15,7 @@ def test_pii_sanitizer_replaces_email_and_phone():
     assert "john.doe@example.com" not in result["what_happened"]
     assert "[EMAIL_REDACTED]" in result["what_happened"]
     assert "+33 6 12 34 56 78" not in result["what_happened"]
-    assert "acc-12345" in result["what_happened"]
+    assert "[PHONE_REDACTED]" in result["what_happened"]
 
 
 def test_pii_sanitizer_keeps_technical_ids():

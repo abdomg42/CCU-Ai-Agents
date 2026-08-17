@@ -7,6 +7,7 @@ Avantages par rapport au générateur "pur Python" précédent :
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -58,8 +59,8 @@ LOGO_PATH = Path(__file__).resolve().parents[2] / "reports" / "logo.png"
 LOGO_WIDTH_MM = 65
 
 DISCLAIMER = (
-    "This report is generated automatically by the CCU Diagnostic Agent. "
-    "No technical action is executed on production systems."
+    "Ce rapport est généré automatiquement par le CCU Diagnostic Agent. "
+    "Aucune action technique n'est exécutée sur les systèmes de production."
 )
 
 # Couleurs RVB normalisées 0..1 -> fpdf attend 0..255
@@ -139,32 +140,38 @@ class _DiagnosticPDF(FPDF):
         self._font_family = font_family
 
     def header(self) -> None:
-        # Logo sur fond blanc en haut à gauche
         logo_path = self._logo_path()
         logo_height = LOGO_WIDTH_MM * (371 / 1280)  # ratio du logo Inetum
+        header_bottom = 4 + logo_height + 3
+
+        # Fond blanc sous toute la zone d'en-tête pour que le logo transparent ressorte.
+        self.set_fill_color(*WHITE)
+        self.rect(0, 0, PAGE_WIDTH_MM, header_bottom + 2, style="F")
+
+        # Logo en haut à gauche.
         if logo_path.exists():
             self.image(str(logo_path), x=MARGIN_LEFT, y=4, w=LOGO_WIDTH_MM)
 
-        # Titre et ID du rapport à droite, alignés verticalement avec le logo
-        title_y = 4 + (logo_height / 2) - 6
-        self.set_xy(MARGIN_LEFT + LOGO_WIDTH_MM + 8, title_y)
-        self.set_font(self._font_family, "B", 14)
+        # Titre aligné verticalement avec le centre du logo.
+        title_y = 4 + (logo_height / 2) - 5
+        self.set_xy(MARGIN_LEFT + LOGO_WIDTH_MM + 6, title_y)
+        self.set_font(self._font_family, "B", 13)
         self.set_text_color(*BRAND_DARK)
-        self.cell(0, 9, "CCU DIAGNOSTIC REPORT", align="L")
+        self.cell(0, 10, "RAPPORT DE DIAGNOSTIC CCU", align="L")
 
-        self.set_xy(-MARGIN_RIGHT - 70, title_y + 7)
-        self.set_font(self._font_family, "", 8)
+        # ID du rapport à droite, sur la même ligne que le titre.
+        self.set_xy(-MARGIN_RIGHT - 75, title_y)
+        self.set_font(self._font_family, "", 7)
         self.set_text_color(*GREY_LABEL)
-        self.cell(70, 5, self.report_id, align="R")
+        self.cell(75, 10, self.report_id, align="R")
 
-        # Bandeau de marque sous le logo (fond bleu foncé)
-        self.set_fill_color(*BRAND_DARK)
-        self.rect(0, 22, PAGE_WIDTH_MM, 7, style="F")
-
-        # Trait de séparation
+        # Trait de séparation sous l'en-tête.
         self.set_draw_color(*BRAND_MID)
         self.set_line_width(0.5)
-        self.line(MARGIN_LEFT, 31, PAGE_WIDTH_MM - MARGIN_RIGHT, 31)
+        self.line(MARGIN_LEFT, header_bottom, PAGE_WIDTH_MM - MARGIN_RIGHT, header_bottom)
+
+        # Positionne le curseur juste sous l'en-tête pour le contenu de la page.
+        self.set_y(header_bottom + 2)
 
     def footer(self) -> None:
         self.set_y(-12)
@@ -220,7 +227,7 @@ class ReportRenderer:
         assert pdf is not None
         pdf.set_font(pdf._font_family, "", size)
         pdf.set_text_color(*BLACK)
-        safe_text = _safe(text, "No information provided")
+        safe_text = _safe(text, "Aucune information disponible")
         pdf.multi_cell(0, 4.5, safe_text)
         pdf.ln(1)
 
@@ -262,7 +269,7 @@ class ReportRenderer:
         pdf = self._pdf
         assert pdf is not None
         colour = _priority_colour(priority)
-        label = f"  Priority: {str(priority).upper()}  "
+        label = f"  Priorité : {str(priority).upper()}  "
         pdf.set_font(pdf._font_family, "B", 9)
         pdf.set_fill_color(*colour)
         pdf.set_text_color(*WHITE)
@@ -273,7 +280,7 @@ class ReportRenderer:
         pdf = self._pdf
         assert pdf is not None
         colour = _confidence_colour(confidence)
-        label = f"  Confidence: {_confidence_label(confidence).upper()}  "
+        label = f"  Confiance : {_confidence_label(confidence).upper()}  "
         pdf.set_font(pdf._font_family, "B", 9)
         pdf.set_fill_color(*colour)
         pdf.set_text_color(*WHITE)
@@ -296,7 +303,7 @@ class ReportRenderer:
         assert pdf is not None
         pdf.set_font(pdf._font_family, "", 10)
         pdf.set_text_color(*BLACK)
-        for item in items or ["No data available"]:
+        for item in items or ["Aucune donnée disponible"]:
             pdf.set_x(MARGIN_LEFT + 4)
             pdf.cell(4, 5, "\xb7", new_x=XPos.RIGHT, new_y=YPos.TOP)
             pdf.multi_cell(0, 5, _safe(item))
@@ -314,6 +321,24 @@ class ReportRenderer:
         return path
 
 
+def _clean_what_happened(text: Any) -> str:
+    """Nettoie la description brute pour éviter les artefacts de rédaction PII."""
+    if not text:
+        return "Aucune description disponible."
+    cleaned = str(text)
+    # Supprime les répétitions d'identifiants en fin de phrase.
+    cleaned = re.sub(r"\s*\.?\s*[aA]cc-\d+\.?\s*$", ".", cleaned)
+    return cleaned.strip() or "Aucune description disponible."
+
+
+def _mapping_status_label(status: Any) -> str:
+    status_str = str(status or "created_new").lower()
+    return {
+        "linked_to_existing": "Lié à un ticket existant",
+        "created_new": "Nouveau ticket créé",
+    }.get(status_str, status_str.replace("_", " "))
+
+
 def generate_diagnostic_report(report: dict[str, Any], output_path: Path) -> Path:
     """Génère un rapport PDF de diagnostic CCU avec logo et mise en page compacte."""
     renderer = ReportRenderer()
@@ -321,10 +346,10 @@ def generate_diagnostic_report(report: dict[str, Any], output_path: Path) -> Pat
     pdf = renderer._pdf
     pdf.add_page()
 
-    # L'origine d'écriture commence sous l'en-tête dessiné automatiquement
-    pdf.set_xy(MARGIN_LEFT, 33)
+    # L'en-tête positionne déjà le curseur sous le trait de séparation.
+    pdf.set_x(MARGIN_LEFT)
 
-    renderer.add_heading1(_safe(report.get("title"), "CCU Diagnostic Report"))
+    renderer.add_heading1(_safe(report.get("title"), "Rapport de diagnostic CCU"))
 
     # Badges côte à côte pour gagner de la place verticale
     renderer.add_priority_badge(report.get("priority"))
@@ -333,32 +358,31 @@ def generate_diagnostic_report(report: dict[str, Any], output_path: Path) -> Pat
 
     renderer.add_metadata_block(
         [
-            ("Incident ID", _safe(report.get("incident_id"))),
-            ("Generated", _safe(report.get("generated_at"))),
-            ("Detected", _safe(report.get("detected_at"))),
-            ("Client ID", _safe(report.get("client_id"))),
-            ("Order ID", _safe(report.get("order_id"))),
-            ("Product Type", _safe(report.get("product_type"))),
-            ("Category", _safe(report.get("category"))),
+            ("ID incident", _safe(report.get("incident_id"))),
+            ("Généré le", _safe(report.get("generated_at"))),
+            ("Détecté le", _safe(report.get("detected_at"))),
+            ("ID client", _safe(report.get("client_id"))),
+            ("ID commande", _safe(report.get("order_id"))),
+            ("Type de produit", _safe(report.get("product_type"))),
+            ("Catégorie", _safe(report.get("category"))),
         ]
     )
 
-    renderer.add_heading2("What Happened")
-    renderer.add_paragraph(report.get("what_happened", ""))
+    renderer.add_heading2("Ce qui s'est passé")
+    renderer.add_paragraph(_clean_what_happened(report.get("what_happened")))
 
-    renderer.add_heading2("Root Cause")
-    renderer.add_paragraph(report.get("root_cause", "undetermined"))
+    renderer.add_heading2("Cause racine")
+    renderer.add_paragraph(report.get("root_cause", "indéterminée"))
 
     renderer.add_heading2("Sources")
     renderer.add_list(report.get("sources"))
 
-    renderer.add_heading2("Similar Incident Lookup")
-    mapping_status = report.get("mapping_status", "created_new")
-    renderer.add_key_value("Status", mapping_status.replace("_", " "))
-    renderer.add_key_value("Ticket ID", _safe(report.get("mapping_ticket_id")))
-    renderer.add_key_value("Similarity Score", _safe(report.get("mapping_score")))
+    renderer.add_heading2("Recherche d'incident similaire")
+    renderer.add_key_value("Statut", _mapping_status_label(report.get("mapping_status")))
+    renderer.add_key_value("ID ticket", _safe(report.get("mapping_ticket_id")))
+    renderer.add_key_value("Score de similarité", _safe(report.get("mapping_score")))
 
-    renderer.add_heading2("Recommendation")
+    renderer.add_heading2("Recommandation")
     renderer.add_paragraph(report.get("recommendation", ""))
 
     return renderer.save(output_path)

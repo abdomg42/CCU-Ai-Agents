@@ -17,7 +17,7 @@ build/
 # Données générées
 data/
 *.log
-reports/
+
 
 # ChromaDB
 chroma/

@@ -78,13 +78,46 @@ class ZammadBackend(TicketingBackend):
             },
         }
         if tags:
-            payload["tags"] = tags
+            # Zammad attend une chaîne de tags séparés par des virgules, pas une liste.
+            payload["tag"] = ", ".join(str(t) for t in tags)
         payload.update(extra)
 
         with self._client() as client:
             resp = client.post("/api/v1/tickets", json=payload)
+            # Si le client n'existe pas encore, on le crée automatiquement puis on réessaie.
+            if resp.status_code == 422 and "No lookup value found for 'customer'" in resp.text:
+                logger.warning("Client Zammad inconnu (%s), création automatique...", customer)
+                try:
+                    self._ensure_customer(client, str(customer))
+                    resp = client.post("/api/v1/tickets", json=payload)
+                except Exception as exc:
+                    logger.warning(
+                        "Impossible de créer le client %s (%s); le ticket reste en échec.",
+                        customer,
+                        exc,
+                    )
+            if resp.status_code >= 400:
+                logger.error(
+                    "Zammad ticket creation failed (%s): %s - %s",
+                    resp.status_code,
+                    resp.text,
+                    payload,
+                )
             resp.raise_for_status()
             return resp.json()
+
+    def _ensure_customer(self, client: httpx.Client, email: str) -> dict[str, Any]:
+        """Crée un utilisateur Zammad minimal s'il n'existe pas déjà."""
+        login = (email.split("@")[0] if "@" in email else email).lower()
+        user_payload = {
+            "login": login,
+            "email": email.lower(),
+            "firstname": "Client",
+            "lastname": login,
+        }
+        resp = client.post("/api/v1/users", json=user_payload)
+        resp.raise_for_status()
+        return resp.json()
 
     def add_note(
         self,
@@ -123,13 +156,24 @@ class ZammadBackend(TicketingBackend):
         Format attendu : ticket_id, short_description, description, priority,
         category, status, root_cause, resolution_notes, client_id, product_type.
         """
+        # Les priorités par défaut dans Zammad sont "1 low", "2 normal", "3 high".
         priority_map = {
-            "P1": "1 critical",
-            "P2": "2 high",
-            "P3": "3 normal",
-            "P4": "4 low",
+            "P1": "3 high",
+            "P2": "2 normal",
+            "P3": "1 low",
+            "P4": "1 low",
         }
         zammad_priority = priority_map.get(str(ticket.get("priority", "")).upper(), "2 normal")
+
+        state_map = {
+            "new": "new",
+            "open": "open",
+            "closed": "closed",
+            "resolved": "closed",
+            "pending": "pending reminder",
+        }
+        raw_state = str(ticket.get("status", "new")).lower()
+        zammad_state = state_map.get(raw_state, "new")
 
         body = ticket.get("description") or ticket.get("short_description") or "No description"
         if ticket.get("root_cause"):
@@ -143,13 +187,17 @@ class ZammadBackend(TicketingBackend):
 
         title = ticket.get("short_description") or f"CCU incident {ticket.get('ticket_id')}"
 
+        customer = ticket.get("client_id") or "nicole.braun@zammad.org"
+        if "@" not in customer:
+            customer = f"{customer}@ccu.local"
+
         result = self.create_ticket(
             title=title,
             body=body,
-            customer=ticket.get("client_id", "nicole.braun@zammad.org"),
+            customer=customer,
             priority=zammad_priority,
             tags=tags,
-            state=ticket.get("status", "new"),
+            state=zammad_state,
         )
         logger.info("Ticket Zammad créé : %s", result.get("id"))
         return result

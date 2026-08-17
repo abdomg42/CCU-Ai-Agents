@@ -8,6 +8,6 @@ p.flush()
 print('sent')
 
 # Consumer test (stop with Ctrl+C)
-c = KafkaConsumer('ccu-incidents', bootstrap='localhost:9092', auto_offset_reset='earliest', value_deserializer=lambda m: json.loads(m.decode()))
+c = KafkaConsumer('ccu-incidents', bootstrap_servers='localhost:9092', auto_offset_reset='earliest', value_deserializer=lambda m: json.loads(m.decode()))
 for msg in c:
     print(msg.value)

@@ -13,7 +13,7 @@ services:
       - EMBEDDING_MODEL=mxbai-embed-large:latest
       - VECTOR_INDEX_DIM=1024
       - MOCK_LLM=false
-      - ZAMMAD_URL=http://zammad:3000
+      - ZAMMAD_URL=http://host.docker.internal:3000
       - ZAMMAD_TOKEN=${ZAMMAD_TOKEN:-}
       - ZAMMAD_DEFAULT_GROUP=Users
       - SMTP_HOST=${SMTP_HOST:-}
@@ -24,97 +24,65 @@ services:
       - SMTP_USE_TLS=${SMTP_USE_TLS:-true}
       - REPORT_RECIPIENTS=${REPORT_RECIPIENTS:-noc@ccu.local,support@ccu.local}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
-    depends_on:
-      - zammad
     command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
-  zammad-postgres:
-    image: postgres:15-alpine
-    container_name: diagnostic_zammad_postgres
-    environment:
-      - POSTGRES_USER=zammad
-      - POSTGRES_PASSWORD=zammad
-      - POSTGRES_DB=zammad
-    volumes:
-      - zammad_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U zammad -d zammad"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  zammad:
-    image: zammad/zammad:6
-    container_name: diagnostic_zammad
-    ports:
-      - "3000:3000"
-    environment:
-      - ZAMMAD_DB_ADAPTER=postgresql
-      - ZAMMAD_DB_HOST=zammad-postgres
-      - ZAMMAD_DB_PORT=5432
-      - ZAMMAD_DB_USER=zammad
-      - ZAMMAD_DB_PASSWORD=zammad
-      - ZAMMAD_DB_NAME=zammad
-      - ZAMMAD_RAILS_TRUSTED_PROXIES=0.0.0.0/0
-    depends_on:
-      zammad-postgres:
-        condition: service_healthy
-    volumes:
-      - zammad_data:/opt/zammad
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/v1/status"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
+  # Zammad is not included here because the official Zammad stack requires
+  # several services (railsserver, nginx, postgres, elasticsearch, redis).
+  # See README.md for how to run Zammad separately.
 
   splunk:
-    image: splunk/splunk:latest
+    image: splunk/splunk:9.1.2
+    platform: linux/amd64
     container_name: diagnostic_splunk
+    user: "0:0"
+    profiles:
+      - full
     ports:
       - "8088:8088"
+      - "8089:8089"
       - "18000:8000"
     environment:
       - SPLUNK_START_ARGS=--accept-license
       - SPLUNK_PASSWORD=SplunkAdmin123!
+      - SPLUNK_USER=root
     volumes:
       - splunk_data:/opt/splunk/var
 
   prism:
     image: stoplight/prism:4
+    platform: linux/amd64
     container_name: diagnostic_prism
+    profiles:
+      - full
     command: ["mock", "-h", "0.0.0.0", "/api.yml"]
     ports:
       - "4010:4010"
     volumes:
       - ../mocks:/api.yml:ro
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.0
-    container_name: diagnostic_zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
   kafka:
     image: confluentinc/cp-kafka:7.6.0
+    platform: linux/amd64
     container_name: diagnostic_kafka
-    depends_on:
-      - zookeeper
+    profiles:
+      - full
     ports:
       - "9092:9092"
-      - "9101:9101"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:19092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
 
 volumes:
-  zammad_postgres_data:
-  zammad_data:
   splunk_data:
 
 # Ollama optionnel : décommenter pour exécuter Ollama dans Docker au lieu de l'hôte.

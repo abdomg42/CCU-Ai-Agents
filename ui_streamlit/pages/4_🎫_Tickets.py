@@ -4,7 +4,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+ROOT = Path(__file__).resolve().parents[2]
+UI_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+if str(UI_DIR) not in sys.path:
+    sys.path.insert(0, str(UI_DIR))
 
 from typing import Any
 
@@ -12,7 +17,11 @@ import pandas as pd
 import streamlit as st
 
 from tools.ticketing import get_ticketing_backend
-from ui_streamlit.shared import load_custom_css
+
+try:
+    from ui_streamlit.shared import load_custom_css
+except ModuleNotFoundError:
+    from shared import load_custom_css
 
 st.set_page_config(
     page_title="Tickets — CCU Diagnostic Agent",

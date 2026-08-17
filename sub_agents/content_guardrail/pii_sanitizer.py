@@ -43,7 +43,7 @@ def _build_replacements(state: GraphState) -> dict[re.Pattern[str], str]:
 
     return {
         _EMAIL_RE: "[EMAIL_REDACTED]",
-        _PHONE_RE: f"[PHONE_REDACTED -> contact {client_id}]",
+        _PHONE_RE: "[PHONE_REDACTED]",
         _IP_ADDRESS_RE: "[IP_REDACTED]",
         _STREET_KEYWORDS_RE: "[ADDRESS_REDACTED]",
         # Remplacement des noms propres complets par le client_id technique.
