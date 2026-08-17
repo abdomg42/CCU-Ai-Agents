@@ -4,14 +4,22 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+ROOT = Path(__file__).resolve().parents[2]
+UI_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+if str(UI_DIR) not in sys.path:
+    sys.path.insert(0, str(UI_DIR))
 
 from typing import Any
 
 import streamlit as st
 from streamlit_agraph import Config, Edge, Node, agraph
 
-from ui_streamlit.shared import get_neo4j_client, load_custom_css
+try:
+    from ui_streamlit.shared import get_neo4j_client, load_custom_css
+except ModuleNotFoundError:
+    from shared import get_neo4j_client, load_custom_css
 
 st.set_page_config(
     page_title="Graph Explorer — CCU Diagnostic Agent",
