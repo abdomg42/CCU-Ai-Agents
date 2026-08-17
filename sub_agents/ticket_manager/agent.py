@@ -14,7 +14,8 @@ from shared.audit_logger import audit_logger
 from shared.state import GraphState
 from config.settings import get_settings
 from graph.queries import search_similar_incidents
-from tools.ticketing_client import push_ticket_to_zammad
+from tools.ticketing import get_ticketing_backend
+from tools.ticketing.base import TicketingBackend
 from sub_agents.intake_parser.schemas import IncidentSchema
 from .schemas import TicketMappingResult
 
@@ -105,16 +106,17 @@ class TicketManagerAgent:
         }
 
         try:
-            result = push_ticket_to_zammad(payload)
-            zammad_id = result.get("id")
-            if zammad_id:
+            backend: TicketingBackend = get_ticketing_backend()
+            result = backend.push(payload)
+            external_id = result.get("id")
+            if external_id:
                 audit_logger.log(
-                    "ticket_mapping_created_zammad",
-                    {"local_id": ticket_id, "zammad_id": zammad_id},
+                    "ticket_mapping_created_ticketing",
+                    {"local_id": ticket_id, "external_id": external_id},
                 )
-                return f"{ticket_id} (Zammad #{zammad_id})"
+                return f"{ticket_id} (Zammad #{external_id})"
         except Exception as exc:
-            audit_logger.log("ticket_mapping_zammad_fallback", {"error": str(exc)})
+            audit_logger.log("ticket_mapping_ticketing_fallback", {"error": str(exc)})
 
         return ticket_id
 

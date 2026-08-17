@@ -6,7 +6,17 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-echo "=== Seeding Neo4j GraphRAG ==="
-python -m graph.ingestion.run_all
+# Détecte automatiquement le Python du venv s'il existe,
+# sinon utilise le python disponible dans le PATH.
+if [ -f ".venv/Scripts/python.exe" ]; then
+    PYTHON=".venv/Scripts/python.exe"
+elif [ -f ".venv/bin/python" ]; then
+    PYTHON=".venv/bin/python"
+else
+    PYTHON="python"
+fi
+
+echo "=== Seeding Neo4j GraphRAG (using $PYTHON) ==="
+"$PYTHON" -m graph.ingestion.run_all
 
 echo "=== Done ==="

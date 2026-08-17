@@ -9,7 +9,8 @@ import logging
 import re
 from typing import Any
 
-from tools.ticketing_client import ZammadClient
+from tools.ticketing import get_ticketing_backend
+from tools.ticketing.base import TicketingBackend
 
 logger = logging.getLogger(__name__)
 
@@ -37,10 +38,10 @@ def add_diagnostic_note(ticket_id: str, incident_id: str, report_path: str) -> d
     )
 
     try:
-        client = ZammadClient()
-        result = client.add_note(zammad_id, body, internal=True)
-        logger.info("Note Zammad ajoutée sur le ticket %s", zammad_id)
+        backend: TicketingBackend = get_ticketing_backend()
+        result = backend.add_note(zammad_id, body, internal=True)
+        logger.info("Note ajoutée sur le ticket %s", zammad_id)
         return {"added": True, "zammad_id": zammad_id, "note_id": result.get("id")}
     except Exception as exc:
-        logger.warning("Échec ajout note Zammad : %s", exc)
+        logger.warning("Échec ajout de note : %s", exc)
         return {"added": False, "reason": str(exc), "ticket_id": ticket_id}

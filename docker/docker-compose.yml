@@ -7,10 +7,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - NEO4J_URI=bolt://host.docker.internal:7687
-      - NEO4J_USER=neo4j
-      - NEO4J_PASSWORD=password
-      - NEO4J_DATABASE=neo4j
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - OLLAMA_MODEL=qwen2.5:latest
       - EMBEDDING_PROVIDER=ollama
@@ -92,6 +88,29 @@ services:
       - "4010:4010"
     volumes:
       - ../mocks:/api.yml:ro
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: diagnostic_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: diagnostic_kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
 volumes:
   zammad_postgres_data:

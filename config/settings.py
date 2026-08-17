@@ -53,6 +53,16 @@ class Settings:
     MOCK_ORDERS: Path = MOCKS_DIR / "mock_orders_tmf622.json"
     MOCK_TICKETS_DIR: Path = MOCKS_DIR / "mock_tickets"
 
+    # Postgres / CRM
+    POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "localhost")
+    POSTGRES_PORT: int = int(os.getenv("POSTGRES_PORT", "5432"))
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
+    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "postgres")
+
+    # Ticketing backend abstraction
+    TICKETING_BACKEND: str = os.getenv("TICKETING_BACKEND", "zammad")
+
     # Zammad
     ZAMMAD_URL: str = os.getenv("ZAMMAD_URL", "http://localhost:3000")
     ZAMMAD_TOKEN: str = os.getenv("ZAMMAD_TOKEN", "")

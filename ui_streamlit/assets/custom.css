@@ -1,0 +1,143 @@
+/* Thème sombre cohérent pour toutes les pages Streamlit */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+html,
+body,
+[class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Fond principal sombre */
+.stApp {
+    background: linear-gradient(135deg, #0f1115 0%, #1a1d24 100%);
+    color: #e8eaed;
+}
+
+/* Titres */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #f1f3f4 !important;
+    font-weight: 600;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: #16181f !important;
+    border-right: 1px solid #2a2d37;
+}
+
+section[data-testid="stSidebar"] .stMarkdown {
+    color: #9aa0a6;
+}
+
+/* Boutons */
+.stButton > button {
+    background-color: #2c5de6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.stButton > button:hover {
+    background-color: #3a6df7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 93, 230, 0.3);
+}
+
+/* Cards métriques */
+[data-testid="stMetric"] {
+    background-color: #1e2129;
+    border: 1px solid #2a2d37;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #9aa0a6;
+    font-size: 0.875rem;
+}
+
+[data-testid="stMetricValue"] {
+    color: #f1f3f4;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+/* Dataframes / tableaux */
+.stDataFrame {
+    border-radius: 12px;
+    border: 1px solid #2a2d37;
+}
+
+/* Inputs */
+.stTextInput > div > div > input,
+.stTextArea textarea,
+.stSelectbox > div > div > div {
+    background-color: #1e2129;
+    color: #e8eaed;
+    border: 1px solid #2a2d37;
+    border-radius: 8px;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea textarea:focus,
+.stSelectbox > div > div > div:focus {
+    border-color: #2c5de6;
+    box-shadow: 0 0 0 2px rgba(44, 93, 230, 0.2);
+}
+
+/* Chat messages */
+.stChatMessage {
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+}
+
+.stChatMessage[data-testid="stChatMessageUser"] {
+    background-color: rgba(44, 93, 230, 0.12);
+}
+
+.stChatMessage[data-testid="stChatMessageAssistant"] {
+    background-color: #1e2129;
+}
+
+/* Lien */
+a {
+    color: #8ab4f8;
+}
+
+/* Code */
+code {
+    background-color: #2a2d37;
+    color: #e8eaed;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+}
+
+/* On cache le footer Streamlit par défaut */
+footer {
+    visibility: hidden;
+}
+
+#MainMenu {
+    visibility: hidden;
+}
+
+/* Header page d'accueil */
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+    color: #9aa0a6;
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+}
