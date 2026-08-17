@@ -71,11 +71,11 @@ diagnostic-technique/
 │   ├── context_agent/
 │   ├── rag_ticket_search/       # Appelle graph.queries.search_similar_incidents
 │   ├── root_cause_reasoner/
-│   ├── ticket_manager/          # Mapping/création de tickets Zammad
+│   ├── ticket_manager/            # Mapping/création de tickets via backend abstrait
 │   ├── remediation_explainer/   # Texte informatif (pas d'action exécutable)
 │   ├── content_guardrail/       # PII sanitizer
 │   ├── report_generator/        # Générateur PDF pur Python
-│   └── notifier/                # Email + note Zammad
+│   └── notifier/                # Email + note ticketing
 ├── graph/                       # GraphRAG Neo4j
 │   ├── schema.cypher            # Contraintes + index vectoriel
 │   ├── graph_client.py          # Wrapper driver Neo4j avec retry
@@ -89,8 +89,23 @@ diagnostic-technique/
 │       ├── ingest_logs.py
 │       ├── generate_embeddings.py
 │       └── run_all.py
-├── tools/                       # Clients bas niveau (Zammad, ...)
-│   └── ticketing_client.py
+├── data/                        # Données brutes et pipeline d'ingestion
+│   ├── raw/                     # Fichiers sources CSV/JSON/YAML
+│   └── ingestion/               # Pipeline générique de détection/mapping/liaison
+│       ├── detect_and_load.py
+│       ├── schema_mapper.py
+│       ├── entity_linker.py
+│       └── run_ingestion.py
+├── tools/                       # Clients bas niveau (ticketing, CRM)
+│   ├── ticketing/               # Abstraction du backend de ticketing
+│   │   ├── base.py              # Interface TicketingBackend
+│   │   ├── zammad_backend.py    # Implémentation Zammad
+│   │   └── __init__.py          # Factory get_ticketing_backend()
+│   ├── ticketing_client.py      # Facade rétrocompatible
+│   └── crm_client.py            # Client Postgres CRM
+├── services/                    # Webhook receiver + worker Kafka
+│   ├── webhook_receiver.py
+│   └── worker.py
 ├── shared/
 ├── mocks/
 ├── evaluation/
@@ -99,8 +114,17 @@ diagnostic-technique/
 │   ├── main.py
 │   └── routes/diagnose.py
 ├── tests/
-├── ui/                          # Interface Streamlit
-│   └── app.py
+├── ui/                          # Interface Streamlit legacy (page chat unique)
+├── ui_streamlit/                # Application Streamlit multi-pages
+│   ├── app.py                   # Page d'accueil
+│   ├── shared.py
+│   ├── assets/custom.css        # Thème sombre
+│   └── pages/
+│       ├── 1_💬_Chat.py
+│       ├── 2_📊_Dashboard.py
+│       ├── 3_🕸️_Graph_Explorer.py
+│       ├── 4_🎫_Tickets.py
+│       └── 5_⚙️_Settings.py
 ├── docker/
 │   ├── docker-compose.yml
 │   └── Dockerfile
@@ -112,7 +136,6 @@ diagnostic-technique/
 ├── infra/
 │   └── scripts/seed_zammad.py   # Injection des tickets dans Zammad
 ├── reports/                     # Rapports PDF générés
-├── Makefile
 ├── pyproject.toml
 └── README.md
 ```
@@ -140,14 +163,17 @@ Neo4j doit être installé et exécuté **localement** (pas dans Docker). Par d�
 Avec Neo4j Desktop / Neo4j local démarré :
 
 ```bash
-make seed
+# Assurez-vous que le venv est activé (PowerShell : .venv\Scripts\activate)
+bash scripts/seed_graph.sh
 ```
+
+> `scripts/seed_graph.sh` détecte automatiquement `.venv/Scripts/python.exe` sous Windows ou `.venv/bin/python` sous Linux/macOS.
 
 Si vous préférez lancer l'API dans Docker tout en gardant Neo4j local et Ollama local :
 
 ```bash
 cd docker
-docker compose up --build
+docker compose up --build api
 ```
 
 Dans ce cas, l'API se connecte à Neo4j via `host.docker.internal:7687` et à Ollama via `host.docker.internal:11434`. Elle est disponible sur `http://127.0.0.1:8000`.
@@ -157,7 +183,7 @@ Dans ce cas, l'API se connecte à Neo4j via `host.docker.internal:7687` et à Ol
 Après avoir seedé Neo4j :
 
 ```bash
-make api
+uvicorn api.main:app --reload
 ```
 
 L'API est disponible sur `http://127.0.0.1:8000`.
@@ -185,7 +211,7 @@ curl -X POST "http://127.0.0.1:8000/diagnose/text" \
 ## Lancer les tests
 
 ```bash
-make test
+pytest tests/ -q
 ```
 
 Les tests `test_graph_ingestion.py` et `test_rag.py` nécessitent Neo4j accessible. Ils seedent le graphe automatiquement et vérifient les compteurs de nœuds/relations et la recherche de tickets similaires.
@@ -220,6 +246,96 @@ python -m evaluation.golden_incidents.eval_runner
 
 Le runner rejoue les 5 cas mockés et affiche un rapport pass/fail + accuracy globale. Le processus retourne un exit code 0 si tous les cas passent.
 
+## Pipeline d'ingestion générique (`data/ingestion`)
+
+Le pipeline détecte automatiquement les fichiers placés dans `data/raw/`, les mappe vers le schéma cible du graphe, puis crée des liens synthétiques déterministes entre sources indépendantes.
+
+```bash
+python -m data.ingestion.run_ingestion
+```
+
+Mode dry-run (détection/mapping/liaison sans écrire dans Neo4j/Postgres) :
+
+```bash
+python -m data.ingestion.run_ingestion --dry-run
+```
+
+Modules :
+
+- `detect_and_load.py` — scanne `data/raw/` et charge CSV/JSON/YAML avec le bon parser.
+- `schema_mapper.py` — mapping explicite vers `Client`, `Ticket`, `LogEvent`, `Product`. Les champs manquants restent `null` et sont loggués.
+- `entity_linker.py` — liens synthétiques traçables :
+  - `client_id` par hash déterministe du `ticket_id` modulo le nombre de clients CRM.
+  - `order_id` au format `ORD-XXXXX`.
+  - logs dont la sévérité correspond à la priorité du ticket.
+  - produit dérivé des specs TM Forum et de la catégorie.
+- `run_ingestion.py` — orchestration idempotente, écrit dans Neo4j et Postgres, affiche le rapport final.
+
+## Abstraction du backend de ticketing (`tools/ticketing`)
+
+Le backend est configurable via `TICKETING_BACKEND` (défaut `zammad`). Seule l'interface `TicketingBackend` est utilisée par les `sub_agents`.
+
+```python
+from tools.ticketing import get_ticketing_backend
+
+backend = get_ticketing_backend()
+backend.create_ticket(title=..., body=...)
+backend.search_tickets("query")
+backend.add_note(ticket_id, body)
+backend.get_ticket(ticket_id)
+```
+
+Implémentations :
+
+- `tools.ticketing.zammad_backend.ZammadBackend`
+
+Variables d'environnement Zammad :
+
+```env
+TICKETING_BACKEND=zammad
+ZAMMAD_URL=http://localhost:3000
+ZAMMAD_TOKEN=your-token
+ZAMMAD_DEFAULT_GROUP=Users
+```
+
+## Interface Streamlit multi-pages (`ui_streamlit`)
+
+Application native multi-pages avec navigation automatique par préfixe numérique.
+
+```bash
+streamlit run ui_streamlit/app.py
+```
+
+Pages accessibles :
+
+| Page | URL auto | Description |
+|---|---|---|
+| Accueil | `/` | Redirection vers les pages |
+| 💬 Chat | `/Chat` | Diagnostic conversationnel existant |
+| 📊 Dashboard | `/Dashboard` | KPIs Neo4j/Postgres avec Plotly |
+| 🕸️ Graph Explorer | `/Graph_Explorer` | Sous-graphe interactif streamlit-agraph |
+| 🎫 Tickets | `/Tickets` | Liste filtrée via backend ticketing |
+| ⚙️ Settings | `/Settings` | Backend actif, statut ingestion, relance |
+
+Le thème sombre est appliqué via `ui_streamlit/assets/custom.css` chargé dans chaque page.
+
+## Messaging Kafka
+
+Docker Compose lance Zookeeper et Kafka (`kafka:9092`). En local, les services utilisent `localhost:9092`.
+
+```bash
+python services/webhook_receiver.py  # uvicorn services.webhook_receiver:app --port 9000
+python services/worker.py
+```
+
+Variables d'environnement Kafka :
+
+```env
+KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+KAFKA_TOPIC=ccu-incidents
+KAFKA_GROUP_ID=ccu-worker
+```
+
 ## Configuration
 
 Variables d'environnement disponibles (voir `.env.example`) :
@@ -246,15 +362,17 @@ VECTOR_SIMILARITY_THRESHOLD=0.75
 
 Pour basculer vers un autre provider d'embedding (sentence-transformers, OpenAI, Voyage AI), implémentez `EmbeddingProvider` dans `graph/embedding_provider.py` et changez `EMBEDDING_PROVIDER` / `EMBEDDING_MODEL` / `VECTOR_INDEX_DIM` en conséquence.
 
-## Commandes utiles (Makefile)
+## Commandes utiles
 
 ```bash
-make install      # pip install -r requirements.txt
-make seed         # Seed Neo4j local (schema + mocks + embeddings)
-make test         # pytest tests/  (Nécessite Neo4j local lancé)
-make api          # uvicorn api.main:app --reload
-make docker-up    # docker compose up --build api (Neo4j local requis)
-make docker-down  # docker compose down
+pip install -r requirements.txt
+bash scripts/seed_graph.sh            # Seed Neo4j local (schema + mocks + embeddings)
+pytest tests/ -q                        # Nécessite Neo4j local lancé
+uvicorn api.main:app --reload           # API FastAPI locale
+streamlit run ui_streamlit/app.py       # Interface Streamlit
+
+cd docker && docker compose up --build api    # API seule dans Docker (Neo4j local requis)
+cd docker && docker compose down              # Arrêter les conteneurs
 ```
 
 ## Notes de conception
@@ -285,10 +403,11 @@ Points importants :
 Le plus simple est Docker Compose :
 
 ```bash
-make docker-up
+cd docker
+docker compose up --build
 ```
 
-Cela démarre : API FastAPI (8000), Zammad (3000), Splunk (18000/8088), Prism (4010). Neo4j doit être démarré séparément sur l'hôte.
+Cela démarre : API FastAPI (8000), Zammad (3000), Splunk (18000/8088), Prism (4010), Zookeeper + Kafka. Neo4j doit être démarré séparément sur l'hôte.
 
 > Le rapport PDF est généré directement en Python sans dépendance à WeasyPrint ou aux librairies GTK/Pango.
 
@@ -298,23 +417,24 @@ Dans un autre terminal (avec l'API et Neo4j démarrés) :
 
 ```bash
 # Seed Neo4j (clients, commandes, logs, tickets + embeddings)
-make seed
+bash scripts/seed_graph.sh
 
 # Générer des tickets mockés
-make seed-tickets
+python scripts/seed/generate_tickets.py --count 50
+python scripts/seed/generate_ccu_tickets.py --count 30
 
 # Injecter les tickets dans Zammad (une fois Zammad healthy)
-make seed-zammad
+python infra/scripts/seed_zammad.py
 ```
 
 ### 4. Démarrer l'interface utilisateur (sans Docker)
 
 ```bash
 # Terminal 1 : backend
-make api
+uvicorn api.main:app --reload
 
 # Terminal 2 : frontend Streamlit
-make ui
+streamlit run ui_streamlit/app.py
 ```
 
 Ouvrir http://localhost:8501.
