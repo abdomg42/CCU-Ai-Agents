@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 import smtplib
+from email.headerregistry import Address
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
@@ -35,7 +36,8 @@ class EmailClient:
         self.recipients = settings.REPORT_RECIPIENTS
 
     def build_subject(self, context: dict[str, Any]) -> str:
-        incident_id = context.get("incident_id", "N/A")
+        incident_id_f = context.get("incident_id", "N/A")
+        incident_id = incident_id_f.split('/')[-1]
         incident_type = context.get("incident_type", "")
         priority = context.get("priority", "")
         parts = ["[CCU] Incident détecté"]
@@ -103,14 +105,31 @@ class EmailClient:
         incident_id: str,
         confidence_label: str,
         report_path: str,
-        recipients: list[str] | None = None,
+        recipients: str | None = None,
         context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Envoie le rapport par email avec pièce jointe."""
         recipients = recipients or self.recipients
-        if not recipients:
-            logger.warning("Aucun destinataire configuré pour l'envoi de rapport.")
-            return {"sent": False, "reason": "no_recipients", "recipients": []}
+        # Sécurise et valide chaque destinataire avec la classe Address du stdlib.
+        valid_recipients: list[str] = []
+        if isinstance(recipients, str):
+            recipients = [recipients]
+        for addr in recipients:
+            clean_addr = str(addr).strip() if addr else ""
+            if not clean_addr or "@" not in clean_addr or clean_addr.startswith("@"):
+                continue
+            try:
+                valid_recipients.append(str(Address(display_name="", addr_spec=clean_addr)))
+            except Exception:
+                logger.warning("Format d'adresse email rejeté : %s", clean_addr)
+
+        if not valid_recipients:
+            logger.warning("Aucun destinataire valide pour l'envoi de rapport.")
+            return {"sent": False, "reason": "no_valid_recipients", "recipients": []}
+
+        if not self.from_addr or "@" not in self.from_addr or self.from_addr.startswith("@"):
+            logger.warning("SMTP_FROM invalide : %s", self.from_addr)
+            return {"sent": False, "reason": "invalid_from_address", "recipients": valid_recipients}
 
         context = context or {}
         context.setdefault("incident_id", incident_id)
@@ -118,8 +137,8 @@ class EmailClient:
         context.setdefault("report_path", report_path)
 
         msg = EmailMessage()
-        msg["From"] = self.from_addr
-        msg["To"] = ", ".join(recipients)
+        msg["From"] = Address(display_name="CCU Diagnostic Agent", addr_spec=self.from_addr)
+        msg["To"] = ", ".join(valid_recipients)
         msg["Subject"] = self.build_subject(context)
         msg.set_content(self.build_body(context))
 

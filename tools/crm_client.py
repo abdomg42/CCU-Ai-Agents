@@ -79,13 +79,31 @@ class PostgresCRMClient:
         if not clients:
             return 0
 
+        def _to_int(value: Any) -> int | None:
+            if value is None:
+                return None
+            try:
+                cleaned = str(value).strip()
+                return int(cleaned) if cleaned else None
+            except ValueError:
+                return None
+
+        def _to_float(value: Any) -> float | None:
+            if value is None:
+                return None
+            try:
+                cleaned = str(value).strip()
+                return float(cleaned) if cleaned else None
+            except ValueError:
+                return None
+
         rows = [
             (
                 c.get("id"),
-                int(c["tenure"]) if c.get("tenure") is not None else None,
+                _to_int(c.get("tenure")),
                 c.get("contract"),
-                float(c["monthly_charges"]) if c.get("monthly_charges") is not None else None,
-                float(c["total_charges"]) if c.get("total_charges") is not None else None,
+                _to_float(c.get("monthly_charges")),
+                _to_float(c.get("total_charges")),
                 c.get("churn"),
             )
             for c in clients
@@ -114,6 +132,35 @@ class PostgresCRMClient:
         self._conn.commit()
         logger.info("CRM Postgres : %s clients upsertés", len(rows))
         return len(rows)
+
+    def get_client(self, customer_id: str) -> dict[str, Any] | None:
+        """Récupère un client par son ID depuis Postgres."""
+        if not self._conn:
+            self.connect()
+        try:
+            with self._conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT id, tenure, contract, monthly_charges, total_charges, churn
+                    FROM clients
+                    WHERE id = %s
+                    """,
+                    (customer_id,),
+                )
+                row = cur.fetchone()
+                if not row:
+                    return None
+                return {
+                    "customer_id": row[0],
+                    "tenure": row[1],
+                    "contract": row[2],
+                    "monthly_charges": row[3],
+                    "total_charges": row[4],
+                    "churn": row[5],
+                }
+        except Exception as exc:
+            logger.warning("Échec lecture client Postgres %s : %s", customer_id, exc)
+            return None
 
 
 def ingest_clients_to_postgres(clients: list[dict[str, Any]]) -> int:

@@ -9,7 +9,7 @@ import logging
 import os
 from typing import Any
 
-from fastapi import FastAPI, Request
+from fastapi import BackgroundTasks, FastAPI, Request
 from kafka import KafkaProducer
 
 logger = logging.getLogger(__name__)
@@ -36,19 +36,31 @@ def _shutdown() -> None:
         app.state.producer.close()
 
 
-@app.post("/webhook/{source}")
-async def receive_webhook(source: str, request: Request) -> dict[str, Any]:
-    """Reçoit un webhook externe et le publie sur Kafka."""
+def _publish_to_kafka(source: str, event: dict[str, Any]) -> None:
+    """Publication Kafka effectuée après le retour HTTP (fire-and-forget)."""
+    try:
+        app.state.producer.send(
+            KAFKA_TOPIC,
+            key=source,
+            value=event,
+        )
+        logger.info("Webhook %s publié sur %s", source, KAFKA_TOPIC)
+    except Exception as exc:
+        logger.exception("Échec publication Kafka pour %s : %s", source, exc)
+
+
+@app.post("/webhok/{source}")
+async def receive_webhook(
+    source: str,
+    request: Request,
+    background_tasks: BackgroundTasks,
+) -> dict[str, Any]:
+    """Reçoit un webhook externe, répond 200 OK immédiatement, puis publie sur Kafka."""
     payload = await request.json()
     event = {
         "source": source,
         "payload": payload,
         "headers": dict(request.headers),
     }
-    app.state.producer.send(
-        KAFKA_TOPIC,
-        key=source,
-        value=event,
-    )
-    logger.info("Webhook %s publié sur %s", source, KAFKA_TOPIC)
-    return {"status": "published", "topic": KAFKA_TOPIC, "source": source}
+    background_tasks.add_task(_publish_to_kafka, source, event)
+    return {"status": "received", "topic": KAFKA_TOPIC, "source": source}

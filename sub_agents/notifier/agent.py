@@ -6,6 +6,7 @@ destinataires configurés et ajoute une trace dans le ticket.
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Any
 
 from shared.audit_logger import audit_logger
@@ -33,9 +34,8 @@ def _confidence_label(state: GraphState) -> str:
 
 def _incident_id(state: GraphState) -> str:
     if state.report_path:
-        path = state.report_path
-        # Le nom de fichier est reports/{incident_id}.pdf ou .html
-        return path.split("/")[-1].split(".")[0]
+        # Fonctionne aussi bien sous Windows (\) que Linux (/).
+        return Path(state.report_path).stem
     parsed = _as_parsed(state.parsed_incident)
     return f"INC-{parsed.customer_id or 'UNKNOWN'}"
 

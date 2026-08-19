@@ -260,6 +260,18 @@ Mode dry-run (détection/mapping/liaison sans écrire dans Neo4j ni Postgres) :
 python -m data.ingestion.run_ingestion --dry-run
 ```
 
+Écriture uniquement dans Postgres (pas de Neo4j) :
+
+```bash
+python -m data.ingestion.run_ingestion --postgres-only
+```
+
+Écriture uniquement dans Neo4j (pas de Postgres) :
+
+```bash
+python -m data.ingestion.run_ingestion --neo4j-only
+```
+
 Modules :
 
 - `detect_and_load.py` — scanne `data/raw/` et charge CSV/JSON/YAML avec le bon parser.
@@ -318,7 +330,7 @@ Variables d'environnement Zammad :
 
 ```env
 TICKETING_BACKEND=zammad
-ZAMMAD_URL=http://localhost:3000
+ZAMMAD_URL=http://localhost:8080
 ZAMMAD_TOKEN=your-token
 ZAMMAD_DEFAULT_GROUP=Users
 ```
@@ -463,7 +475,7 @@ docker compose up -d
 Puis configurez `.env` du projet CCU :
 
 ```env
-ZAMMAD_URL=http://host.docker.internal:3000
+ZAMMAD_URL=http://host.docker.internal:8080
 ZAMMAD_TOKEN=your-token-from-zammad
 ```
 
@@ -593,13 +605,15 @@ intake_parser
 |----------|-------------|
 | Rapport PDF | `reports/INC-CCU-XXXX.pdf` ou bouton **Download PDF report** dans Streamlit |
 | Email envoyé | Logs du terminal C et boîte des destinataires `REPORT_RECIPIENTS` |
-| Ticket Zammad | http://localhost:3000, note interne "Full report sent by email" |
+| Ticket Zammad | http://localhost:, note interne "Full report sent by email" |
 | Logs Splunk | http://localhost:18000, recherche `source=ccu` |
 | Sous-graphe Neo4j | Neo4j Browser, `MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 50` |
 
 ### 6. Flux event-driven avec Kafka (optionnel)
 
-Pour publier un incident depuis un webhook externe :
+Le worker Kafka reçoit des événements sur le topic `ccu-incidents`, les transforme en incident et appelle l'API `/diagnose`. Le pipeline complet s'exécute ensuite (PDF, email, note Zammad).
+
+#### 6.1 Webhook générique
 
 ```bash
 # Terminal E : worker Kafka
@@ -607,13 +621,39 @@ python services/worker.py
 ```
 
 ```bash
-# Publier un événement
-curl -X POST "http://localhost:8001/webhook/splunk" \
-  -H "Content-Type: application/json" \
-  -d '{"message": "fiber outage", "service_id": "svc-fiber-12345"}'
+# Terminal F : webhook receiver
+uvicorn services.webhook_receiver:app --port 8001
 ```
 
-Le worker consomme le topic `ccu-incidents` et loggue l'événement. Vous pouvez le brancher sur l'API `/diagnose` si nécessaire.
+```bash
+# Publier un événement
+Invoke-RestMethod -Uri "http://localhost:8001/webhook/splunk" -Method POST -ContentType "application/json" -Body '{"message": "fiber outage", "service_id": "svc-fiber-12345"}'
+```
+
+#### 6.2 Zammad → Kafka → Diagnostic complet
+
+Depuis Zammad, chaque nouveau ticket peut être poussé automatiquement vers Kafka. Deux méthodes :
+
+**Méthode A — Polling (la plus simple) :**
+
+```bash
+# Récupère les tickets Zammad récents et les pousse dans Kafka
+python infra/scripts/poll_zammad_to_kafka.py --since-minutes 10
+```
+
+Vous pouvez exécuter ce script régulièrement (tâche planifiée ou cron).
+
+**Méthode B — Webhook Zammad :**
+
+Dans l'interface Zammad :
+1. **Admin → Webhooks → New**
+2. Endpoint : `http://host.docker.internal:8001/webhook/zammad` (ou `http://localhost:8001/webhook/zammad` si Zammad est en local)
+3. Activez l'option **Ticket created**
+4. Démarrez le webhook receiver : `uvicorn services.webhook_receiver:app --port 8001`
+
+Le worker Kafka déclenchera alors automatiquement le pipeline pour chaque ticket.
+
+> **Important** : le worker suppose que l'API `/diagnose` est accessible à l'adresse configurée dans `DIAGNOSE_API_URL` (défaut : `http://localhost:8000/diagnose`).
 
 ### Dépannage rapide
 

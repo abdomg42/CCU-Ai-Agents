@@ -35,6 +35,15 @@ class RootCauseReasonerAgent:
         sources, _ = self._collect_sources(state)
         parsed = _as_parsed(state.parsed_incident)
 
+        # Les incidents commerciaux/facturation ne nécessitent pas de source technique.
+        if parsed.incident_type == "billing":
+            return RootCauseSchema(
+                confidence="moyenne",
+                cause="Demande commerciale / ajustement de facturation",
+                explanation="Le client sollicite une remise, un avoir ou un ajustement de facturation. Nécessite validation par le service billing ou commercial.",
+                source_ids=sources,
+            )
+
         if not sources:
             return RootCauseSchema(
                 confidence="faible",
@@ -84,6 +93,13 @@ class RootCauseReasonerAgent:
                 confidence="moyenne",
                 cause="VLAN mismatch entre service et port switch",
                 explanation="Le switch remonte un VLAN mismatch sur le port concerné.",
+                source_ids=sources,
+            )
+        if parsed.incident_type == "billing":
+            return RootCauseSchema(
+                confidence="moyenne",
+                cause="Demande commerciale / ajustement de facturation",
+                explanation="Le client sollicite une remise, un avoir ou un ajustement de facturation. Nécessite validation par le service billing ou commercial.",
                 source_ids=sources,
             )
 

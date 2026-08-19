@@ -38,7 +38,7 @@ class Settings:
     )
     VECTOR_INDEX_DIM: int = int(os.getenv("VECTOR_INDEX_DIM", "1024"))
     VECTOR_SIMILARITY_THRESHOLD: float = float(
-        os.getenv("VECTOR_SIMILARITY_THRESHOLD", "0.75")
+        os.getenv("VECTOR_SIMILARITY_THRESHOLD", "0.6")
     )
     TICKETS_VECTOR_INDEX: str = os.getenv("TICKETS_VECTOR_INDEX", "ticket_embeddings")
 

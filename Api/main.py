@@ -5,6 +5,8 @@ Endpoints :
     POST /diagnose/text -> résumé textuel simple.
     GET /health -> healthcheck.
 """
+from __future__ import annotations
+
 from typing import Any
 
 from fastapi import FastAPI
@@ -13,6 +15,8 @@ from pydantic import BaseModel
 
 from orchestrator.pipeline import run_diagnosis
 from api.routes import diagnose as diagnose_router
+from api.routes import chat as chat_router
+from config.settings import get_settings
 
 app = FastAPI(
     title="Diagnostic Technique CCU",
@@ -22,6 +26,7 @@ app = FastAPI(
 )
 
 app.include_router(diagnose_router.router, prefix="/diagnose")
+app.include_router(chat_router.router, prefix="/chat")
 
 
 class IncidentInput(BaseModel):

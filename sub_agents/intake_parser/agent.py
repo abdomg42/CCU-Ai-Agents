@@ -47,7 +47,7 @@ class IntakeParserAgent:
             incident_type = "mobile"
         elif "vlan" in lowered or "switch" in lowered or "lan" in lowered:
             incident_type = "lan"
-        elif "facture" in lowered or "billing" in lowered or "facturation" in lowered:
+        elif any(k in lowered for k in ("facture", "billing", "facturation", "remise", "discount", "reduction", "avoir", "promotion", "commercial")):
             incident_type = "billing"
         else:
             incident_type = "autre"

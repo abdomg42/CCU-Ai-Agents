@@ -6,24 +6,13 @@ services:
     container_name: diagnostic_api
     ports:
       - "8000:8000"
+    env_file:
+      - ../.env
     environment:
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - OLLAMA_MODEL=qwen2.5:latest
-      - EMBEDDING_PROVIDER=ollama
-      - EMBEDDING_MODEL=mxbai-embed-large:latest
-      - VECTOR_INDEX_DIM=1024
-      - MOCK_LLM=false
-      - ZAMMAD_URL=http://host.docker.internal:3000
-      - ZAMMAD_TOKEN=${ZAMMAD_TOKEN:-}
-      - ZAMMAD_DEFAULT_GROUP=Users
-      - SMTP_HOST=${SMTP_HOST:-}
-      - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_USER=${SMTP_USER:-}
-      - SMTP_PASS=${SMTP_PASS:-}
-      - SMTP_FROM=${SMTP_FROM:-}
-      - SMTP_USE_TLS=${SMTP_USE_TLS:-true}
-      - REPORT_RECIPIENTS=${REPORT_RECIPIENTS:-noc@ccu.local,support@ccu.local}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      # Overrides nécessaires car le conteneur ne peut pas utiliser localhost.
+      - ZAMMAD_URL=http://host.docker.internal:8080
+    volumes:
+      - ../reports:/app/reports
     command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
   # Zammad is not included here because the official Zammad stack requires
