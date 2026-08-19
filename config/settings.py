@@ -28,7 +28,7 @@ class Settings:
     # Neo4j GraphRAG
     NEO4J_URI: str = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     NEO4J_USER: str = os.getenv("NEO4J_USER", "neo4j")
-    NEO4J_PASSWORD: str = os.getenv("NEO4J_PASSWORD", "password")
+    NEO4J_PASSWORD: str = os.getenv("NEO4J_PASSWORD", "abdo1234")
     NEO4J_DATABASE: str = os.getenv("NEO4J_DATABASE", "neo4j")
 
     # Embeddings (abstraction : ollama par défaut, sentence-transformers/openai/voyage possible)
@@ -56,30 +56,26 @@ class Settings:
     # Postgres / CRM
     POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "localhost")
     POSTGRES_PORT: int = int(os.getenv("POSTGRES_PORT", "5432"))
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "postgres")
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "inetum")
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "inetum")
+    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "inetum")
 
     # Ticketing backend abstraction
     TICKETING_BACKEND: str = os.getenv("TICKETING_BACKEND", "zammad")
 
     # Zammad
-    ZAMMAD_URL: str = os.getenv("ZAMMAD_URL", "http://localhost:3000")
-    ZAMMAD_TOKEN: str = os.getenv("ZAMMAD_TOKEN", "")
+    ZAMMAD_URL: str = os.getenv("ZAMMAD_URL", "http://localhost:8080")
+    ZAMMAD_TOKEN: str = os.getenv("ZAMMAD_TOKEN", "UOIt7O8Ez4FJ3-SFaCBM6QrIwOmEJSnVVFozTJEH1U4Q9PdbaodIRumm0zEEKeuU")
     ZAMMAD_DEFAULT_GROUP: str = os.getenv("ZAMMAD_DEFAULT_GROUP", "Users")
 
     # SMTP configuration
-    SMTP_HOST: str = os.getenv("SMTP_HOST", "")
+    SMTP_HOST: str = os.getenv("SMTP_HOST", "smtp.gmail.com")
     SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
-    SMTP_USER: str = os.getenv("SMTP_USER", "")
-    SMTP_PASS: str = os.getenv("SMTP_PASS", "")
-    SMTP_FROM: str = os.getenv("SMTP_FROM", os.getenv("SMTP_USER", ""))
+    SMTP_USER: str = os.getenv("SMTP_USER", "kmg59674@gmail.com")
+    SMTP_PASS: str = os.getenv("SMTP_PASS", "nrvbupgsrsvrqpvga")
+    SMTP_FROM: str = os.getenv("SMTP_FROM", os.getenv("SMTP_USER", "kmg59674@gmail.com"))
     SMTP_USE_TLS: bool = os.getenv("SMTP_USE_TLS", "true").lower() in {"1", "true", "yes"}
-    REPORT_RECIPIENTS: list[str] = [
-        addr.strip()
-        for addr in os.getenv("REPORT_RECIPIENTS", "noc@ccu.local, support@ccu.local").split(",")
-        if addr.strip()
-    ]
+    REPORT_RECIPIENTS: str = os.getenv("REPORT_RECIPIENTS", "abdellah.moghandez@gmail.com")
 
     # Reports
     REPORTS_DIR: Path = PROJECT_ROOT / "reports"
