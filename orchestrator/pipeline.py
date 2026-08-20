@@ -11,6 +11,11 @@ de diagnostiquer, de rapporter et de notifier.
 import asyncio
 import concurrent.futures
 from typing import Any
+import os
+import sys
+
+# Ajoute le dossier 'orchestrator' au sys.path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from langgraph.graph import StateGraph, START, END
 
@@ -111,3 +116,6 @@ def run_diagnosis(incident: dict[str, Any]) -> dict[str, Any]:
 def stream_diagnosis(incident: dict[str, Any]):
     """Point d'entrée de streaming pour le diagnostic."""
     yield from DiagnosticPipeline().stream(incident)
+
+
+

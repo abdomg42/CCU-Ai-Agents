@@ -279,13 +279,13 @@ def main() -> None:
             f"Créés : {data['mapping_stats']['created']}"
         )
 
-    with col_right3:
-        st.subheader("Temps de traitement moyen")
-        avg = data["avg_pipeline_seconds"]
-        if avg is not None:
-            st.metric("Durée moyenne", f"{avg:.2f} s")
-        else:
-            st.info("Aucun audit pipeline disponible.")
+    # with col_right3:
+    #     st.subheader("Temps de traitement moyen")
+    #     avg = data["avg_pipeline_seconds"]
+    #     if avg is not None:
+    #         st.metric("Durée moyenne", f"{avg:.2f} s")
+    #     else:
+    #         st.info("Aucun audit pipeline disponible.")
 
 
 main()

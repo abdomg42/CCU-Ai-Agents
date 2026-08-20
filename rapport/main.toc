@@ -1,0 +1,89 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Remerciements}{i}{section*.2}%
+\contentsline {chapter}{Résumé}{ii}{section*.4}%
+\contentsline {xchapter}{}{ii}{section*.2}%
+\contentsline {chapter}{Abstract}{iii}{section*.6}%
+\contentsline {xchapter}{}{iii}{section*.4}%
+\contentsline {xchapter}{}{iv}{section*.6}%
+\babel@toc {french}{}\relax 
+\contentsline {xchapter}{}{iv}{section*.6}%
+\contentsline {chapter}{Table des figures}{v}{section*.7}%
+\contentsline {xchapter}{}{v}{section*.7}%
+\contentsline {chapter}{Liste des tableaux}{vi}{section*.8}%
+\contentsline {xchapter}{}{vi}{section*.8}%
+\contentsline {chapter}{Liste des sigles et acronymes}{vii}{section*.10}%
+\contentsline {chapter}{Introduction}{1}{section*.12}%
+\contentsline {xchapter}{}{1}{section*.10}%
+\contentsline {xchapter}{}{2}{section*.12}%
+\babel@toc {french}{}\relax 
+\contentsline {chapter}{\numberline {1}Présentation du Projet}{2}{chapter.1}%
+\contentsline {section}{Introduction}{2}{section*.13}%
+\contentsline {section}{\numberline {1.1}Présentation de l'organisme d'accueil}{2}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Le Groupe Inetum}{2}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Inetum Offshore Maroc (IOM)}{3}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}Organisation et pôles d'expertise}{3}{subsection.1.1.3}%
+\contentsline {subsection}{\numberline {1.1.4}Secteurs d’activité}{4}{subsection.1.1.4}%
+\contentsline {subsection}{\numberline {1.1.5}Organigramme d'Inetum Offshore Maroc}{4}{subsection.1.1.5}%
+\contentsline {subsection}{\numberline {1.1.6}Partenaires et Clients}{5}{subsection.1.1.6}%
+\contentsline {paragraph}{Partenaires stratégiques :}{5}{subsection.1.1.6}%
+\contentsline {paragraph}{Principaux clients au Maroc :}{5}{subsection.1.1.6}%
+\contentsline {section}{\numberline {1.2}Contexte du projet}{6}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Cadre général du projet}{6}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Problématique et enjeux}{6}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.2.3}Périmètre fonctionnel}{6}{subsection.1.2.3}%
+\contentsline {subsection}{\numberline {1.2.4}Objectifs du projet}{7}{subsection.1.2.4}%
+\contentsline {section}{\numberline {1.3}Méthodologie et planification}{7}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Choix méthodologique}{7}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Planification}{7}{subsection.1.3.2}%
+\contentsline {chapter}{\numberline {2}Conception de l'Architecture Agentique}{9}{chapter.2}%
+\contentsline {section}{Introduction}{9}{section*.19}%
+\contentsline {section}{\numberline {2.1}Vue d'ensemble du pipeline}{9}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Modèle de données partagé}{10}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Les agents du pipeline}{11}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Intake parser}{11}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Collecteurs parallèles}{11}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Root cause reasoner}{11}{subsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.3.4}Ticket manager}{11}{subsection.2.3.4}%
+\contentsline {subsection}{\numberline {2.3.5}Remediation explainer}{12}{subsection.2.3.5}%
+\contentsline {subsection}{\numberline {2.3.6}Content guardrail}{12}{subsection.2.3.6}%
+\contentsline {subsection}{\numberline {2.3.7}Report generator et notifier}{12}{subsection.2.3.7}%
+\contentsline {section}{\numberline {2.4}Graphe de connaissances Neo4j}{12}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Modèle de données graphe}{12}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Contraintes et index vectoriel}{12}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Recherche GraphRAG}{13}{subsection.2.4.3}%
+\contentsline {subsection}{\numberline {2.4.4}Provider d'embeddings}{13}{subsection.2.4.4}%
+\contentsline {section}{\numberline {2.5}API REST et interface utilisateur}{13}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}FastAPI et streaming SSE}{13}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Chatbot Next.js}{13}{subsection.2.5.2}%
+\contentsline {chapter}{\numberline {3}Réalisation et Implémentation}{14}{chapter.3}%
+\contentsline {section}{Introduction}{14}{section*.23}%
+\contentsline {section}{\numberline {3.1}Stack technique}{14}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Implémentation du pipeline}{15}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Construction du graphe}{15}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Parallélisme des collecteurs}{15}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Exemples d'agents}{16}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Intake parser}{16}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Root cause reasoner}{16}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Requête GraphRAG}{16}{subsection.3.3.3}%
+\contentsline {section}{\numberline {3.4}Configuration et variables d'environnement}{17}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Fichier .env}{17}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Makefile}{17}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Sécurité et guardrails}{17}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Principe de non-exécution automatique}{17}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Guardrail de contenu}{18}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Refus d'hallucination}{18}{subsection.3.5.3}%
+\contentsline {chapter}{\numberline {4}Validation, Déploiement et Démonstration}{19}{chapter.4}%
+\contentsline {section}{Introduction}{19}{section*.26}%
+\contentsline {section}{\numberline {4.1}Stratégie de test}{19}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Tests unitaires et d'intégration}{19}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Tests Neo4j}{19}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Golden incidents}{20}{subsection.4.1.3}%
+\contentsline {section}{\numberline {4.2}Déploiement}{20}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Docker Compose}{20}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Seed des données}{20}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Scénario de démonstration}{21}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Description du cas}{21}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Déroulement du diagnostic}{21}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Observation des résultats}{21}{subsection.4.3.3}%
+\contentsline {chapter}{Conclusion}{22}{section*.29}%
+\contentsline {chapter}{Bibliographie}{23}{section*.30}%
