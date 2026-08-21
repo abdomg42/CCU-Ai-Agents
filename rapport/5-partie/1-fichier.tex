@@ -1,0 +1,201 @@
+% !TeX root = ../main.tex
+\addcontentsline{toc}{section}{Introduction}
+\section*{Introduction}
+Ce chapitre présente les résultats obtenus et leur analyse. Nous y détaillons les fonctionnalités réalisées, illustrons les résultats par des captures d'écran, décrivons les scénarios d'utilisation, évaluons les performances, puis dressons les avantages et les limites de la solution.
+
+\section{Fonctionnalités réalisées}
+L'ensemble des besoins fonctionnels identifiés au chapitre 2 a été implémenté. Le tableau \ref{tab:fonctionnalites} résume le statut de chaque fonctionnalité.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|p{8cm}|c|}
+        \hline
+        \rowcolor{iNavy} \textbf{\color{white}ID} & \textbf{\color{white}Fonctionnalité} & \textbf{\color{white}Statut} \\ \hline
+        BF1 & Intake intelligent et normalisation de l'incident & Réalisé \\ \hline
+        BF2 & Collecte parallèle logs / contexte client / tickets & Réalisé \\ \hline
+        BF3 & Raisonnement sur la cause racine avec confiance & Réalisé \\ \hline
+        BF4 & Mapping ou création de ticket Zammad & Réalisé \\ \hline
+        BF5 & Remédiation explicative non automatique & Réalisé \\ \hline
+        BF6 & Guardrail PII et liste blanche d'actions & Réalisé \\ \hline
+        BF7 & Génération de rapport PDF & Réalisé \\ \hline
+        BF8 & Notification email et note Zammad & Réalisé \\ \hline
+    \end{tabular}
+    \caption{Fonctionnalités réalisées}
+    \label{tab:fonctionnalites}
+\end{table}
+
+\section{Résultats et captures d'écran}
+Les figures \ref{fig:result_chat} à \ref{fig:result_neo4j} illustrent les principaux résultats obtenus.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/Chat_agent_streamlit.png}
+    \caption{Agent conversationnel dans l'interface Streamlit}
+    \label{fig:result_chat}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/dashboard_streamlit.png}
+    \caption{Tableau de bord des incidents}
+    \label{fig:result_dashboard}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/liste_ticket_streamlit.png}
+    \caption{Liste des tickets dans l'interface}
+    \label{fig:result_tickets}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/Graph_streamlit.png}
+    \caption{Visualisation graphe dans l'interface}
+    \label{fig:result_graph}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/rapport_ccu.png}
+    \caption{Rapport PDF généré}
+    \label{fig:result_report}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/email_sent_gmail.png}
+    \caption{Email de notification reçu}
+    \label{fig:result_email}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/CapturGraph_neo4j.png}
+    \caption{Graphe de connaissances dans Neo4j Browser}
+    \label{fig:result_neo4j}
+\end{figure}
+
+\section{Scénarios d'utilisation}
+
+\subsection{Scénario 1 : Coupure fibre optique}
+Un opérateur reçoit l'incident suivant :
+
+\begin{fquote}
+Client acc-12345, service svc-fiber-12345, commande ord-2026-001. Coupure Internet fibre.
+\end{fquote}
+
+Le pipeline exécute successivement les étapes suivantes :
+
+\begin{enumerate}
+    \item \textbf{Intake} : extraction de \texttt{customer\_id=acc-12345}, \texttt{service\_id=svc-fiber-12345}, \texttt{order\_id=ord-2026-001}, type \texttt{fibre}, priorité \texttt{P2}.
+    \item \textbf{Collecte} : logs OLT, contexte client CRM et tickets similaires de coupure fibre en parallèle.
+    \item \textbf{Root cause} : cause racine \texttt{Perte de signal fibre optique} avec confiance moyenne ou forte.
+    \item \textbf{Ticket manager} : création du ticket \texttt{TICK-CCU-XXXX}.
+    \item \textbf{Remediation} : proposition d'actions informatives (vérification de la paire, test optique).
+    \item \textbf{Guardrail} : vérification PII.
+    \item \textbf{Report generator} : génération du PDF \texttt{INC-CCU-XXXX.pdf}.
+    \item \textbf{Notifier} : envoi d'un email et ajout d'une note interne dans Zammad.
+\end{enumerate}
+
+\subsection{Observation des résultats}
+La démonstration peut être observée à plusieurs endroits :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \textbf{Streamlit} : affichage de la trace agent et du lien de téléchargement du rapport.
+    \item \textbf{MailHog} : réception de l'email avec le PDF en pièce jointe.
+    \item \textbf{Zammad} : ticket créé avec une note interne indiquant l'envoi du rapport.
+    \item \textbf{Neo4j Browser} : visualisation des nœuds et relations du graphe.
+\end{itemize}
+
+\section{Performances}
+
+\subsection{Tests automatisés}
+Le projet utilise \textbf{pytest} pour valider le fonctionnement des agents, de l'ingestion Neo4j et des requêtes GraphRAG. La configuration de pytest est définie dans \texttt{pyproject.toml} avec le mode asynchrone activé.
+
+\begin{lstlisting}[language=Python, caption={Configuration pytest dans pyproject.toml}]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+\end{lstlisting}
+
+Les tests couvrent les domaines suivants :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \textbf{Intake} : validation du parsing heuristique.
+    \item \textbf{Contexte} : récupération du contexte client.
+    \item \textbf{Guardrail} : vérification du filtrage PII.
+    \item \textbf{Pipeline} : exécution complète du graphe en mode mock.
+    \item \textbf{Graph ingestion} : compteurs de nœuds et relations après seed.
+    \item \textbf{GraphRAG} : recherche de tickets similaires.
+\end{itemize}
+
+\subsection{Golden incidents}
+Le répertoire \texttt{evaluation/golden\_incidents/} contient un ensemble de cas de test attendus. Le runner \texttt{eval\_runner.py} rejoue ces incidents, compare les résultats aux attentes et produit un rapport pass/fail avec une accuracy globale.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|p{7cm}|l|}
+        \hline
+        \rowcolor{iNavy} \textbf{\color{white}Cas} & \textbf{\color{white}Objectif} & \textbf{\color{white}Résultat attendu} \\ \hline
+        Coupure fibre & Valider la corrélation logs + ticket similaire & Cause fibre identifiée \\ \hline
+        Timeout CRM & Valider le contexte client et logs applicatifs & Cause CRM identifiée \\ \hline
+        SIM non provisionnée & Valider le type d'incident mobile & Cause HLR identifiée \\ \hline
+        VLAN mismatch & Valider le type d'incident LAN & Cause VLAN identifiée \\ \hline
+        Billing & Valider le fallback faible confiance & Cause indéterminée \\ \hline
+    \end{tabular}
+    \caption{Exemples de cas golden incidents}
+    \label{tab:golden}
+\end{table}
+
+\subsection{Métriques de performance}
+En mode mock, le pipeline s'exécute en quelques secondes. Le temps de réponse dépend principalement de :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item La latence d'Ollama lorsque le LLM est activé.
+    \item Le temps de recherche vectorielle dans Neo4j.
+    \item La génération du PDF avec WeasyPrint.
+\end{itemize}
+
+\section{Avantages}
+La solution apporte plusieurs avantages par rapport au diagnostic manuel :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \textbf{Gain de temps} : agrégation automatique des sources pertinentes.
+    \item \textbf{Fiabilisation} : corrélation structurée et raisonnement guidé par les données.
+    \item \textbf{Capitalisation} : réutilisation des tickets historiques via le graphe Neo4j.
+    \item \textbf{Sécurité} : aucune action corrective automatique et filtrage des PII.
+    \item \textbf{Traçabilité} : journal d'audit de chaque exécution.
+    \item \textbf{Industrialisation} : API REST, tests automatisés et déploiement Docker.
+\end{itemize}
+
+\section{Limites}
+Certaines limites demeurent et constituent des axes d'amélioration :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \textbf{Données mockées} : le système s'appuie sur des données simulées, ce qui limite la généralisation à un environnement de production réel.
+    \item \textbf{LLM local} : les performances du modèle local peuvent être inférieures à celles d'un modèle cloud, notamment pour des cas complexes.
+    \item \textbf{Mode mock déterministe} : en mode \texttt{MOCK\_LLM=true}, le raisonnement est entièrement déterministe et ne bénéficie pas de la créativité du LLM.
+    \item \textbf{Couverture des cas} : le jeu de golden incidents est limité et devrait être enrichi.
+\end{itemize}
+
+\section*{Conclusion}
+Ce chapitre a présenté les résultats obtenus : fonctionnalités réalisées, captures d'écran, scénarios d'utilisation, performances, avantages et limites. La solution démontre la faisabilité d'un agent IA de diagnostic technique pour le SI CCU dans un environnement local contrôlé. La conclusion générale qui suit dresse le bilan du stage et les perspectives d'évolution.

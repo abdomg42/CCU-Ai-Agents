@@ -1,10 +1,13 @@
 % !TeX root = ../main.tex
 \addcontentsline{toc}{section}{Introduction}
 \section*{Introduction}
-Ce chapitre détaille la réalisation technique du projet. Il présente la stack utilisée, l'implémentation du pipeline LangGraph, des extraits de code représentatifs des agents, la configuration et les mécanismes de sécurité mis en place.
+Ce chapitre détaille la réalisation technique du projet. Nous présentons l'environnement de développement, les technologies utilisées, l'intégration des modèles IA, le système d'agents, le traitement des documents, la génération des informations métier, le moteur de recherche, les API et les captures d'écran de l'application.
 
-\section{Stack technique}
-Le projet est développé en Python 3.11 et s'appuie sur un ensemble de bibliothèques et outils open source :
+\section{Environnement de développement}
+Le développement s'est déroulé sur un poste de travail équipé de Windows 11. L'environnement comprend Visual Studio Code comme IDE, Git pour la gestion de versions, Python 3.11 dans un environnement virtuel \texttt{.venv}, Docker Desktop pour la conteneurisation, Neo4j Community Edition en local et Ollama pour l'exécution locale des modèles de langage.
+
+\section{Technologies utilisées}
+Le tableau \ref{tab:stack} résume les technologies principales du projet.
 
 \begin{table}[H]
     \centering
@@ -20,172 +23,161 @@ Le projet est développé en Python 3.11 et s'appuie sur un ensemble de biblioth
         pytest & Tests unitaires et d'intégration \\ \hline
         Docker Compose & Conteneurisation de l'API et des services \\ \hline
         Jinja2 / WeasyPrint & Génération de rapports PDF/HTML \\ \hline
-        Next.js & Interface utilisateur chatbot \\ \hline
+        Streamlit & Interface utilisateur chatbot \\ \hline
     \end{tabular}
     \caption{Stack technique du projet}
     \label{tab:stack}
 \end{table}
 
-\section{Implémentation du pipeline}
+Les figures \ref{fig:tools_langgraph} à \ref{fig:tools_zammad} présentent les logos des principales technologies utilisées.
 
-\subsection{Construction du graphe}
-La classe \texttt{DiagnosticPipeline} dans \texttt{orchestrator/pipeline.py} construit le graphe LangGraph en déclarant les nœuds et les arêtes. Le nœud \texttt{collectors} encapsule le parallélisme des trois agents collecteurs.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/langgraph.png}
+        \caption{LangGraph}
+        \label{fig:tools_langgraph}
+    \end{minipage}%
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/FastAPI.png}
+        \caption{FastAPI}
+        \label{fig:tools_fastapi}
+    \end{minipage}%
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/Neo4j.png}
+        \caption{Neo4j}
+        \label{fig:tools_neo4j}
+    \end{minipage}
+\end{figure}
 
-\begin{lstlisting}[language=Python, caption={Construction du graphe LangGraph}, label={lst:pipeline}]
-from langgraph.graph import StateGraph, START, END
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/ollama.png}
+        \caption{Ollama}
+        \label{fig:tools_ollama}
+    \end{minipage}%
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/postgres.png}
+        \caption{PostgreSQL (Zammad)}
+        \label{fig:tools_postgres}
+    \end{minipage}%
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/Docker.png}
+        \caption{Docker}
+        \label{fig:tools_docker}
+    \end{minipage}
+\end{figure}
 
-class DiagnosticPipeline:
-    def __init__(self) -> None:
-        self.graph = self._build_graph()
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/chromaDB.png}
+        \caption{ChromaDB}
+        \label{fig:tools_chroma}
+    \end{minipage}%
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/kafka.png}
+        \caption{Kafka}
+        \label{fig:tools_kafka}
+    \end{minipage}%
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/tools/Zammad.png}
+        \caption{Zammad}
+        \label{fig:tools_zammad}
+    \end{minipage}
+\end{figure}
 
-    def _build_graph(self) -> StateGraph:
-        builder = StateGraph(GraphState)
-        builder.add_node("intake", run_intake)
-        builder.add_node("collectors", _collect)
-        builder.add_node("root_cause", run_root_cause)
-        builder.add_node("ticket_manager", run_ticket_manager)
-        builder.add_node("remediation_explainer", run_remediation_explanation)
-        builder.add_node("content_guardrail", run_content_guardrail)
-        builder.add_node("report_generator", run_report_generator)
-        builder.add_node("notifier", run_notifier)
+\section{Intégration des modèles IA}
+Le projet s'appuie sur des modèles exécutés localement via \textbf{Ollama}, garantissant l'autonomie du système et la confidentialité des données.
 
-        builder.add_edge(START, "intake")
-        builder.add_edge("intake", "collectors")
-        builder.add_edge("collectors", "root_cause")
-        builder.add_edge("root_cause", "ticket_manager")
-        builder.add_edge("ticket_manager", "remediation_explainer")
-        builder.add_edge("remediation_explainer", "content_guardrail")
-        builder.add_edge("content_guardrail", "report_generator")
-        builder.add_edge("report_generator", "notifier")
-        builder.add_edge("notifier", END)
-        return builder.compile()
-\end{lstlisting}
+\subsection{Modèle de langage}
+Le modèle \textbf{qwen2.5:latest} est utilisé pour la validation et l'enrichissement du parsing d'incident, l'explication des causes racines, la rédaction des remédiations et la génération de texte structuré pour les rapports. En mode \texttt{MOCK\_LLM=true}, le système fonctionne de manière déterministe sans dépendance externe, ce qui facilite les tests et les démonstrations.
+
+\subsection{Modèle d'embedding}
+Le modèle \textbf{mxbai-embed-large:latest} est utilisé pour vectoriser les descriptions d'incidents et les tickets historiques. Ces vecteurs sont stockés dans Neo4j et servent à la recherche de similarité cosine.
+
+\subsection{Provider d'embeddings}
+L'interface \texttt{EmbeddingProvider} permet de changer de provider (Ollama, sentence-transformers, OpenAI, Voyage AI) sans modifier le reste du code. Cette modularité facilite les tests comparatifs et l'évolution vers d'autres modèles.
+
+\section{Système d'agents}
+
+\subsection{Modèle de données partagé}
+L'état du graphe est matérialisé par la classe \texttt{GraphState} définie dans \texttt{shared/state.py}. Elle utilise Pydantic pour valider les données à chaque transition. Les champs principaux incluent l'incident brut, l'incident normalisé, les résultats des collecteurs, la cause racine, l'explication de remédiation, le mapping du ticket, les champs filtrés par le guardrail, le chemin du rapport, les indicateurs de notification et le journal d'audit.
 
 \subsection{Parallélisme des collecteurs}
-La fonction \texttt{\_collect} tente d'abord une exécution asynchrone via \texttt{asyncio.gather}. Si une boucle d'événements est déjà active, elle bascule vers un \texttt{ThreadPoolExecutor}.
+Les trois agents collecteurs s'exécutent en parallèle via \texttt{asyncio.gather}, avec un fallback sur \texttt{ThreadPoolExecutor} en cas de boucle déjà active. Cette approche réduit le temps total de collecte en interrogeant simultanément les logs, le CRM et le graphe Neo4j.
 
-\begin{lstlisting}[language=Python, caption={Parallélisme des collecteurs}, label={lst:collectors}]
-async def _collect_async(state: GraphState) -> dict[str, Any]:
-    results = await asyncio.gather(
-        asyncio.to_thread(run_logs, state),
-        asyncio.to_thread(run_context, state),
-        asyncio.to_thread(run_rag, state),
-    )
-    merged: dict[str, Any] = {}
-    for r in results:
-        merged.update(r)
-    return merged
-\end{lstlisting}
+\subsection{Exemples d'implémentation}
+L'agent d'intake utilise des expressions régulières pour extraire les identifiants métier (service, commande, client), puis détermine le type d'incident et la priorité par des règles heuristiques. Lorsque le LLM est disponible, il valide et enrichit ces extractions.
 
-\section{Exemples d'agents}
+L'agent de raisonnement implémente une logique déterministe qui refuse toute hallucination : en l'absence de source suffisante, il retourne systématiquement une cause \texttt{indéterminée} avec une confiance faible.
 
-\subsection{Intake parser}
-L'agent d'intake utilise des expressions régulières pour extraire les identifiants métier, puis détermine le type d'incident et la priorité par des règles heuristiques.
+\section{Traitement des documents}
+Le traitement des documents concerne l'ingestion des données mockées dans le graphe Neo4j. Le répertoire \texttt{mocks/} contient les fichiers JSON représentant les clients, les commandes, les tickets historiques et les logs. La commande \texttt{make seed} exécute les étapes suivantes :
 
-\begin{lstlisting}[language=Python, caption={Parsing heuristique de l'incident}, label={lst:intake}]
-class IntakeParserAgent:
-    def _heuristic_parse(self, incident: dict[str, Any]) -> IncidentSchema:
-        text = incident.get("description", "") + " " + incident.get("title", "")
-        service_id = self._extract_field(text, [
-            r"service[_\-]?id\s*[:=]\s*([a-z0-9\-]+)",
-            r"\b(svc-[a-z0-9\-]+)\b",
-        ])
-        order_id = self._extract_field(text, [
-            r"\b(ord-[0-9\-]+)\b",
-        ])
-        customer_id = self._extract_field(text, [
-            r"\b(acc-[0-9]+)\b",
-        ])
-        # Type et priorité determines par mots-cles
-        ...
-\end{lstlisting}
+\begin{enumerate}
+    \item Création du schéma et des contraintes Neo4j.
+    \item Insertion des nœuds et des relations.
+    \item Calcul et stockage des embeddings des tickets.
+\end{enumerate}
 
-\subsection{Root cause reasoner}
-L'agent de raisonnement implémente une logique déterministe qui s'appuie sur les sources collectées. Si un ticket similaire fournit une cause racine, celle-ci est retenue. Sinon, l'agent applique des règles par type d'incident. En l'absence de source suffisante, il retourne une cause \texttt{indéterminée}.
+\section{Génération des questions métier}
+La phase d'intake transforme un incident exprimé en langage naturel en une structure métier normalisée. Le système identifie les champs essentiels (client, service, commande, type, priorité) à partir du texte brut. Cette conversion constitue la base de la génération des informations métier exploitées par les agents pour le diagnostic.
 
-\begin{lstlisting}[language=Python, caption={Refus d'hallucination dans le root cause reasoner}, label={lst:rootcause}]
-def _deterministic_cause(self, state: GraphState) -> RootCauseSchema:
-    sources, _ = self._collect_sources(state)
-    if not sources:
-        return RootCauseSchema(
-            confidence="faible",
-            cause="indeterminee",
-            explanation="Aucune source suffisante ...",
-            source_ids=[],
-        )
-    # Correlation avec le ticket similaire le plus proche
-    rag = state.similar_tickets or {}
-    similar = rag.get("similar_tickets", [])
-    if similar:
-        best = min(similar, key=lambda t: t.get("distance", 1.0))
-        cause = best.get("root_cause", "indeterminee")
-        ...
-\end{lstlisting}
+\section{Moteur de recherche}
+Le moteur de recherche repose sur GraphRAG : combinaison de la recherche vectorielle native Neo4j avec un filtre de proximité de graphe. L'incident courant est vectorisé, Neo4j retourne les tickets les plus proches en similarité cosine, puis un filtre conserve ceux liés au même produit ou au même type de commande.
 
-\subsection{Requête GraphRAG}
-La requête Cypher suivante illustre la combinaison de la recherche vectorielle native Neo4j avec un filtre de proximité de graphe.
+\section{API}
+L'API est développée avec \textbf{FastAPI}. La route \texttt{/diagnose/stream} retourne un flux d'événements Server-Sent Events (SSE), chaque événement correspondant à un nœud traversé par le graphe LangGraph. Cette approche permet au client de suivre la progression du diagnostic en temps réel.
 
-\begin{lstlisting}[language=SQL, caption={Recherche GraphRAG dans Neo4j}, label={lst:cypher}]
-CALL db.index.vector.queryNodes($index_name, $candidate_limit, $query_embedding)
-YIELD node AS t, score
-WHERE score >= $threshold
-  AND (size(product_names) = 0 OR EXISTS {
-    MATCH (t)-[:RELATED_TO_PRODUCT]->(p:Product)
-    WHERE p.name IN product_names
-  })
-RETURN t.id AS ticket_id, t.summary AS summary,
-       t.root_cause AS root_cause, t.resolution AS resolution, score
-ORDER BY score DESC
-LIMIT $top_k
-\end{lstlisting}
+\section{Captures d'écran de l'application}
+Les figures suivantes illustrent les principales interfaces de l'application.
 
-\section{Configuration et variables d'environnement}
+La figure \ref{fig:streamlit_chat} montre l'interface conversationnelle Streamlit où l'opérateur saisit l'incident en langage naturel et visualise la trace des agents.
 
-\subsection{Fichier .env}
-Le projet utilise un fichier \texttt{.env} pour la configuration. Le mode \texttt{MOCK\_LLM=true} permet de démarrer sans Ollama, en utilisant une logique déterministe.
-
-\begin{table}[H]
+\begin{figure}[H]
     \centering
-    \renewcommand{\arraystretch}{1.2}
-    \begin{tabular}{|l|p{8cm}|}
-        \hline
-        \rowcolor{iNavy} \textbf{\color{white}Variable} & \textbf{\color{white}Description} \\ \hline
-        MOCK\_LLM & Mode LLM simulé (true/false) \\ \hline
-        OLLAMA\_BASE\_URL & URL du service Ollama local \\ \hline
-        OLLAMA\_MODEL & Modèle de langage local \\ \hline
-        NEO4J\_URI & URI de connexion Neo4j \\ \hline
-        NEO4J\_USER / NEO4J\_PASSWORD & Credentials Neo4j \\ \hline
-        EMBEDDING\_PROVIDER & Provider d'embedding (ollama, ...) \\ \hline
-        VECTOR\_SIMILARITY\_THRESHOLD & Seuil de similarité cosine \\ \hline
-    \end{tabular}
-    \caption{Principales variables d'environnement}
-    \label{tab:env}
-\end{table}
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/Chat_agent_streamlit.png}
+    \caption{Interface chatbot Streamlit}
+    \label{fig:streamlit_chat}
+\end{figure}
 
-\subsection{Makefile}
-Le \texttt{Makefile} fournit les commandes essentielles du projet :
+La figure \ref{fig:streamlit_dashboard} présente le tableau de bord des incidents, qui offre une vue synthétique des diagnostics en cours et passés.
 
-\begin{itemize}
-    \setlength\itemsep{0.1em}
-    \setlength\parskip{0pt}
-    \setlength\parsep{0pt}
-    \item \texttt{make install} : installation des dépendances Python.
-    \item \texttt{make seed} : seed de Neo4j (schéma, mocks, embeddings).
-    \item \texttt{make test} : exécution des tests pytest.
-    \item \texttt{make api} : lancement de l'API FastAPI.
-    \item \texttt{make docker-up} / \texttt{make docker-down} : gestion des conteneurs.
-\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/dashboard_streamlit.png}
+    \caption{Tableau de bord Streamlit}
+    \label{fig:streamlit_dashboard}
+\end{figure}
 
-\section{Sécurité et guardrails}
+La figure \ref{fig:streamlit_tickets} affiche la liste des tickets gérés par l'application.
 
-\subsection{Principe de non-exécution automatique}
-Le projet respecte une règle fondamentale : \textbf{aucune action technique n'est jamais exécutée automatiquement} sur un système réel. L'agent produit des diagnostics, des explications et des rapports, mais toute action corrective reste sous le contrôle d'un opérateur humain.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/liste_ticket_streamlit.png}
+    \caption{Liste des tickets dans Streamlit}
+    \label{fig:streamlit_tickets}
+\end{figure}
 
-\subsection{Guardrail de contenu}
-Le guardrail de contenu filtre les informations personnelles identifiables (PII) avant toute génération de rapport ou notification. Il s'appuie sur une logique de whitelist pour les actions autorisées et refuse toute action hors périmètre.
+La figure \ref{fig:streamlit_graph} illustre la visualisation du graphe de connaissances directement dans l'interface Streamlit.
 
-\subsection{Refus d'hallucination}
-Le \texttt{root\_cause\_reasoner} retourne systématiquement une cause \texttt{indéterminée} avec une confiance faible lorsqu'il ne peut citer aucune source. Cette mesure limite les diagnostics inventés par le modèle.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/Graph_streamlit.png}
+    \caption{Visualisation du graphe dans Streamlit}
+    \label{fig:streamlit_graph}
+\end{figure}
 
 \section*{Conclusion}
-Ce chapitre a détaillé la réalisation technique du projet : stack Python, orchestration LangGraph, implémentation des agents, requêtes GraphRAG, configuration et guardrails de sécurité. Le chapitre suivant traite de la validation, du déploiement et de la démonstration de bout en bout.
+Ce chapitre a détaillé la réalisation technique du projet : environnement, stack technologique, modèles IA locaux, orchestration LangGraph, traitement des documents, moteur GraphRAG, API FastAPI et interfaces utilisateur. Le chapitre suivant présente les résultats obtenus et leur analyse.

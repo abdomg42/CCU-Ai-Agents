@@ -1,145 +1,231 @@
 % !TeX root = ../main.tex
 \addcontentsline{toc}{section}{Introduction}
 \section*{Introduction}
-Ce chapitre présente la conception de l'architecture agentique du diagnostic technique CCU. Il décrit le pipeline global orchestré par LangGraph, le rôle de chaque agent, le modèle de données partagé, le graphe Neo4j et le mécanisme de recherche augmentée par graphe (GraphRAG).
+Ce chapitre présente le contexte du projet, l'analyse des besoins, l'étude de l'existant, la méthodologie et la conception de l'architecture agentique. Nous y formalisons les difficultés rencontrées, les besoins fonctionnels et non fonctionnels, les contraintes techniques, puis nous détaillons l'architecture générale, la base de données et les workflows agents.
 
-\section{Vue d'ensemble du pipeline}
-L'architecture repose sur un graphe d'état (state graph) implémenté avec \textbf{LangGraph}. Chaque nœud du graphe correspond à un agent spécialisé qui lit et écrit dans un état partagé. Le flux de traitement d'un incident suit le cheminement suivant :
+\section{Présentation du projet}
+Ce projet de fin d'études s'inscrit dans le cadre de la refonte du Système d'Information (SI) Commercial d'un opérateur télécom, plus précisément autour du système \textbf{CCU} (Commande et Catalogue Unifiés). L'objectif est de concevoir et de développer un \textbf{agent IA de diagnostic technique} capable d'assister les équipes de support dans la résolution des incidents affectant ce SI.
 
-\begin{center}
-\texttt{START $\rightarrow$ intake $\rightarrow$ collectors $\rightarrow$ root\_cause $\rightarrow$ ticket\_manager}\\
-\texttt{$\rightarrow$ remediation\_explainer $\rightarrow$ content\_guardrail $\rightarrow$ report\_generator $\rightarrow$ notifier $\rightarrow$ END}
-\end{center}
+\subsection{Contexte}
+Dans un secteur des télécommunications en constante mutation, les opérateurs doivent moderniser leur SI Commercial pour répondre aux attentes des clients et soutenir le déploiement de nouvelles technologies (FTTH, 4G/5G). Le programme de refonte porte sur le système \textbf{CCU}, qui centralise le catalogue de produits et la gestion des commandes clients.
 
-La figure \ref{fig:architecture_ccu} illustre ce pipeline agentique.
+Le projet objet de ce mémoire ne porte pas sur la migration de données, mais sur la conception d'un agent IA de diagnostic technique capable d'assister les équipes de support. L'agent exploite les APIs \textbf{TMF620} (Product Catalog) et \textbf{TMF622} (Product Ordering) du TM Forum pour s'aligner sur les standards de l'industrie télécom.
 
-\begin{figure}[H]
-    \centering
-    \input{images/architecture_ccu}
-    \caption{Pipeline agentique du diagnostic technique CCU}
-    \label{fig:architecture_ccu}
-\end{figure}
-
-\section{Modèle de données partagé}
-L'état du graphe est matérialisé par la classe \texttt{GraphState} définie dans \texttt{shared/state.py}. Elle utilise \textbf{Pydantic} pour valider les données à chaque transition. Les champs principaux sont :
+\subsection{Problématique}
+Les équipes de support technique font face à des incidents dont l'investigation requiert de consulter plusieurs sources disjointes :
 
 \begin{itemize}
     \setlength\itemsep{0.1em}
     \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item \texttt{incident} : description brute de l'incident.
-    \item \texttt{parsed\_incident} : structure normalisée (client, service, commande, type, priorité).
-    \item \texttt{logs}, \texttt{customer\_context}, \texttt{similar\_tickets} : résultats des agents collecteurs.
-    \item \texttt{root\_cause} : cause racine et niveau de confiance.
-    \item \texttt{remediation\_explanation} : explication de la remédiation proposée.
-    \item \texttt{ticket\_mapping} : mapping ou création du ticket.
-    \item \texttt{sanitized\_*} : champs filtrés par le guardrail.
-    \item \texttt{report\_path}, \texttt{email\_sent}, \texttt{zammad\_note\_added} : sorties finales.
-    \item \texttt{traces} : journal d'audit de l'exécution.
+    \item Les \textbf{logs réseau} et applicatifs, souvent volumineux et difficiles à interpréter rapidement.
+    \item Le \textbf{contexte client} stocké dans le CRM (statut du contrat, services actifs, historique).
+    \item Les \textbf{tickets historiques} résolus, qui contiennent une expertise précieuse mais sont difficiles à exploiter manuellement.
 \end{itemize}
 
-La classe \texttt{ParsedIncident} formalise les attributs extraits lors de l'intake :
+Cette dispersion des données engendre des temps de diagnostic longs, une dépendance forte à l'expertise humaine et un risque d'erreur. La problématique centrale est donc la suivante : \textbf{comment concevoir un système intelligent capable de corréler automatiquement ces sources pour produire un diagnostic fiable, explicable et actionnable, sans jamais exécuter d'action corrective automatique sur le SI réel ?}
+
+\subsection{Objectifs}
+Les objectifs du projet se déclinent en quatre axes :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \textbf{Centraliser l'investigation} : offrir un point d'entrée unique qui agrège les sources pertinentes à un incident.
+    \item \textbf{Fiabiliser le diagnostic} : réduire les erreurs humaines grâce à une corrélation structurée et à un raisonnement guidé par les données.
+    \item \textbf{Capitaliser l'expertise} : exploiter les tickets historiques via un graphe de connaissances et une recherche sémantique.
+    \item \textbf{Garantir la sécurité} : s'assurer qu'aucune action technique n'est exécutée automatiquement et que les données sensibles sont filtrées.
+\end{itemize}
+
+\section{Analyse des besoins et étude de l'existant}
+
+\subsection{Difficultés rencontrées dans les projets}
+Les projets de support et de maintenance du SI CCU rencontrent plusieurs difficultés récurrentes.
+
+\paragraph{Fragmentation des sources de données :}
+Les informations pertinentes à un incident sont dispersées entre logs réseau, CRM, historique des tickets et catalogues de produits. Cette fragmentation oblige les équipes de support à consulter manuellement plusieurs outils.
+
+\paragraph{Dépendance à l'expertise humaine :}
+Le diagnostic repose largement sur l'expérience individuelle des techniciens. Le savoir-faire est difficile à formaliser et à transmettre.
+
+\paragraph{Temps de résolution et risque d'erreur :}
+La consultation manuelle de sources hétérogènes engendre des temps de diagnostic longs et un risque d'erreur d'interprétation.
+
+\paragraph{Systèmes legacy :}
+Le SI CCU s'appuie sur des composants hérités dont les interfaces varient. Toute solution doit s'intégrer sans perturber ces systèmes existants.
+
+\subsection{Besoins fonctionnels}
+Le système doit couvrir les besoins fonctionnels suivants :
 
 \begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{1.2}
     \begin{tabular}{|l|p{10cm}|}
         \hline
-        \rowcolor{iNavy} \textbf{\color{white}Attribut} & \textbf{\color{white}Description} \\ \hline
-        service\_id & Identifiant du service concerné (ex. svc-fiber-12345) \\ \hline
-        order\_id & Identifiant de la commande (ex. ord-2026-001) \\ \hline
-        customer\_id & Identifiant du client (ex. acc-12345) \\ \hline
-        incident\_type & Type d'incident : fibre, sim, mobile, lan, billing, autre \\ \hline
-        description & Texte décrivant l'incident \\ \hline
-        priority & Priorité P1, P2 ou P3 \\ \hline
+        \rowcolor{iNavy} \textbf{\color{white}ID} & \textbf{\color{white}Besoin fonctionnel} \\ \hline
+        BF1 & Normaliser un incident exprimé en langage naturel ou structuré \\ \hline
+        BF2 & Collecter en parallèle les logs, le contexte client et les tickets similaires \\ \hline
+        BF3 & Corréler les sources pour établir une cause racine avec un niveau de confiance \\ \hline
+        BF4 & Mapper l'incident à un ticket existant ou créer un nouveau ticket dans Zammad \\ \hline
+        BF5 & Proposer une remédiation informative sans exécution automatique \\ \hline
+        BF6 & Filtrer les informations personnelles (PII) avant envoi externe \\ \hline
+        BF7 & Générer un rapport PDF/HTML structuré \\ \hline
+        BF8 & Notifier l'opérateur par email et ajouter une note dans le ticket \\ \hline
     \end{tabular}
-    \caption{Attributs de l'incident normalisé}
-    \label{tab:parsed_incident}
+    \caption{Besoins fonctionnels du système}
+    \label{tab:besoins_fonctionnels}
 \end{table}
 
-\section{Les agents du pipeline}
-
-\subsection{Intake parser}
-L'agent \texttt{intake\_parser} a pour mission de normaliser l'incident brut. Il combine une phase de parsing heuristique par expressions régulières et une validation/ajustement par LLM structuré lorsque le modèle est disponible. En mode \texttt{MOCK\_LLM=true}, le système fonctionne de manière déterministe sans dépendance externe.
-
-\subsection{Collecteurs parallèles}
-Les trois agents collecteurs s'exécutent en parallèle dans le nœud \texttt{collectors} :
+\subsection{Besoins non fonctionnels}
+Le système doit satisfaire les besoins non fonctionnels suivants :
 
 \begin{itemize}
     \setlength\itemsep{0.1em}
     \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item \texttt{logs\_investigator} : synthétise les logs réseau et applicatifs pertinents.
-    \item \texttt{context\_agent} : récupère le contexte client et contractuel dans le CRM.
-    \item \texttt{rag\_ticket\_search} : recherche des tickets historiques similaires dans Neo4j.
+    \item \textbf{Sécurité :} aucune action corrective automatique sur un système réel.
+    \item \textbf{Protection des données :} filtrage des PII avant envoi externe.
+    \item \textbf{Performance :} diagnostic en quelques secondes.
+    \item \textbf{Traçabilité :} journal d'audit de chaque exécution.
+    \item \textbf{Extensibilité :} ajout facilité de nouveaux agents ou sources.
+    \item \textbf{Testabilité :} composants testables unitairement et en intégration.
 \end{itemize}
 
-Le parallélisme est mis en œuvre via \texttt{asyncio.gather}, avec un fallback \texttt{ThreadPoolExecutor} en cas de boucle déjà active.
+\subsection{Contraintes techniques}
+Le projet s'inscrit dans un environnement technique contraint :
 
-\subsection{Root cause reasoner}
-L'agent \texttt{root\_cause\_reasoner} corrèle les sources collectées pour établir une cause racine. Il retourne un niveau de confiance (faible, moyenne, forte) et une liste de \texttt{source\_ids}. Si aucune source suffisante n'est disponible, il retourne une cause \texttt{indéterminée} avec une confiance faible, ce qui constitue un mécanisme de refus d'hallucination.
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item Stack Python 3.11.
+    \item Modèles de langage locaux via Ollama.
+    \item Base de données graphe Neo4j avec index vectoriel.
+    \item API REST avec FastAPI.
+    \item Conteneurisation avec Docker Compose.
+    \item APIs TMF620/TMF622 du TM Forum.
+    \item Données mockées en l'absence d'accès aux systèmes de production.
+\end{itemize}
 
-\subsection{Ticket manager}
-L'agent \texttt{ticket\_manager} détermine s'il faut créer un nouveau ticket ou rattacher l'incident à un ticket existant. Il s'appuie sur le client, le service et les tickets similaires déjà présents.
+\section{Méthodologie et planification}
 
-\subsection{Remediation explainer}
-L'agent \texttt{remediation\_explainer} produit un texte informatif décrivant les actions recommandées. Conformément au principe de sécurité du projet, ces actions ne sont jamais exécutées automatiquement.
+\subsection{Choix méthodologique}
+La conduite du projet s'appuie sur une approche hybride combinant le cycle en V pour la gouvernance globale et la méthode Agile/Scrum pour l'itération technique. Le développement a été découpé en sprints thématiques (intake, collecteurs, raisonnement, guardrail, reporting, notification) avec daily stand-ups, démos et rétrospectives.
 
-\subsection{Content guardrail}
-Le guardrail \texttt{pii\_sanitizer} filtre les informations personnelles identifiables (PII) avant toute génération de rapport ou notification externe. Il classe également les actions selon une liste blanche pour refuser tout comportement non autorisé.
+\subsection{Planification}
+Le tableau \ref{tab:planning} résume les grandes phases du projet.
 
-\subsection{Report generator et notifier}
-L'agent \texttt{report\_generator} produit un rapport PDF/HTML à partir d'un template Jinja2, avec WeasyPrint ou un fallback HTML. L'agent \texttt{notifier} envoie l'email et ajoute une note interne dans Zammad.
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|l|p{8cm}|l|}
+        \hline
+        \rowcolor{iNavy} \textbf{\color{white}Phase} & \textbf{\color{white}Description} & \textbf{\color{white}Durée} \\ \hline
+        Analyse & Étude du SI CCU, APIs TMF et sources de données & 2 semaines \\ \hline
+        Conception & Architecture agentique, modèle de données Neo4j, flux & 3 semaines \\ \hline
+        Réalisation & Implémentation des agents, API, ingestion & 5 semaines \\ \hline
+        Validation & Tests pytest, golden incidents, recette & 2 semaines \\ \hline
+        Documentation & Rédaction du rapport et démonstration & 2 semaines \\ \hline
+    \end{tabular}
+    \caption{Planification macro du projet}
+    \label{tab:planning}
+\end{table}
 
-\section{Graphe de connaissances Neo4j}
+\section{Conception de l'architecture}
+
+\subsection{Vue d'ensemble du pipeline}
+L'architecture repose sur un graphe d'état implémenté avec \textbf{LangGraph}. Le flux de traitement d'un incident suit le cheminement suivant : intake, collecte parallèle des sources, raisonnement sur la cause racine, gestion du ticket, explication de la remédiation, guardrail de contenu, génération du rapport, puis notification.
+
+\subsection{Architecture générale}
+Le système se décompose en cinq grands composants :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \textbf{Interface et API} : chatbot Streamlit et API REST FastAPI.
+    \item \textbf{Orchestrateur LangGraph} : pipeline agentique en graphe d'état.
+    \item \textbf{Agents spécialisés} : intake, collecteurs, raisonnement, ticket manager, remédiation, guardrail, report generator, notifier.
+    \item \textbf{Sources de données} : logs mockés, CRM mock, graphe Neo4j.
+    \item \textbf{Services externes} : Zammad, MailHog, Docker Compose.
+\end{itemize}
+
+La figure \ref{fig:architecture_generale} illustre l'architecture générale. On y distingue le flux entrant depuis l'interface utilisateur, l'orchestration par LangGraph, l'accès aux trois sources de données en parallèle, et les sorties vers le ticketing, l'email et le rapport PDF.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/new/architecture.png}
+    \caption{Architecture générale du système de diagnostic CCU}
+    \label{fig:architecture_generale}
+\end{figure}
+
+\subsection{Communication entre les composants}
+Les communications s'effectuent via l'API REST FastAPI. Le client envoie un payload JSON décrivant l'incident. L'orchestrateur invoque les agents, met à jour l'état partagé et retourne un flux d'événements Server-Sent Events (SSE) pour le suivi en temps réel.
+
+\subsection{Architecture multi-agents et rôle des agents}
+Chaque agent est responsable d'une tâche précise et communique via l'état partagé. Le tableau \ref{tab:roles_agents} résume leurs rôles.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|p{10cm}|}
+        \hline
+        \rowcolor{iNavy} \textbf{\color{white}Agent} & \textbf{\color{white}Rôle} \\ \hline
+        intake\_parser & Normalisation de l'incident brut \\ \hline
+        logs\_investigator & Synthèse des logs pertinents \\ \hline
+        context\_agent & Récupération du contexte client \\ \hline
+        rag\_ticket\_search & Recherche de tickets similaires dans Neo4j \\ \hline
+        root\_cause\_reasoner & Corrélation et détermination de la cause racine \\ \hline
+        ticket\_manager & Mapping ou création du ticket Zammad \\ \hline
+        remediation\_explainer & Rédaction de la remédiation informative \\ \hline
+        content\_guardrail & Filtrage PII et validation des actions \\ \hline
+        report\_generator & Génération du rapport PDF/HTML \\ \hline
+        notifier & Envoi d'email et note Zammad \\ \hline
+    \end{tabular}
+    \caption{Rôle des agents du pipeline}
+    \label{tab:roles_agents}
+\end{table}
+
+\section{Diagrammes de classe}
+La figure \ref{fig:class_diagram} présente le diagramme de classe du système. Celui-ci met en lumière les principales entités métiers, leurs attributs et leurs relations, notamment entre l'incident, les agents, l'état partagé et les sources de données.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/new/class_diagram.png}
+    \caption{Diagramme de classe du système de diagnostic CCU}
+    \label{fig:class_diagram}
+\end{figure}
+
+\section{Conception de la base de données}
 
 \subsection{Modèle de données graphe}
 Le graphe Neo4j stocke les entités métiers et leurs relations. Il sert à la fois de base de connaissances structurée et de support à la recherche vectorielle. Les principaux nœuds sont : \texttt{Client}, \texttt{Subscription}, \texttt{Order}, \texttt{Product}, \texttt{Ticket} et \texttt{LogEvent}.
 
-La figure \ref{fig:data_model_ccu} représente le modèle de données graphe.
+La figure \ref{fig:modele_neo4j} représente le modèle de données graphe. On y voit comment un client est lié à ses abonnements, ses commandes, les produits souscrits, les tickets historiques et les événements de logs.
 
 \begin{figure}[H]
     \centering
-    \input{images/data_model_ccu}
+    \includegraphics[width=0.95\textwidth]{images/new/modele_neo4j.png}
     \caption{Modèle de données du graphe Neo4j}
-    \label{fig:data_model_ccu}
+    \label{fig:modele_neo4j}
 \end{figure}
 
 \subsection{Contraintes et index vectoriel}
-Le fichier \texttt{graph/schema.cypher} définit les contraintes d'unicité sur chaque entité et crée un index vectoriel sur les embeddings des tickets. Cet index permet d'effectuer une recherche de similarité cosine nativement dans Neo4j.
+Le fichier \texttt{graph/schema.cypher} définit les contraintes d'unicité sur chaque entité et crée un index vectoriel sur les embeddings des tickets. Cet index permet d'effectuer une recherche de similarité cosine nativement dans Neo4j. Le provider Ollama avec le modèle \texttt{mxbai-embed-large:latest} est utilisé par défaut pour produire ces embeddings.
 
-\begin{lstlisting}[language=SQL, caption={Extrait du schema.cypher}, label={lst:schema_cypher}]
-CREATE CONSTRAINT ticket_id IF NOT EXISTS
-FOR (t:Ticket) REQUIRE t.id IS UNIQUE;
+\section{Workflow des agents}
+Le workflow est modélisé par un graphe d'état LangGraph. La classe \texttt{DiagnosticPipeline} construit le graphe en déclarant les nœuds et les arêtes. Le nœud \texttt{collectors} encapsule le parallélisme des trois agents collecteurs (logs, contexte client, tickets similaires). Après la collecte, l'agent de cause racine corrèle les sources, le ticket manager rattache ou crée le ticket, le remédiateur rédige une fiche informative, le guardrail filtre les PII, le report generator produit le PDF, et le notifier envoie l'email.
 
-CREATE VECTOR INDEX ticket_embeddings IF NOT EXISTS
-FOR (t:Ticket) ON (t.embedding)
-OPTIONS {indexConfig: {
-    `vector.dimensions`: __VECTOR_DIM__,
-    `vector.similarity_function`: 'cosine'
-}};
-\end{lstlisting}
-
-\subsection{Recherche GraphRAG}
-La requête principale \texttt{search\_similar\_incidents}, définie dans \texttt{graph/queries.py}, combine deux mécanismes :
+\section{Workflow RAG}
+La recherche GraphRAG combine deux mécanismes :
 
 \begin{enumerate}
-    \item \textbf{Recherche vectorielle} : l'incident courant est vectorisé par un provider d'embedding, puis Neo4j retourne les tickets les plus proches en termes de cosine similarity.
-    \item \textbf{Filtre de proximité de graphe} : seuls les tickets liés au même produit ou au même type de commande que l'incident courant sont conservés.
+    \item \textbf{Recherche vectorielle} : vectorisation de l'incident courant, puis recherche cosine dans Neo4j.
+    \item \textbf{Filtre de proximité de graphe} : conservation des tickets liés au même produit ou type de commande.
 \end{enumerate}
 
-Cette approche \textbf{GraphRAG} améliore la précision par rapport à une simple recherche sémantique en intégrant la structure relationnelle du graphe.
-
-\subsection{Provider d'embeddings}
-L'interface \texttt{EmbeddingProvider} définie dans \texttt{graph/embedding\_provider.py} permet de changer de provider d'embedding (Ollama, sentence-transformers, OpenAI, Voyage AI) sans modifier le reste du code. Le provider Ollama est utilisé par défaut avec le modèle \texttt{mxbai-embed-large:latest}.
-
-\section{API REST et interface utilisateur}
-
-\subsection{FastAPI et streaming SSE}
-L'API est développée avec \textbf{FastAPI}. La route \texttt{/diagnose/stream} retourne un flux d'événements Server-Sent Events (SSE), chaque événement correspondant à un nœud traversé par le graphe LangGraph. Cette approche permet au client (chatbot ou outil externe) de suivre la progression du diagnostic en temps réel.
-
-\subsection{Chatbot Next.js}
-L'interface utilisateur est un chatbot développé avec \textbf{Next.js}. Il affiche la trace d'exécution des agents, le badge de création du ticket et la carte de rapport avec le lien de téléchargement PDF.
+Cette approche améliore la précision par rapport à une simple recherche sémantique en intégrant la structure relationnelle du graphe.
 
 \section*{Conclusion}
-Ce chapitre a présenté l'architecture agentique du projet : un pipeline LangGraph modulaire, un état partagé validé par Pydantic, des agents spécialisés et un graphe de connaissances Neo4j exploitant la recherche GraphRAG. Le chapitre suivant détaille l'implémentation technique de ces composants.
+Ce chapitre a présenté le contexte du projet, l'analyse des besoins, les contraintes techniques, la méthodologie et la conception de l'architecture agentique. Le chapitre suivant détaille la réalisation technique de ces composants.

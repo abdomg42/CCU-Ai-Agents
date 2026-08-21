@@ -1,96 +1,87 @@
 % !TeX root = ../main.tex
 \addcontentsline{toc}{section}{Introduction}
 \section*{Introduction}
-Ce chapitre présente la stratégie de validation du projet, les tests automatisés mis en place, le déploiement via Docker Compose, ainsi qu'un scénario de démonstration de bout en bout.
+Ce chapitre présente les résultats obtenus et leur analyse. Nous y détaillons les fonctionnalités réalisées, illustrons les résultats par des captures d'écran, décrivons les scénarios d'utilisation, évaluons les performances, puis dressons les avantages et les limites de la solution.
 
-\section{Stratégie de test}
-
-\subsection{Tests unitaires et d'intégration}
-Le projet utilise \textbf{pytest} pour valider le fonctionnement des agents, de l'ingestion Neo4j et des requêtes GraphRAG. La configuration de pytest est définie dans \texttt{pyproject.toml} avec le mode asynchrone activé.
-
-\begin{lstlisting}[language=Python, caption={Configuration pytest dans pyproject.toml}]
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["."]
-asyncio_mode = "auto"
-\end{lstlisting}
-
-Les tests couvrent les domaines suivants :
-
-\begin{itemize}
-    \setlength\itemsep{0.1em}
-    \setlength\parskip{0pt}
-    \setlength\parsep{0pt}
-    \item \textbf{Intake} : validation du parsing heuristique.
-    \item \textbf{Contexte} : récupération du contexte client.
-    \item \textbf{Guardrail} : vérification du filtrage PII.
-    \item \textbf{Pipeline} : exécution complète du graphe en mode mock.
-    \item \textbf{Graph ingestion} : compteurs de nœuds et relations après seed.
-    \item \textbf{GraphRAG} : recherche de tickets similaires.
-\end{itemize}
-
-\subsection{Tests Neo4j}
-Les tests \texttt{test\_graph\_ingestion.py} et \texttt{test\_rag.py} nécessitent une instance Neo4j accessible. Ils seedent automatiquement le graphe et vérifient :
-
-\begin{itemize}
-    \setlength\itemsep{0.1em}
-    \setlength\parskip{0pt}
-    \setlength\parsep{0pt}
-    \item La création correcte des nœuds \texttt{Client}, \texttt{Subscription}, \texttt{Order}, \texttt{Product}, \texttt{Ticket} et \texttt{LogEvent}.
-    \item L'existence des relations attendues.
-    \item Le fonctionnement de la recherche vectorielle avec le seuil de similarité configuré.
-\end{itemize}
-
-\subsection{Golden incidents}
-Le répertoire \texttt{evaluation/golden\_incidents/} contient un ensemble de cas de test attendus. Le runner \texttt{eval\_runner.py} rejoue ces incidents, compare les résultats aux attentes et produit un rapport pass/fail avec une accuracy globale. Le processus retourne un code de sortie 0 si tous les cas passent.
+\section{Fonctionnalités réalisées}
+L'ensemble des besoins fonctionnels identifiés au chapitre 2 a été implémenté. Le tableau \ref{tab:fonctionnalites} résume le statut de chaque fonctionnalité.
 
 \begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{1.2}
-    \begin{tabular}{|l|p{8cm}|l|}
+    \begin{tabular}{|l|p{8cm}|c|}
         \hline
-        \rowcolor{iNavy} \textbf{\color{white}Cas} & \textbf{\color{white}Objectif} & \textbf{\color{white}Résultat attendu} \\ \hline
-        Coupure fibre & Valider la corrélation logs + ticket similaire & Cause fibre identifiée \\ \hline
-        Timeout CRM & Valider le contexte client et logs applicatifs & Cause CRM identifiée \\ \hline
-        SIM non provisionnée & Valider le type d'incident mobile & Cause HLR identifiée \\ \hline
-        VLAN mismatch & Valider le type d'incident LAN & Cause VLAN identifiée \\ \hline
-        Billing & Valider le fallback faible confiance & Cause indéterminée \\ \hline
+        \rowcolor{iNavy} \textbf{\color{white}ID} & \textbf{\color{white}Fonctionnalité} & \textbf{\color{white}Statut} \\ \hline
+        BF1 & Intake intelligent et normalisation de l'incident & Réalisé \\ \hline
+        BF2 & Collecte parallèle logs / contexte client / tickets & Réalisé \\ \hline
+        BF3 & Raisonnement sur la cause racine avec confiance & Réalisé \\ \hline
+        BF4 & Mapping ou création de ticket Zammad & Réalisé \\ \hline
+        BF5 & Remédiation explicative non automatique & Réalisé \\ \hline
+        BF6 & Guardrail PII et liste blanche d'actions & Réalisé \\ \hline
+        BF7 & Génération de rapport PDF & Réalisé \\ \hline
+        BF8 & Notification email et note Zammad & Réalisé \\ \hline
     \end{tabular}
-    \caption{Exemples de cas golden incidents}
-    \label{tab:golden}
+    \caption{Fonctionnalités réalisées}
+    \label{tab:fonctionnalites}
 \end{table}
 
-\section{Déploiement}
+\section{Résultats et captures d'écran}
+Les figures suivantes illustrent les principaux résultats obtenus.
 
-\subsection{Docker Compose}
-Le fichier \texttt{docker/docker-compose.yml} permet de démarrer l'ensemble des services : API FastAPI, Neo4j, Zammad, Mailhog, Splunk et Prism. Cette infrastructure facilite la démonstration de bout en bout sans dépendre d'un environnement externe.
+La figure \ref{fig:result_report} montre un exemple de rapport PDF généré par le système. Ce rapport regroupe l'incident, la cause racine déterminée, les sources consultées, la remédiation proposée et les métadonnées du diagnostic. Il constitue le livrable principal transmis à l'opérateur.
 
-\begin{lstlisting}[language=bash, caption={Démarrage de l'infrastructure}]
-cd docker
-docker compose up --build
-\end{lstlisting}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/rapport_ccu.png}
+    \caption{Rapport PDF généré}
+    \label{fig:result_report}
+\end{figure}
 
-L'API est alors accessible sur \texttt{http://127.0.0.1:8000}, Neo4j sur \texttt{http://localhost:7474}, Zammad sur \texttt{http://localhost:3000} et Mailhog sur \texttt{http://localhost:8025}.
+La figure \ref{fig:result_email} illustre l'email de notification reçu par l'opérateur, avec le rapport PDF en pièce jointe.
 
-\subsection{Seed des données}
-Une fois l'infrastructure démarrée, les commandes suivantes permettent de peupler la base Neo4j et Zammad :
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/email_sent_gmail.png}
+    \caption{Email de notification reçu}
+    \label{fig:result_email}
+\end{figure}
 
-\begin{lstlisting}[language=bash, caption={Seed des données}]
-make seed
-make seed-tickets
-make seed-zammad
-\end{lstlisting}
+La figure \ref{fig:result_zammad_interface} présente l'interface Zammad avec le ticket créé ou mis à jour par le système.
 
-\section{Scénario de démonstration}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/Zammad_inteface.png}
+    \caption{Interface Zammad}
+    \label{fig:result_zammad_interface}
+\end{figure}
 
-\subsection{Description du cas}
-Un opérateur reçoit l'incident suivant, exprimé en langage naturel :
+La figure \ref{fig:result_zammad_ticket} montre la création d'un ticket dans Zammad, avec la note interne indiquant l'envoi du rapport.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/Zammad_create_ticket.png}
+    \caption{Création d'un ticket dans Zammad}
+    \label{fig:result_zammad_ticket}
+\end{figure}
+
+La figure \ref{fig:result_neo4j} présente la visualisation du graphe de connaissances dans Neo4j Browser, avec les nœuds et relations entre clients, abonnements, commandes, produits et tickets.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/realisation_result/CapturGraph_neo4j.png}
+    \caption{Graphe de connaissances dans Neo4j Browser}
+    \label{fig:result_neo4j}
+\end{figure}
+
+\section{Scénarios d'utilisation}
+
+\subsection{Scénario 1 : Coupure fibre optique}
+Un opérateur reçoit l'incident suivant :
 
 \begin{fquote}
 Client acc-12345, service svc-fiber-12345, commande ord-2026-001. Coupure Internet fibre.
 \end{fquote}
 
-\subsection{Déroulement du diagnostic}
 Le pipeline exécute successivement les étapes suivantes :
 
 \begin{enumerate}
@@ -111,11 +102,66 @@ La démonstration peut être observée à plusieurs endroits :
     \setlength\itemsep{0.1em}
     \setlength\parskip{0pt}
     \setlength\parsep{0pt}
-    \item \textbf{Chatbot Next.js} : affichage de la trace agent et du lien de téléchargement du rapport.
-    \item \textbf{Mailhog} : réception de l'email avec le PDF en pièce jointe.
+    \item \textbf{Streamlit} : affichage de la trace agent et du lien de téléchargement du rapport.
+    \item \textbf{MailHog} : réception de l'email avec le PDF en pièce jointe.
     \item \textbf{Zammad} : ticket créé avec une note interne indiquant l'envoi du rapport.
-    \item \textbf{Neo4j Browser} : visualisation des nœuds et relations du graphe avec le style GRASS fourni.
+    \item \textbf{Neo4j Browser} : visualisation des nœuds et relations du graphe.
+\end{itemize}
+
+\section{Performances}
+
+\subsection{Tests automatisés}
+Le projet utilise \textbf{pytest} avec le mode asynchrone activé. Les tests couvrent le parsing d'incident, la récupération du contexte client, le filtrage PII, l'exécution complète du pipeline, l'ingestion Neo4j et la recherche GraphRAG.
+
+\subsection{Golden incidents}
+Le répertoire \texttt{evaluation/golden\_incidents/} contient les cas de test attendus. Le runner \texttt{eval\_runner.py} rejoue ces incidents, compare les résultats aux attentes et produit un rapport pass/fail avec une accuracy globale.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|p{7cm}|l|}
+        \hline
+        \rowcolor{iNavy} \textbf{\color{white}Cas} & \textbf{\color{white}Objectif} & \textbf{\color{white}Résultat attendu} \\ \hline
+        Coupure fibre & Valider la corrélation logs + ticket similaire & Cause fibre identifiée \\ \hline
+        Timeout CRM & Valider le contexte client et logs applicatifs & Cause CRM identifiée \\ \hline
+        SIM non provisionnée & Valider le type d'incident mobile & Cause HLR identifiée \\ \hline
+        VLAN mismatch & Valider le type d'incident LAN & Cause VLAN identifiée \\ \hline
+        Billing & Valider le fallback faible confiance & Cause indéterminée \\ \hline
+    \end{tabular}
+    \caption{Exemples de cas golden incidents}
+    \label{tab:golden}
+\end{table}
+
+\subsection{Métriques de performance}
+En mode mock, le pipeline s'exécute en quelques secondes. Le temps de réponse dépend principalement de la latence d'Ollama lorsque le LLM est activé, du temps de recherche vectorielle dans Neo4j et de la génération du PDF.
+
+\section{Avantages}
+La solution apporte plusieurs avantages par rapport au diagnostic manuel :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \textbf{Gain de temps} : agrégation automatique des sources pertinentes.
+    \item \textbf{Fiabilisation} : corrélation structurée et raisonnement guidé par les données.
+    \item \textbf{Capitalisation} : réutilisation des tickets historiques via le graphe Neo4j.
+    \item \textbf{Sécurité} : aucune action corrective automatique et filtrage des PII.
+    \item \textbf{Traçabilité} : journal d'audit de chaque exécution.
+    \item \textbf{Industrialisation} : API REST, tests automatisés et déploiement Docker.
+\end{itemize}
+
+\section{Limites}
+Certaines limites demeurent et constituent des axes d'amélioration :
+
+\begin{itemize}
+    \setlength\itemsep{0.1em}
+    \setlength\parskip{0pt}
+    \setlength\parsep{0pt}
+    \item \textbf{Données mockées} : le système s'appuie sur des données simulées, ce qui limite la généralisation à un environnement de production réel.
+    \item \textbf{LLM local} : les performances du modèle local peuvent être inférieures à celles d'un modèle cloud pour des cas complexes.
+    \item \textbf{Mode mock déterministe} : en mode \texttt{MOCK\_LLM=true}, le raisonnement est entièrement déterministe et ne bénéficie pas de la créativité du LLM.
+    \item \textbf{Couverture des cas} : le jeu de golden incidents est limité et devrait être enrichi.
 \end{itemize}
 
 \section*{Conclusion}
-Ce chapitre a présenté la stratégie de validation du projet, fondée sur des tests automatisés et des cas golden incidents, ainsi que le déploiement via Docker Compose et un scénario de démonstration de bout en bout. Le projet démontre la faisabilité d'un agent IA de diagnostic technique pour le SI CCU, tout en respectant les contraintes de sécurité et de traçabilité.
+Ce chapitre a présenté les résultats obtenus : fonctionnalités réalisées, captures d'écran, scénarios d'utilisation, performances, avantages et limites. La conclusion générale qui suit dresse le bilan du stage et les perspectives d'évolution.

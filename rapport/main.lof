@@ -3,21 +3,40 @@
 \contentsline {xchapter}{}{iii}{section*.4}%
 \contentsline {xchapter}{}{iv}{section*.6}%
 \babel@toc {french}{}\relax 
-\contentsline {xchapter}{}{iv}{section*.6}%
-\contentsline {xchapter}{}{v}{section*.7}%
-\contentsline {xchapter}{}{vi}{section*.8}%
+\contentsline {xchapter}{}{vi}{section*.6}%
+\contentsline {xchapter}{}{vii}{section*.7}%
+\contentsline {xchapter}{}{viii}{section*.8}%
 \contentsline {xchapter}{}{1}{section*.10}%
 \contentsline {xchapter}{}{2}{section*.12}%
 \babel@toc {french}{}\relax 
 \addvspace {10\p@ }
-\contentsline {xchapter}{Présentation du Projet}{2}{chapter.1}%
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Secteurs d'activité}}{4}{figure.caption.16}%
+\contentsline {xchapter}{Présentation de l'entreprise}{2}{chapter.1}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Secteurs d'activité}}{5}{figure.caption.16}%
 \contentsline {figure}{\numberline {1.2}{\ignorespaces Organigramme d'Inetum Offshore Maroc}}{5}{figure.caption.17}%
 \addvspace {10\p@ }
-\contentsline {xchapter}{Conception de l'Architecture Agentique}{9}{chapter.2}%
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Pipeline agentique du diagnostic technique CCU}}{10}{figure.caption.20}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Modèle de données du graphe Neo4j}}{12}{figure.caption.22}%
+\contentsline {xchapter}{Analyse des besoins, étude de l'existant et conception}{7}{chapter.2}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Architecture générale du système de diagnostic CCU}}{11}{figure.caption.21}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Diagramme de classe du système de diagnostic CCU}}{12}{figure.caption.23}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Modèle de données du graphe Neo4j}}{13}{figure.caption.24}%
 \addvspace {10\p@ }
-\contentsline {xchapter}{Réalisation et Implémentation}{14}{chapter.3}%
+\contentsline {xchapter}{Réalisation}{15}{chapter.3}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces LangGraph}}{16}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces FastAPI}}{16}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Neo4j}}{16}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Ollama}}{16}{figure.caption.28}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces PostgreSQL (Zammad)}}{16}{figure.caption.28}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Docker}}{16}{figure.caption.28}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces ChromaDB}}{16}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Kafka}}{16}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Zammad}}{16}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Interface chatbot Streamlit}}{19}{figure.caption.30}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Tableau de bord Streamlit}}{19}{figure.caption.31}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Liste des tickets dans Streamlit}}{20}{figure.caption.32}%
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Visualisation du graphe dans Streamlit}}{20}{figure.caption.33}%
 \addvspace {10\p@ }
-\contentsline {xchapter}{Validation, Déploiement et Démonstration}{19}{chapter.4}%
+\contentsline {xchapter}{Résultats et analyse}{21}{chapter.4}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Rapport PDF généré}}{22}{figure.caption.36}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Email de notification reçu}}{23}{figure.caption.37}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Interface Zammad}}{23}{figure.caption.38}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Création d'un ticket dans Zammad}}{24}{figure.caption.39}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Graphe de connaissances dans Neo4j Browser}}{24}{figure.caption.40}%

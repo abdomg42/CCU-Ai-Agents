@@ -1,6 +1,13 @@
 \addcontentsline{toc}{section}{Introduction}
 \section*{Introduction}
-Ce chapitre se focalise sur l’introduction de l’entreprise d’accueil ainsi que sur la contextualisation du projet. Il débutera par une présentation de l’entreprise hôte et de ses domaines d’activité. Ensuite, nous aborderons la formulation de la problématique, les objectifs du projet, et enfin, nous discuterons de la méthodologie de gestion de projet et de sa planification.
+Ce chapitre présente l'organisme d'accueil. Nous commençons par l'historique du groupe, puis nous décrivons le groupe Inetum, sa filiale marocaine Inetum Offshore Maroc, ses pôles d'expertise, ses secteurs d'activité, son organigramme ainsi que ses principaux partenaires et clients.
+
+\section{Historique de l'entreprise}
+Le groupe Inetum trouve ses racines dans l'histoire du numérique français. Initialement créé en 1970 sous le nom de GFI Informatique, le groupe a progressivement évolué pour devenir l'un des acteurs majeurs des services informatiques en Europe. Au fil des décennies, il a développé une expertise multisectorielle à travers des acquisitions stratégiques et un ancrage croissant auprès des grands comptes.
+
+En 2020, le groupe adopte officiellement le nom \textbf{Inetum}, marquant une étape importante dans sa transformation vers une ESN agile et internationale. Cette nouvelle identité reflète son ambition : accompagner les entreprises et les institutions dans leur transformation digitale en combinant proximité, excellence technique et solutions industrielles.
+
+Aujourd'hui, Inetum compte plus de 28 000 collaborateurs dans 19 pays et a réalisé un chiffre d'affaires de 2,5 Md€ en 2024. Sa filiale marocaine, Inetum Offshore Maroc, créée en 2011, constitue un pilier du développement du groupe sur le continent africain.
 
 \section{Présentation de l'organisme d'accueil}
 Cette première partie présente le groupe Inetum, ses chiffres clés ainsi que sa structure organisationnelle à l'échelle internationale et nationale.
@@ -15,7 +22,7 @@ Suisse, Espagne, Portugal, Angleterre, Pologne, Roumanie, Singapour, Dubaï, Mar
 Côte d’ivoire, Cameroun, Angola, Brésil, Colombie, Mexique, USA, Pérou et Panama.
 Avec son profil de multi-spécialiste, Inetum met au service de ses clients une combinaison
 unique de proximité, d’organisation sectorielle et de solutions de qualité industrielle. Le
-groupe qui compte plus de 28.000 collaborateurs a réalisé en 2024 un chiffre d’affaires de
+groupe qui compte plus de 28.000 collaborateurs a réalisé en 2024 un chiffre d'affaires de
 2,5 M€. Elle est implantée dans toute la France autour de trois grandes régions et avec
 plus de 40 agences.\\
 Le tableau ci-dessous regroupe les informations d'identité et les chiffres clés du groupe au niveau mondial et local :
@@ -157,95 +164,5 @@ Inetum collabore avec des partenaires technologiques de premier plan afin d’en
     \item \textbf{Royal Air Maroc :} Compagnie aérienne nationale.
 \end{itemize}
 
-
-\medskip
-\vspace{15cm}
-
-\section{Contexte du projet}
-
-\subsection{Cadre général du projet}
-Dans un secteur des télécommunications en constante mutation, les opérateurs doivent moderniser leur Système d'Information (SI) Commercial pour répondre aux attentes des clients et soutenir le déploiement de nouvelles technologies (FTTH, 4G/5G). Le programme de refonte porte sur le système \textbf{CCU} (Commande et Catalogue Unifiés), qui centralise le catalogue de produits et la gestion des commandes clients.
-
-\medskip
-
-Le projet objet de ce mémoire ne porte pas sur la migration de données, mais sur la conception d'un \textbf{agent IA de diagnostic technique} capable d'assister les équipes de support dans la résolution des incidents affectant le SI CCU. L'agent exploite les APIs \textbf{TMF620} (Product Catalog) et \textbf{TMF622} (Product Ordering) du TM Forum pour s'aligner sur les standards de l'industrie télécom.
-
-\subsection{Problématique et enjeux}
-Les équipes de support technique font face à des incidents dont l'investigation requiert de consulter plusieurs sources disjointes :
-
-\begin{itemize}
-    \setlength\itemsep{0.1em}
-    \setlength\parskip{0pt}
-    \setlength\parsep{0pt}
-    \item Les \textbf{logs réseau} et applicatifs, souvent volumineux et difficiles à interpréter rapidement.
-    \item Le \textbf{contexte client} stocké dans le CRM (statut du contrat, services actifs, historique).
-    \item Les \textbf{tickets historiques} résolus, qui contiennent une expertise précieuse mais sont difficiles à exploiter manuellement.
-\end{itemize}
-
-Cette dispersion des données engendre des temps de diagnostic longs, une dépendance forte à l'expertise humaine et un risque d'erreur. La problématique centrale est donc la suivante : \textbf{comment concevoir un système intelligent capable de corréler automatiquement ces sources pour produire un diagnostic fiable, explicable et actionnable, sans jamais exécuter d'action corrective automatique sur le SI réel ?}
-
-\subsection{Périmètre fonctionnel}
-Le périmètre du projet couvre les fonctionnalités suivantes :
-
-\begin{enumerate}
-    \item \textbf{Intake intelligent} : normalisation d'un incident exprimé en langage naturel ou structuré.
-    \item \textbf{Collecte multi-source} : récupération parallèle des logs, du contexte client et des tickets similaires.
-    \item \textbf{Raisonnement sur la cause racine} : corrélation des sources avec attribution d'un niveau de confiance.
-    \item \textbf{Gestion des tickets} : mapping ou création d'un ticket dans l'outil de ticketing (Zammad).
-    \item \textbf{Remédiation explicative} : proposition d'actions informatives (non exécutables automatiquement).
-    \item \textbf{Guardrail de contenu} : vérification PII avant envoi externe.
-    \item \textbf{Génération de rapport} : production d'un rapport PDF/HTML.
-    \item \textbf{Notification} : envoi d'email et ajout d'une note dans le ticket.
-\end{enumerate}
-
-\subsection{Objectifs du projet}
-Les objectifs du projet se déclinent en quatre axes :
-
-\begin{itemize}
-    \setlength\itemsep{0.1em}
-    \setlength\parskip{0pt}
-    \setlength\parsep{0pt}
-    \item \textbf{Centraliser l'investigation} : offrir un point d'entrée unique qui agrège les sources pertinentes à un incident.
-    \item \textbf{Fiabiliser le diagnostic} : réduire les erreurs humaines grâce à une corrélation structurée et à un raisonnement guidé par les données.
-    \item \textbf{Capitaliser l'expertise} : exploiter les tickets historiques via un graphe de connaissances et une recherche sémantique.
-    \item \textbf{Garantir la sécurité} : s'assurer qu'aucune action technique n'est exécutée automatiquement et que les données sensibles sont filtrées.
-\end{itemize}
-
-\section{Méthodologie et planification}
-
-\subsection{Choix méthodologique}
-La conduite du projet s'appuie sur une approche hybride combinant le cycle en V pour la gouvernance globale et la méthode Agile/Scrum pour l'itération technique. Cette approche permet de concilier rigueur de spécification et capacité d'adaptation face à la complexité des systèmes legacy et des modèles d'IA.
-
-Le développement a été découpé en sprints de deux à quatre semaines, avec les rituels suivants :
-
-\begin{itemize}
-    \setlength\itemsep{0.1em}
-    \setlength\parskip{0pt}
-    \setlength\parsep{0pt}
-    \item \textbf{Backlog produit} : centralisation des fonctionnalités (agents, API, ingestion, tests).
-    \item \textbf{Sprints thématiques} : intake, collecteurs, raisonnement, guardrail, reporting, notification.
-    \item \textbf{Daily stand-ups} : synchronisation rapide avec les encadrants et l'équipe technique.
-    \item \textbf{Démos et rétrospectives} : validation des livrables et amélioration continue.
-\end{itemize}
-
-\subsection{Planification}
-Le tableau \ref{tab:planning} résume les grandes phases du projet.
-
-\begin{table}[H]
-    \centering
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{|l|p{8cm}|l|}
-        \hline
-        \rowcolor{iNavy} \textbf{\color{white}Phase} & \textbf{\color{white}Description} & \textbf{\color{white}Durée} \\ \hline
-        Analyse & Étude du SI CCU, APIs TMF et sources de données & 2 semaines \\ \hline
-        Conception & Architecture agentique, modèle de données Neo4j, flux & 3 semaines \\ \hline
-        Réalisation & Implémentation des agents, API, ingestion & 5 semaines \\ \hline
-        Validation & Tests pytest, golden incidents, recette & 2 semaines \\ \hline
-        Documentation & Rédaction du rapport et démonstration & 2 semaines \\ \hline
-    \end{tabular}
-    \caption{Planification macro du projet}
-    \label{tab:planning}
-\end{table}
-
 \section*{Conclusion}
-Ce premier chapitre a présenté le contexte général du projet, l'organisme d'accueil, la problématique du diagnostic technique CCU, les objectifs et la méthodologie adoptée. Le chapitre suivant détaille la conception de l'architecture agentique et du graphe de connaissances.
+Ce premier chapitre a présenté le groupe Inetum, sa filiale Inetum Offshore Maroc, ses pôles d'expertise, ses secteurs d'activité, son organigramme ainsi que ses partenaires et clients. Le chapitre suivant aborde le contexte du projet, l'analyse des besoins et la conception de la solution.

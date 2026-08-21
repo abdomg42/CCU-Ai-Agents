@@ -1,18 +1,2 @@
 \conclusion
-Au terme de ce projet de fin d'études, réalisé au sein d'Inetum Offshore Maroc, les objectifs de conception et de réalisation d'un agent IA de diagnostic technique pour le système d'information CCU ont été atteints. Le travail mené démontre qu'il est possible de combiner orchestration agentique, graphe de connaissances et modèles de langage pour accélérer le diagnostic d'incidents télécom tout en maîtrisant les risques.
-
-\medskip
-
-La première contribution de ce projet est architecturale. Le pipeline conçu autour de \textbf{LangGraph} articule de manière modulaire les étapes d'analyse d'un incident : parsing, collecte parallèle des sources, raisonnement sur la cause racine, gestion du ticket, génération de remédiation, guardrail de contenu, production de rapport et notification. Cette décomposition en agents spécialisés facilite l'évolution, le test et l'audit du système.
-
-\medskip
-
-La seconde contribution est technique. L'intégration de \textbf{Neo4j} comme base de graphe et d'index vectoriel permet de stocker les entités métier et d'effectuer une recherche de tickets similaires combinant similarité sémantique et proximité de graphe. L'utilisation de \textbf{FastAPI}, de \textbf{Pydantic} et d'une interface d'embedding extensible assure un socle robuste et industrialisable.
-
-\medskip
-
-Enfin, la démarche de validation, fondée sur des tests automatisés avec \textbf{pytest} et un jeu de \textbf{golden incidents}, garantit la reproductibilité et la mesure de la performance du système. Le déploiement via \textbf{Docker Compose} et le scénario de bout en bout valident la faisabilité opérationnelle de la solution.
-
-\medskip
-
-Sur le plan personnel, ce projet m'a permis d'approfondir les concepts d'IA générative appliquée au support, de conception multi-agents, de bases de données graphe et de déploiement d'applications LLM en contexte entreprise. Les perspectives d'évolution incluent l'enrichissement du graphe avec des données temps réel, l'amélioration du raisonnement par LLM local et l'intégration de mécanismes de feedback humain pour affiner continuellement la qualité du diagnostic.
+Au terme de ce stage réalisé au sein d'Inetum Offshore Maroc, le projet a permis de concevoir et de développer un agent IA de diagnostic technique pour le SI CCU, en s'appuyant sur une architecture multi-agents LangGraph, un graphe de connaissances Neo4j avec recherche GraphRAG, des modèles de langage et d'embedding locaux via Ollama, et une API FastAPI. Les objectifs fonctionnels ont été atteints : intake intelligent, collecte multi-source, raisonnement sur la cause racine, gestion des tickets, remédiation explicative, guardrail de contenu, génération de rapport PDF et notification. Cette expérience m'a permis d'acquérir des compétences solides en orchestration d'agents, bases de données graphe, intégration de LLM locaux et déploiement conteneurisé, tout en prenant conscience des défis liés aux données mockées, à la performance des modèles locaux et à la couverture des cas de test. Les perspectives incluent l'enrichissement du graphe avec des données temps réel, l'amélioration du raisonnement par feedback humain et l'extension du périmètre fonctionnel à d'autres domaines du SI.

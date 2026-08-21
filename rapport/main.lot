@@ -3,24 +3,25 @@
 \contentsline {xchapter}{}{iii}{section*.4}%
 \contentsline {xchapter}{}{iv}{section*.6}%
 \babel@toc {french}{}\relax 
-\contentsline {xchapter}{}{iv}{section*.6}%
-\contentsline {xchapter}{}{v}{section*.7}%
-\contentsline {xchapter}{}{vi}{section*.8}%
+\contentsline {xchapter}{}{vi}{section*.6}%
+\contentsline {xchapter}{}{vii}{section*.7}%
+\contentsline {xchapter}{}{viii}{section*.8}%
 \contentsline {xchapter}{}{1}{section*.10}%
 \contentsline {xchapter}{}{2}{section*.12}%
 \babel@toc {french}{}\relax 
 \addvspace {10\p@ }
-\contentsline {xchapter}{Présentation du Projet}{2}{chapter.1}%
+\contentsline {xchapter}{Présentation de l'entreprise}{2}{chapter.1}%
 \contentsline {table}{\numberline {1.1}{\ignorespaces Identité et chiffres clés d'Inetum}}{3}{table.caption.14}%
-\contentsline {table}{\numberline {1.2}{\ignorespaces Fiche technique d’Inetum Offshore Maroc}}{3}{table.caption.15}%
-\contentsline {table}{\numberline {1.3}{\ignorespaces Planification macro du projet}}{8}{table.caption.18}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces Fiche technique d’Inetum Offshore Maroc}}{4}{table.caption.15}%
 \addvspace {10\p@ }
-\contentsline {xchapter}{Conception de l'Architecture Agentique}{9}{chapter.2}%
-\contentsline {table}{\numberline {2.1}{\ignorespaces Attributs de l'incident normalisé}}{11}{table.caption.21}%
+\contentsline {xchapter}{Analyse des besoins, étude de l'existant et conception}{7}{chapter.2}%
+\contentsline {table}{\numberline {2.1}{\ignorespaces Besoins fonctionnels du système}}{9}{table.caption.19}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Planification macro du projet}}{10}{table.caption.20}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Rôle des agents du pipeline}}{11}{table.caption.22}%
 \addvspace {10\p@ }
-\contentsline {xchapter}{Réalisation et Implémentation}{14}{chapter.3}%
-\contentsline {table}{\numberline {3.1}{\ignorespaces Stack technique du projet}}{14}{table.caption.24}%
-\contentsline {table}{\numberline {3.2}{\ignorespaces Principales variables d'environnement}}{17}{table.caption.25}%
+\contentsline {xchapter}{Réalisation}{15}{chapter.3}%
+\contentsline {table}{\numberline {3.1}{\ignorespaces Stack technique du projet}}{16}{table.caption.26}%
 \addvspace {10\p@ }
-\contentsline {xchapter}{Validation, Déploiement et Démonstration}{19}{chapter.4}%
-\contentsline {table}{\numberline {4.1}{\ignorespaces Exemples de cas golden incidents}}{20}{table.caption.27}%
+\contentsline {xchapter}{Résultats et analyse}{21}{chapter.4}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Fonctionnalités réalisées}}{21}{table.caption.35}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Exemples de cas golden incidents}}{26}{table.caption.41}%
